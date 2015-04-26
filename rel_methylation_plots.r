@@ -22,7 +22,7 @@ rel.dist=matrix(ifelse(cpg.sub$real.dist==0,ifelse(cpg.sub[,f1.end + 6]=="-",((c
 cpg.sub=cbind(cpg.sub,rel.dist)
 fixy=ifelse(cpg.sub$rel.dist < 0 & cpg.sub$real.dist==0,0,ifelse(cpg.sub$rel.dist >1000 & cpg.sub$real.dist==0,1000,cpg.sub$rel.dist))
 cpg.sub$rel.dist=fixy
-cpg.bin=stats.bin(cpg.sub$rel.dist,cpg.sub$V4,N=100)
+cpg.bin=stats.bin(cpg.sub$rel.dist,cpg.sub$V4,N=200)
 p.cpg.bin=cbind(matrix(cpg.bin$centers,ncol=1),cpg.bin$stats["mean",])
 
 #CHG
@@ -32,7 +32,7 @@ rel.dist=matrix(ifelse(chg.sub$real.dist==0,ifelse(chg.sub[,f1.end + 6]=="-",((c
 chg.sub=cbind(chg.sub,rel.dist)
 fixy=ifelse(chg.sub$rel.dist < 0 & chg.sub$real.dist==0,0,ifelse(chg.sub$rel.dist >1000 & chg.sub$real.dist==0,1000,chg.sub$rel.dist))
 chg.sub$rel.dist=fixy
-chg.bin=stats.bin(chg.sub$rel.dist,chg.sub$V4,N=100)
+chg.bin=stats.bin(chg.sub$rel.dist,chg.sub$V4,N=200)
 p.chg.bin=cbind(matrix(chg.bin$centers,ncol=1),chg.bin$stats["mean",])
 
 #CHH
@@ -42,7 +42,7 @@ rel.dist=matrix(ifelse(chh.sub$real.dist==0,ifelse(chh.sub[,f1.end + 6]=="-",((c
 chh.sub=cbind(chh.sub,rel.dist)
 fixy=ifelse(chh.sub$rel.dist < 0 & chh.sub$real.dist==0,0,ifelse(chh.sub$rel.dist >1000 & chh.sub$real.dist==0,1000,chh.sub$rel.dist))
 chh.sub$rel.dist=fixy
-chh.bin=stats.bin(chh.sub$rel.dist,chh.sub$V4,N=100)
+chh.bin=stats.bin(chh.sub$rel.dist,chh.sub$V4,N=200)
 p.chh.bin=cbind(matrix(chh.bin$centers,ncol=1),chh.bin$stats["mean",])
 
 #create plots
