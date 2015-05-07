@@ -30,4 +30,9 @@ closestBed -D "ref" -a ${sample}_CpG_100bp.bed -b $annotation > ${sample}_CpG_${
 echo "subsetting files"
 awk -F$'\t' '$NF<${subset} && $NF>-${subset}' ${sample}_CHG_${outname}.bed > ${sample}_CHG_${outname}.${subset}.bed
 awk -F$'\t' '$NF<${subset} && $NF>-${subset}' ${sample}_CHH_${outname}.bed > ${sample}_CHH_${outname}.${subset}.bed
-awk -F$'\t' '$NF<${subset} && $NF>-${subset}' ${filename}_CpG_${outname}.bed > ${filename}_CpG_${outname}.1k.bed
+awk -F$'\t' '$NF<${subset} && $NF>-${subset}' ${sample}_CpG_${outname}.bed > ${sample}_CpG_${outname}.${subset}.bed
+
+mkdir ${sample}.${outname}
+mv ${sample}_CpG_${outname}.${subset}.bed ${sample}.${outname}
+mv ${sample}_CHH_${outname}.${subset}.bed ${sample}.${outname}
+mv ${sample}_CHG_${outname}.${subset}.bed ${sample}.${outname}
