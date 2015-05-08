@@ -5,11 +5,10 @@
 # Provide the script WIG files of interest and an annotation file.
 
 if [ "$#" -ne 4 ]; then
-
+##############################################################################################################
 echo "USAGE: methylation_tiling.sh <filename prefix> <relative path to annotation file> <output map name> <subset>"
-
 echo "Example: methylation_tiling.sh 317-1-4 ../annotation/TAIR10_TE.bed TE 3000"
-
+###############################################################################################################
 exit 1
 fi
 
@@ -25,7 +24,7 @@ sed -e "1d" ${sample}_CHH_100bp.wig > ${sample}_CHH_100bp.bed
 echo "Performing closestBed of CHG methylation..."
 closestBed -D "ref" -a ${sample}_CHG_100bp.bed -b ${annotation} > ${sample}_CHG_${outname}.bed
 echo "Performing closestBed of CHH methylation..."
-closestBed -D "ref" -a ${sample}_CHH_100bp.bed -b ${$annotation} > ${sample}_CHH_${outname}.bed
+closestBed -D "ref" -a ${sample}_CHH_100bp.bed -b ${annotation} > ${sample}_CHH_${outname}.bed
 echo "Performing closestBed of CpG methylation..."
 closestBed -D "ref" -a ${sample}_CpG_100bp.bed -b ${annotation} > ${sample}_CpG_${outname}.bed
 
@@ -41,4 +40,4 @@ mv ${sample}_CpG_${outname}.${subset}.bed ${sample}.${outname}
 mv ${sample}_CHH_${outname}.${subset}.bed ${sample}.${outname}
 mv ${sample}_CHG_${outname}.${subset}.bed ${sample}.${outname}
 
-rm ${sample}*bed
+rm ${sample}*.bed
