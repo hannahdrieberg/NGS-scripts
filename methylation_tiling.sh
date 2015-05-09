@@ -5,10 +5,11 @@
 # Provide the script WIG files of interest and an annotation file.
 
 if [ "$#" -ne 4 ]; then
-##############################################################################################################
+echo "############################################################################################################"
 echo "USAGE: methylation_tiling.sh <filename prefix> <relative path to annotation file> <output map name> <subset>"
+echo
 echo "Example: methylation_tiling.sh 317-1-4 ../annotation/TAIR10_TE.bed TE 3000"
-###############################################################################################################
+echo "############################################################################################################"
 exit 1
 fi
 
@@ -36,8 +37,7 @@ awk -v var=${subset} -F$'\t' '$NF<var && $NF>-var' ${sample}_CpG_${outname}.bed 
 # Create directory and cleanup
 
 mkdir ${sample}_${outname}
-mv ${sample}_CpG_${outname}.${subset}.bed ${sample}.${outname}
-mv ${sample}_CHH_${outname}.${subset}.bed ${sample}.${outname}
-mv ${sample}_CHG_${outname}.${subset}.bed ${sample}.${outname}
+
+mv ${sample}*${outname}.${subset}.bed ${sample}_${outname}
 
 rm ${sample}*.bed
