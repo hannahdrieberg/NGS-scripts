@@ -6,7 +6,7 @@
 
 if [ "$#" -ne 4 ]; then
 echo "############################################################################################################"
-echo "USAGE: methylation_tiling.sh <filename prefix> <relative path to annotation file> <output map name> <subset>"
+echo "USAGE: methylation_tiling.sh <filename prefix> <relative path to annotation file> <output name> <subset>"
 echo
 echo "Example: methylation_tiling.sh 317-1-4 ../annotation/TAIR10_TE.bed TE 3000"
 echo "############################################################################################################"
