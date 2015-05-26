@@ -2,7 +2,8 @@
 
 # Script similar to bed_to_rel, however, in this case producing a file with methylation values at features
 # of interest identified with an annotation file. e.g. Methylation near and across all protein coding genes.
-# Provide the script WIG files of interest and an annotation file.
+# Provide the script WIG files of interest and an annotation file. Should be able to run in directory that
+# contains all alignment output, along with WIG file.
 
 if [ "$#" -ne 4 ]; then
 echo "############################################################################################################"
@@ -44,8 +45,9 @@ awk -v var=${subset} -F$'\t' '$NF<var && $NF>-var' ${sample}_CpG_${outname}.bed 
 
 # Create directory and cleanup
 
-mkdir ${sample}_${outname}
+mkdir Methylation_tiling_${sample}_${outname}
 
 mv ${sample}*${outname}.${subset}.bed ${sample}_${outname}
 
-rm ${sample}*.bed
+rm ${sample}*_100bp.bed
+rm ${sample}*_${outname}.bed
