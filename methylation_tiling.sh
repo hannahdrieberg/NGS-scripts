@@ -13,14 +13,20 @@ echo "##########################################################################
 exit 1
 fi
 
+# define arguments
+
 sample=$1
 annotation=$2
 outname=$3
 subset=$4
 
+# convert wig files to bed files
+
 sed -e "1d" ${sample}_CpG_100bp.wig > ${sample}_CpG_100bp.bed
 sed -e "1d" ${sample}_CHG_100bp.wig > ${sample}_CHG_100bp.bed
 sed -e "1d" ${sample}_CHH_100bp.wig > ${sample}_CHH_100bp.bed
+
+# use bedtools to determing methylation at annotation features
 
 echo "Performing closestBed of CHG methylation..."
 closestBed -D "ref" -a ${sample}_CHG_100bp.bed -b ${annotation} > ${sample}_CHG_${outname}.bed
@@ -28,6 +34,8 @@ echo "Performing closestBed of CHH methylation..."
 closestBed -D "ref" -a ${sample}_CHH_100bp.bed -b ${annotation} > ${sample}_CHH_${outname}.bed
 echo "Performing closestBed of CpG methylation..."
 closestBed -D "ref" -a ${sample}_CpG_100bp.bed -b ${annotation} > ${sample}_CpG_${outname}.bed
+
+# subset files to desired length
 
 echo "subsetting files"
 awk -v var=${subset} -F$'\t' '$NF<var && $NF>-var' ${sample}_CHG_${outname}.bed > ${sample}_CHG_${outname}.${subset}.bed
