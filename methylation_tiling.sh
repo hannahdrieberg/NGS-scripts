@@ -31,8 +31,10 @@ sed -e "1d" ${sample}_CHH_100bp.wig > ${sample}_CHH_100bp.bed
 
 echo "Performing closestBed of CHG methylation..."
 closestBed -D "ref" -a ${sample}_CHG_100bp.bed -b ${annotation} > ${sample}_CHG_${outname}.bed
+
 echo "Performing closestBed of CHH methylation..."
 closestBed -D "ref" -a ${sample}_CHH_100bp.bed -b ${annotation} > ${sample}_CHH_${outname}.bed
+
 echo "Performing closestBed of CpG methylation..."
 closestBed -D "ref" -a ${sample}_CpG_100bp.bed -b ${annotation} > ${sample}_CpG_${outname}.bed
 
@@ -45,9 +47,11 @@ awk -v var=${subset} -F$'\t' '$NF<var && $NF>-var' ${sample}_CpG_${outname}.bed 
 
 # Create directory and cleanup
 
+echo "Create directory and clean up leftoever files"
 mkdir Methylation_tiling_${sample}_${outname}
+mv ${sample}*${outname}.${subset}.bed Methylation_tiling_${sample}_${outname}
 
-mv ${sample}*${outname}.${subset}.bed ${sample}_${outname}
+# delete leftovers
 
 rm ${sample}*_100bp.bed
 rm ${sample}*_${outname}.bed
