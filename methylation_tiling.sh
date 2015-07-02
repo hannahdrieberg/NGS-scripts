@@ -27,7 +27,7 @@ sed -e "1d" ${sample}_CpG_100bp.wig > ${sample}_CpG_100bp.bed
 sed -e "1d" ${sample}_CHG_100bp.wig > ${sample}_CHG_100bp.bed
 sed -e "1d" ${sample}_CHH_100bp.wig > ${sample}_CHH_100bp.bed
 
-# use bedtools to determing methylation at annotation features
+# use bedtools to determine methylation at annotation features
 
 echo "Performing closestBed of CHG methylation..."
 closestBed -D "ref" -a ${sample}_CHG_100bp.bed -b ${annotation} > ${sample}_CHG_${outname}.bed
