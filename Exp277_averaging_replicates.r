@@ -18,13 +18,12 @@ args=commandArgs(trailingOnly=T)
 
 library(plyr)
 library(reshape2)
-library(ggplot2)
-library(gplots)
 library(limma)
+library(gplots)
 library(fields)
 library(RColorBrewer)
 
-a <- dir(pattern = paste0(args[1]))
+a <- dir(pattern = past0(args[1]))
 out <- NULL
 for(i in 1:length(a)){
 input=read.delim(a[i], head=F)
