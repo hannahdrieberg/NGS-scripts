@@ -45,13 +45,7 @@ awk -v var=${subset} -F$'\t' '$NF<var && $NF>-var' ${sample}_CHG_${outname}.bed 
 awk -v var=${subset} -F$'\t' '$NF<var && $NF>-var' ${sample}_CHH_${outname}.bed > ${sample}_CHH_${outname}.${subset}.bed
 awk -v var=${subset} -F$'\t' '$NF<var && $NF>-var' ${sample}_CpG_${outname}.bed > ${sample}_CpG_${outname}.${subset}.bed
 
-# Create directory and cleanup
-
-echo "Create directory and clean up leftoever files"
-mkdir Methylation_tiling_${sample}_${outname}
-mv ${sample}*${outname}.${subset}.bed Methylation_tiling_${sample}_${outname}
-
-# delete leftovers
-
+# Cleanup intermediates
+echo "Clean up intermediates"
 rm ${sample}*_100bp.bed
 rm ${sample}*_${outname}.bed
