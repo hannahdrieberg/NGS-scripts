@@ -68,7 +68,7 @@ out.v2=dcast(out.body, V12 ~ factor(rel.dist)+Treatment+context, mean, value.var
 # Heatmaps of CpG, CHH and CHG methylation within loci body
 for(w in unique(out.body$Treatment)){
   e <- out.body[out.body$Treatment == w,]
-  pdf(file = paste("./Heatmap_",paste(args[1]),"_",w,".pdf"))
+  pdf(file = paste("heatmap_",p,"_",w,".pdf"))
   for(i in unique(e$context)){
     q <- dcast(e[e$context == i,], V12 ~ factor(rel.dist), mean, value.var = "Prop_met")
     rownames(q) <- q[,1]
@@ -110,7 +110,7 @@ out.upstream <- subset(out.reps,out.reps$real.dist < 0)
 
 for(w in unique(out.upstream$Treatment)){
 e <- out.upstream[out.upstream$Treatment == w,]
-pdf(file = paste("./Heatmap_",paste(args[1]),"_",w,".pdf"))
+pdf(file = paste("heatmap_",p,"_",w,".pdf"))
   for(i in unique(e$context)){
   q <- dcast(e[e$context == i,], V12 ~ factor(real.dist), mean, value.var = "Prop_met")
   rownames(q) <- q[,1]
@@ -151,7 +151,7 @@ out.downstream <- subset(out.reps,out.reps$real.dist > 0)
 
 for(w in unique(out.downstream$Treatment)){
 e <- out.downstream[out.downstream$Treatment == w,]
-pdf(file = paste("Figures/Heatmap_",paste(args[1]),"_",w,".pdf"))
+pdf(file = paste("heatmap_",p,"_",w,".pdf"))
   for(i in unique(e$context)){
   q <- dcast(e[e$context == i,], V12 ~ factor(real.dist), mean, value.var = "Prop_met")
   rownames(q) <- q[,1]
