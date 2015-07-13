@@ -5,7 +5,7 @@
 
 
 if [ "$#" -ne 1 ]; then
-echo "############################################################################################################"
+echo "#######################################################################################################"
 echo "Run in directory containing bed files of interest --> output from methylation_tiling.sh"
 echo "BED filenames must have structure: _<context>_DMRs_<annotation>_<subset>.bed"
 echo "USAGE: heatmap.sh <annotation name>"
@@ -13,7 +13,7 @@ echo "Note: annotation name should be the output name given to bed files from me
 echo "Example: heatmap.sh TE"
 echo "Change R script depending on experiment/samples --> treatment defined here: line 37"
 echo "Check R script also for output heatmap file names"
-echo "############################################################################################################"
+echo "#######################################################################################################"
 exit 1
 fi
 
