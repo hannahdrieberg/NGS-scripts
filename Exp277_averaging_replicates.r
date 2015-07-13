@@ -15,6 +15,7 @@
 # make sure to have files of a particular feature there or make sure naming is appropriate
 
 args=commandArgs(trailingOnly=T)
+print(args)
 
 library(plyr)
 library(reshape2)
@@ -23,7 +24,9 @@ library(gplots)
 library(fields)
 library(RColorBrewer)
 
-a <- dir(pattern = past0(args[1]))
+p <- substr(args, start = 0, stop = nchar(args[1]))
+
+a <- dir(pattern = p)
 out <- NULL
 for(i in 1:length(a)){
 input=read.delim(a[i], head=F)
@@ -65,7 +68,7 @@ out.v2=dcast(out.body, V12 ~ factor(rel.dist)+Treatment+context, mean, value.var
 # Heatmaps of CpG, CHH and CHG methylation within loci body
 for(w in unique(out.body$Treatment)){
   e <- out.body[out.body$Treatment == w,]
-  pdf(file = paste0("./Heatmap_",paste0(args[1]),"_",w,".pdf"))
+  pdf(file = paste("./Heatmap_",paste(args[1]),"_",w,".pdf"))
   for(i in unique(e$context)){
     q <- dcast(e[e$context == i,], V12 ~ factor(rel.dist), mean, value.var = "Prop_met")
     rownames(q) <- q[,1]
@@ -78,25 +81,24 @@ for(w in unique(out.body$Treatment)){
               Colv=NULL,
               trace='none',
               key=T,
-              main = paste0(i),
+              main = paste(i),
               labRow=F, 
               breaks=c(seq(-1,0,length=1),
-                       seq(0,10,length=10),
-                       seq(10,20,length=10),
-                       seq(20,30,length=10),
-                       seq(30,40,length=10),
-                       seq(40,50,length=10),
-                       seq(50,60,length=10),
-                       seq(60,70,length=10),
-                       seq(70,80,length=10),
-                       seq(80,90,length=10),
-                       seq(90,100,length=10)),
+                       seq(1,10,length=10),
+                       seq(11,20,length=10),
+                       seq(21,30,length=10),
+                       seq(31,40,length=10),
+                       seq(41,50,length=10),
+                       seq(51,60,length=10),
+                       seq(61,70,length=10),
+                       seq(71,80,length=10),
+                       seq(81,90,length=10),
+                       seq(91,100,length=10)),
               symm=F,
               symkey=F,
               symbreaks = T,
               cexCol = 1,
-              col=colorRampPalette(c("white",
-                                     "blue"))(100))
+              col=colorRampPalette(c("white","blue"))(100))
   }
   dev.off()
 }
@@ -108,7 +110,7 @@ out.upstream <- subset(out.reps,out.reps$real.dist < 0)
 
 for(w in unique(out.upstream$Treatment)){
 e <- out.upstream[out.upstream$Treatment == w,]
-pdf(file = paste0("./Heatmap_",paste0(args[1]),"_",w,".pdf"))
+pdf(file = paste("./Heatmap_",paste(args[1]),"_",w,".pdf"))
   for(i in unique(e$context)){
   q <- dcast(e[e$context == i,], V12 ~ factor(real.dist), mean, value.var = "Prop_met")
   rownames(q) <- q[,1]
@@ -124,16 +126,16 @@ pdf(file = paste0("./Heatmap_",paste0(args[1]),"_",w,".pdf"))
           main = paste0(i),
           labRow=F, 
           breaks=c(seq(-1,0,length=1),
-                    seq(0,10,length=10),
-                   seq(10,20,length=10),
-                   seq(20,30,length=10),
-                   seq(30,40,length=10),
-                   seq(40,50,length=10),
-                   seq(50,60,length=10),
-                   seq(60,70,length=10),
-                   seq(70,80,length=10),
-                   seq(80,90,length=10),
-                   seq(90,100,length=10)),
+                    seq(1,10,length=10),
+                   seq(11,20,length=10),
+                   seq(21,30,length=10),
+                   seq(31,40,length=10),
+                   seq(41,50,length=10),
+                   seq(51,60,length=10),
+                   seq(61,70,length=10),
+                   seq(71,80,length=10),
+                   seq(81,90,length=10),
+                   seq(91,100,length=10)),
           symm=F,
           symkey=F,
           symbreaks = T,
@@ -149,7 +151,7 @@ out.downstream <- subset(out.reps,out.reps$real.dist > 0)
 
 for(w in unique(out.downstream$Treatment)){
 e <- out.downstream[out.downstream$Treatment == w,]
-pdf(file = paste0("Figures/Heatmap_",paste0(args[1]),"_",w,".pdf"))
+pdf(file = paste("Figures/Heatmap_",paste(args[1]),"_",w,".pdf"))
   for(i in unique(e$context)){
   q <- dcast(e[e$context == i,], V12 ~ factor(real.dist), mean, value.var = "Prop_met")
   rownames(q) <- q[,1]
@@ -165,16 +167,16 @@ pdf(file = paste0("Figures/Heatmap_",paste0(args[1]),"_",w,".pdf"))
           main = paste0(i),
           labRow=F, 
           breaks=c(seq(-1,0,length=1),
-                    seq(0,10,length=10),
-                   seq(10,20,length=10),
-                   seq(20,30,length=10),
-                   seq(30,40,length=10),
-                   seq(40,50,length=10),
-                   seq(50,60,length=10),
-                   seq(60,70,length=10),
-                   seq(70,80,length=10),
-                   seq(80,90,length=10),
-                   seq(90,100,length=10)),
+                    seq(1,10,length=10),
+                   seq(11,20,length=10),
+                   seq(21,30,length=10),
+                   seq(31,40,length=10),
+                   seq(41,50,length=10),
+                   seq(51,60,length=10),
+                   seq(61,70,length=10),
+                   seq(71,80,length=10),
+                   seq(81,90,length=10),
+                   seq(91,100,length=10)),
           symm=F,
           symkey=F,
           symbreaks = T,
