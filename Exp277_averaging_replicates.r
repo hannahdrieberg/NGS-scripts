@@ -110,7 +110,7 @@ out.upstream <- subset(out.reps,out.reps$real.dist < 0)
 
 for(w in unique(out.upstream$Treatment)){
 e <- out.upstream[out.upstream$Treatment == w,]
-pdf(file = paste("heatmap_",p,"_",w,".pdf"))
+pdf(file = paste("heatmap_",p,"_",w,"_upstream.pdf"))
   for(i in unique(e$context)){
   q <- dcast(e[e$context == i,], V12 ~ factor(real.dist), mean, value.var = "Prop_met")
   rownames(q) <- q[,1]
@@ -151,7 +151,7 @@ out.downstream <- subset(out.reps,out.reps$real.dist > 0)
 
 for(w in unique(out.downstream$Treatment)){
 e <- out.downstream[out.downstream$Treatment == w,]
-pdf(file = paste("heatmap_",p,"_",w,".pdf"))
+pdf(file = paste("heatmap_",p,"_",w,"_downstream.pdf"))
   for(i in unique(e$context)){
   q <- dcast(e[e$context == i,], V12 ~ factor(real.dist), mean, value.var = "Prop_met")
   rownames(q) <- q[,1]
