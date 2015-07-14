@@ -77,8 +77,6 @@ for(w in unique(out.body$Treatment)){
     w[is.na(w)] <- -10
     heatmap.2(w,
               dendrogram="none", 
-              Rowv=NULL,
-              Colv=NULL,
               trace='none',
               key=T,
               main = paste(i),
@@ -119,8 +117,6 @@ pdf(file = paste("heatmap_",p,"_",w,"_upstream.pdf"))
   w[is.na(w)] <- -10
     heatmap.2(w,
           dendrogram="none", 
-          Rowv=NULL,
-          Colv=NULL,
           trace='none',
           key=T,
           main = paste0(i),
@@ -160,8 +156,6 @@ pdf(file = paste("heatmap_",p,"_",w,"_downstream.pdf"))
   w[is.na(w)] <- -10
     heatmap.2(w,
           dendrogram="none", 
-          Rowv=NULL,
-          Colv=NULL,
           trace='none',
           key=T,
           main = paste0(i),
