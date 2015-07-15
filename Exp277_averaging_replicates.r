@@ -44,9 +44,9 @@ input$context <- substr(x = as.character(a[i]), start = y+1, stop = y+3)
 out <- rbind(input, out)
 }
 ########################################################################
-out$Treatment <- factor(ifelse(test = out$sample == "D7" | 
-                          out$sample == "D8" |
-                          out$sample == "D9", "Drought", "Control"))
+out$Treatment <- factor(ifelse(test = out$sample == "277-D7" | 
+                          out$sample == "277-D8" |
+                          out$sample == "277-D9", "Drought", "Control"))
 ########################################################################
 # average reps
 out.reps <- ddply(out, .(V1,V2,V3,V9,V10,V11,V12,V13,V14,V15,real.dist,Treatment,context), summarise,
@@ -78,7 +78,8 @@ for(w in unique(out.body$Treatment)){
     heatmap.2(w,
               dendrogram="none", 
               trace='none',
-              key=T,
+              Colv=NULL,
+	      key=T,
               main = paste(i),
               labRow=F, 
               breaks=c(seq(-1,0,length=1),
@@ -117,6 +118,7 @@ pdf(file = paste("heatmap_",p,"_",w,"_upstream.pdf"))
   w[is.na(w)] <- -10
     heatmap.2(w,
           dendrogram="none", 
+	  Colv=NULL,
           trace='none',
           key=T,
           main = paste0(i),
@@ -157,6 +159,7 @@ pdf(file = paste("heatmap_",p,"_",w,"_downstream.pdf"))
     heatmap.2(w,
           dendrogram="none", 
           trace='none',
+	  Colv=NULL,
           key=T,
           main = paste0(i),
           labRow=F, 
