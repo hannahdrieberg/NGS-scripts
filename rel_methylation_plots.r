@@ -23,7 +23,7 @@ cpg.sub=cbind(cpg.sub,rel.dist)
 fixy=ifelse(cpg.sub$rel.dist < 0 & cpg.sub$real.dist==0,0,ifelse(cpg.sub$rel.dist >1000 & cpg.sub$real.dist==0,1000,cpg.sub$rel.dist))
 cpg.sub$rel.dist=fixy
 cpg.bin=stats.bin(cpg.sub$rel.dist,cpg.sub$V4,N=200)
-p.cpg.bin=cbind(matrix(cpg.bin$centers,ncol=1),cpg.bin$stats["mean",])
+p.cpg.bin=cbind(matrix(cpg.bin$centers,ncol=1),cpg.bin$stats["N",])
 
 #CHG
 real.dist=matrix(ifelse(chg.sub[,f1.end + 6]=='+',-1*chg.sub[,f1.end + f2.end],chg.sub[,f1.end + f2.end]),ncol=1)
@@ -33,7 +33,7 @@ chg.sub=cbind(chg.sub,rel.dist)
 fixy=ifelse(chg.sub$rel.dist < 0 & chg.sub$real.dist==0,0,ifelse(chg.sub$rel.dist >1000 & chg.sub$real.dist==0,1000,chg.sub$rel.dist))
 chg.sub$rel.dist=fixy
 chg.bin=stats.bin(chg.sub$rel.dist,chg.sub$V4,N=200)
-p.chg.bin=cbind(matrix(chg.bin$centers,ncol=1),chg.bin$stats["mean",])
+p.chg.bin=cbind(matrix(chg.bin$centers,ncol=1),chg.bin$stats["N",])
 
 #CHH
 real.dist=matrix(ifelse(chh.sub[,f1.end + 6]=='+',-1*chh.sub[,f1.end + f2.end],chh.sub[,f1.end + f2.end]),ncol=1)
@@ -43,7 +43,7 @@ chh.sub=cbind(chh.sub,rel.dist)
 fixy=ifelse(chh.sub$rel.dist < 0 & chh.sub$real.dist==0,0,ifelse(chh.sub$rel.dist >1000 & chh.sub$real.dist==0,1000,chh.sub$rel.dist))
 chh.sub$rel.dist=fixy
 chh.bin=stats.bin(chh.sub$rel.dist,chh.sub$V4,N=200)
-p.chh.bin=cbind(matrix(chh.bin$centers,ncol=1),chh.bin$stats["mean",])
+p.chh.bin=cbind(matrix(chh.bin$centers,ncol=1),chh.bin$stats["N",])
 
 #create plots
 pdf(paste(args[1],'_',args[2],'_methylation.pdf',sep=''),h=10,w=12)
