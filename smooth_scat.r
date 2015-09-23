@@ -18,8 +18,8 @@ c$length <- c$V7 - c$V6
 
 pdf(file=paste0(args[1],"_",args[2],".pdf"))
 par(mfrow=c(2,2))
-smoothScatter(x=a$length, y=a$V4, ylab="CpG Methylation", xlab="TE Length (bp)")
-smoothScatter(x=b$length, y=b$V4, ylab="CHG Methylation", xlab="TE Length (bp)")
-smoothScatter(x=c$length, y=c$V4, ylab="CHH Methylation", xlab="TE Length (bp)")
+smoothScatter(x=a$length, y=a$V4, ylab="CpG Methylation", xlab="TE Length (bp)", colramp = colorRampPalette(c("royalblue", "yellow", "red")))
+smoothScatter(x=b$length, y=b$V4, ylab="CHG Methylation", xlab="TE Length (bp)", colramp = colorRampPalette(c("royalblue", "yellow", "red")))
+smoothScatter(x=c$length, y=c$V4, ylab="CHH Methylation", xlab="TE Length (bp)", colramp = colorRampPalette(c("royalblue", "yellow", "red")))
 dev.off()
 
