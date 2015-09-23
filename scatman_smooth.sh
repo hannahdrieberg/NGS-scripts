@@ -16,13 +16,16 @@ outname=$3
 
 # intersect bed files with annotation file
 echo "Performing intersectBed of CHG methylation..."
-intersectBed -wa -wb -a ${filename}_CHG_100bp.bed -b $bedpath > ${filename}_CHG_${outname}.bed
+intersectBed -wa -wb -a ${sample}_CHG.bed -b $annotation > ${sample}_CHG_${outname}.bed
 echo "Performing intersectBed of CHH methylation..."
-intersectBed -wa -wb -a ${filename}_CHH_100bp.bed -b $bedpath > ${filename}_CHH_${outname}.bed
+intersectBed -wa -wb -a ${sample}_CHH.bed -b $annotation > ${sample}_CHH_${outname}.bed
 echo "Performing intersectBed of CpG methylation..."
-intersectBed -wa -wb -a ${filename}_CpG_100bp.bed -b $bedpath > ${filename}_CpG_${outname}.bed
+intersectBed -wa -wb -a ${sample}_CpG.bed -b $annotation > ${sample}_CpG_${outname}.bed
 
 # take output and produce smoothed scatterplots
 echo "Performing scatterSmooth in R"
 
-Rscript $HOME/scripts/smooth_scat.r ${filename} ${outname}
+Rscript $HOME/scripts/smooth_scat.r ${sample} ${outname}
+
+echo "cleanup intermediates"
+rm ${sample}_*_${outname}.bed
