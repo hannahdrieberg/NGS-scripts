@@ -4,7 +4,9 @@ options(echo=T)
 args=commandArgs(trailingOnly=T)
 print(args)
 
-files=dir(pattern=paste0(args[1],"*.bismark.cov")
+context = args[1]
+
+files=dir(pattern=paste0(context,".bed.bismark.cov"))
 data <- read.delim(files[1], head=F)
 data[,7] <- data[,5] + data[,6]
 data <- data[,c(1,2,5,7)]
@@ -21,5 +23,5 @@ temp <- merge(data,file, by=c('Chr','Pos'), all=T)
 data=temp
 }
 
-write.table(data, file=paste0(substr(as.character(files[1], start=1, stop=4, "_output.bed"), 
-	sep='\t', quote = F, col.names=T, row.names=F)
+write.table(data, file=paste0(substr(as.character(files[1]), start=1, stop=3),"_",
+			paste0(context),"_output.bed"),sep='\t', quote = F, col.names=T, row.names=F)
