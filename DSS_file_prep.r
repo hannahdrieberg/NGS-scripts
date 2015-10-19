@@ -20,6 +20,6 @@ file[,7] <- file[,5] + file[,6]
 file <- file[,c(1,2,7,5)]
 test <- as.numeric(regexec(text = as.character(files[i]), pattern=".bed"))
 sample <- substr(as.character(files[i]), start = 1, stop = test-1)
-colnames(file)=c('Chr','Pos','N','X'))
+colnames(file)=c('Chr','Pos','N','X')
 write.table(x=file, file=paste0(sample,"_output.txt"),sep='\t', quote = F, col.names=T, row.names=F)
 }
