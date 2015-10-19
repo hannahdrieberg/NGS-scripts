@@ -4,24 +4,22 @@ options(echo=T)
 args=commandArgs(trailingOnly=T)
 print(args)
 
+
+## mC context to test
 context = args[1]
 
+## get cov files 
 files=dir(pattern=paste0(context,".bed.bismark.cov"))
-data <- read.delim(files[1], head=F)
-data[,7] <- data[,5] + data[,6]
-data <- data[,c(1,2,5,7)]
-sample <- substr(as.character(files[1]), start = 1, stop = 12)
-colnames(data)=c('Chr','Pos', paste0(sample, '_count_met'),paste0(sample,'_count_total'))
 
-for(i in 2:length(files)){
+## get total and met counts for each sample in given context and write out as separate files
+for(i in 1:length(files)){
 file <- read.delim(files[i], head=F)
+file <- file[file$V1 != "Mt",]
+file <- file[file$V1 != "Pt",]
 file[,7] <- file[,5] + file[,6]
-file <- file[,c(1,2,5,7)]
-sample <- substr(as.character(files[i]), start = 1, stop = 12)
-colnames(file)=c('Chr','Pos', paste0(sample, '_count_met'),paste0(sample,'_count_total'))
-temp <- merge(data,file, by=c('Chr','Pos'), all=T)
-data=temp
+file <- file[,c(1,2,7,5)]
+test <- as.numeric(regexec(text = as.character(files[i]), pattern=".bed"))
+sample <- substr(as.character(files[i]), start = 1, stop = test-1)
+colnames(file)=c('Chr','Pos', paste0(sample, '_total'),paste0(sample,'_met'))
+write.table(x=file, file=paste0(sample,"_output.txt"),sep='\t', quote = F, col.names=T, row.names=F)
 }
-
-write.table(data, file=paste0(substr(as.character(files[1]), start=1, stop=3),"_",
-			paste0(context),"_output.bed"),sep='\t', quote = F, col.names=T, row.names=F)
