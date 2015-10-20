@@ -1,6 +1,5 @@
 options(echo=T)
 args=commandArgs(trailingOnly=T)
-library("DSS")
 print(args)
 
 # install DSS
@@ -14,6 +13,7 @@ group1 = args[3]
 group2 = args[4]
 
 library(DSS)
+library(bsseq)
 
 #read in files, edited from DSS_file_prep.sh.
 files <- dir(pattern = paste0(context,".output")
