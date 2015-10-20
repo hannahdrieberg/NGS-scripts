@@ -13,7 +13,6 @@ pvalue = args[2]
 group1 = args[3]
 group2 = args[4]
 
-library(bsseq)
 library(DSS)
 
 #read in files, edited from DSS_file_prep.sh.
@@ -23,6 +22,10 @@ files <- dir(pattern = paste0(context,".output"))
 control <- list(files[5:8])
 el1hr <- list(files[9:12])
 el1hr_rec <- list(files[1:4])
+
+# define group 1 and group 2 for comparison
+group1 = control
+group2 = el1hr
 
 # read input files in DSS format (chr, pos, N, X)
 dat1.1 <- read.delim(unlist(group1)[1])
