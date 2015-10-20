@@ -12,16 +12,16 @@ pvalue = args[2]
 group1 = args[3]
 group2 = args[4]
 
-library(DSS)
 library(bsseq)
+library(DSS)
 
 #read in files, edited from DSS_file_prep.sh.
-files <- dir(pattern = paste0(context,".output")
+files <- dir(pattern = paste0(context,".output"))
 
 # setup treatment lists
-control <- list(files[1:4])
+control <- list(files[5:8])
 el1hr <- list(files[9:12])
-el1hr_rec <- list(files[5:11])
+el1hr_rec <- list(files[1:4])
 
 # read input files in DSS format (chr, pos, N, X)
 dat1.1 <- read.delim(unlist(group1)[1])
