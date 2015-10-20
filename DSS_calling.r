@@ -1,3 +1,4 @@
+# not quite working automatically, need to enter manually
 options(echo=T)
 args=commandArgs(trailingOnly=T)
 print(args)
