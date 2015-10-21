@@ -2,7 +2,8 @@
 
 flist=dir(pattern="bismark")
 
-for(i in c(15,18,21,24)){
+# for(i in c(15,18,21,24)){
+for (i in 1:length(flist)){
 cov=read.delim(flist[i],head=F)
 cov$V2=cov$V2-1
 cov$id=seq(1:nrow(cov))
