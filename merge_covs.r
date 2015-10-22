@@ -1,11 +1,11 @@
-# merge wigs to make pairwise correlation matrices
+# merge cov files to make pairwise correlation matrices per cytosine base
 
-files=dir(pattern="*.wig")
-data <- read.delim(files[1], head=F, skip=1)
+files=dir(pattern="*.bed.bismark.cov")
+data <- read.delim(files[1], head=F)
 data <- data[,1:4]
 colnames(data)=c('V1','V2','V3',paste(files[1],'_prop',sep=''))
 for(i in 2:length(files)){
-file=read.delim(files[i],head=F,skip=1)
+file=read.delim(files[i],head=F)
 file=file[,1:4]
 colnames(file)=c('V1','V2','V3',paste(files[i],'_prop',sep=''))
 temp=merge(data,file,by=c('V1','V2','V3'),all=T)
