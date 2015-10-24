@@ -39,13 +39,26 @@ dat2.3 <- read.delim(unlist(group2)[3])
 dat2.4 <- read.delim(unlist(group2)[4])
 
 # setup bsseq object
-BSobj <- makeBSseqData(list(dat1.1,dat1.2,dat1.3,dat1.4,dat2.1,dat2.2,dat2.3,dat2.4), sampleNames =c("C1","C2","C3","C4","N1","N2","N3","N4"))
+BSobj <- makeBSseqData(list(dat1.1,dat1.2,dat1.3,dat1.4,
+			    dat2.1,dat2.2,dat2.3), 
+	      sampleNames=c("C1","C2","C3","C4",
+		 	    "N1","N2","N3"))
 
-# perform dml testing
-dmlTest <- DMLtest(BSobj, group1=c("C1","C2","C3","C4"), group2=c("N1","N2","N3","N4"), smoothing=FALSE)
+
+##################################
+# DML testing without smoothing
+dmlTest <- DMLtest(BSobj, group1=c("C1","C2","C3","C4"), group2=c("N1","N2","N3"), smoothing=FALSE)
+####################################
+
+#############################################################
+# perform dml testing with smoothing
+dmlTest <- DMLtest(BSobj, group1=c("C1","C2","C3","C4"), group2=c("N1","N2","N3"), smoothing=TRUE, smoothing.span = 200)
+###############################################################
+
 
 # identify DMRs based on dmltesting
-dmrs <- callDMR(dmlTest, p.threshold=pvalue)
+dmrs <- callDMR(dmlTest, delta=0.1, minlen=50, minCG=3, pct.sig=0.5, dis.merge=50, p.threshold=pvalue)
+dmrs <- callDMR(dmlTest, delta=0.1, minlen=50, minCG=3, pct.sig=0.5, dis.merge=50, p.threshold=0.05)
 
 # write output. as bedfile so can use bedtools for later analyses
 file1=paste0(group1, "vs", group2, "_",context, "_", "p=", pvalue, ".bed")
