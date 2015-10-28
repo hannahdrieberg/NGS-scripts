@@ -2,7 +2,8 @@
 
 # Observe whether annotation feature length correlates with methylation level (technical bias).
 # E.g. Do longer TEs have higher levels of methylation? 
-# intersect bed file with annotation file, then produce scattersmooth plot of methylation level by length of feature.
+# Intersect bed file with annotation file;
+# Produce scattersmooth plot of methylation level vs feature length.
 
 if [ "$#" -ne 3 ]; then
 echo "scatman_smooth.sh annotation sample outname"
