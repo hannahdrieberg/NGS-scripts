@@ -1,0 +1,19 @@
+# In R make IGV formatted file
+
+flist=dir(pattern="bismark")
+
+# for(i in c(15,18,21,24)){
+for (i in 1:length(flist)){
+cov=read.delim(flist[i],head=F)
+cov$V2=cov$V2-1
+cov$id=seq(1:nrow(cov))
+cov=cov[,c(1,2,3,7,4)]
+write.table(cov,paste(flist[i],".igv",sep=''),sep='\t',row.names=F,quote=F)
+}
+
+# use igvtools to make tdf files of IGV data from the command line
+
+for FILE in *.igv
+do
+java -Xmx26g -Djava.awt.headless=true -jar /home/diep/bin/IGVTools/igvtools.jar toTDF $FILE ${FILE}.tdf /home/diep/bin/IGVTools/genomes/TAIR10_All.genome
+done

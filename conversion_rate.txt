@@ -1,0 +1,20 @@
+
+Now, here is a simple one line script that can provide the overall conversion rate of each sample:
+
+grep "Pt" *CHH.bed.bismark.cov | awk '{ met+= $5} { unmet += $6} { total = met + unmet } END {print 100-((met / total)*100)}'
+
+Run that line when you are in any of the '5_output_files' folders and it should spit out the conversion rate (0-100%)
+
+How this is calculated:
+
+So in plants the chloroplast does not contain methylated DNA. Therefore from our cov files, perfect conversion should make all the reads aligning to the chloroplast come up as 'unmethylated'. This script goes into the CHH cov file (although other contexts would also work) and first pulls out all of the chloroplast cytosines with coverage ( grep "Pt" <file>)
+
+This is then looked at and all methylated read counts (which we are assuming are non-converted cytosines) vs the total read count (being met + unmet). Multiply that by 100 to get the percent unconverted, then 100 minus that to get the % conversion.
+
+A few tests on the latest Arabidopsis libraries gives a conversion rate of 99.6% or so. That is right in the ballpark.
+
+
+I'll let you know when I add that to the overall pipeline script, but for now, you can use it across your libraries.
+
+NOTE: This can easily be adapted for other genomes if "Pt" does not designate chloroplast.
+
