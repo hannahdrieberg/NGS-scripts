@@ -23,9 +23,8 @@ cg=data[grep("*CpG",data$contrast),]
 a=strsplit(as.character(cg$contrast),"vs")
 a=unlist(a)
 a=matrix(a,ncol=2,byrow=T)
-############################################
 b=table(a[,1],a[,2])
 write.table(b,'test.txt',sep='\t',row.names=T,col.names=T)
-
+######################################################################
 test=data[complete.cases(data),]
 write.table(cor(as.matrix(test[,4:length(test)])), 'test.txt', sep='\t', row.names=T, col.names=T, quote=F)
