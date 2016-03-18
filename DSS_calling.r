@@ -50,6 +50,9 @@ BSobj <- makeBSseqData(list(dat1.1,dat1.2,dat1.3,
               sampleNames=c("C1","C2","C3",
                             "N1","N2","N3"))
 
+BSobj <- makeBSseqData(list(dat1.1,dat1.2,dat2.1,dat2.2),
+              sampleNames=c("C1","C2","N1","N2"))
+
 ##################################
 # DML testing without smoothing
 dmlTest <- DMLtest(BSobj, group1=c("C1","C2","C3","C4"), group2=c("N1","N2","N3","N4"), smoothing=FALSE)
@@ -59,6 +62,8 @@ dmlTest <- DMLtest(BSobj, group1=c("C1","C2","C3","C4"), group2=c("N1","N2","N3"
 # perform dml testing with smoothing
 dmlTest <- DMLtest(BSobj, group1=c("C1","C2","C3"), group2=c("N1","N2","N3"), smoothing=TRUE)
 ###############################################################
+dmlTest <- DMLtest(BSobj, group1=c("C1","C2"), group2=c("N1","N2"), smoothing=TRUE)
+
 
 # identify DMRs based on dmltesting
 dmrs <- callDMR(dmlTest, delta=0.1, minlen=50, minCG=3, pct.sig=0.5, dis.merge=50, p.threshold=pvalue)
