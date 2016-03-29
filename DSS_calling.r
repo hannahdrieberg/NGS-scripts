@@ -55,7 +55,7 @@ BSobj <- makeBSseqData(list(dat1.1,dat1.2,dat2.1,dat2.2),
 
 ##################################
 # DML testing without smoothing
-dmlTest <- DMLtest(BSobj, group1=c("C1","C2","C3","C4"), group2=c("N1","N2","N3","N4"), smoothing=FALSE)
+dmlTest <- DMLtest(BSobj, group1=c("C1","C2","C3","C4"), group2=c("N1","N2","N3","N4"), smoothing=TRUE)
 ####################################
 
 #############################################################
