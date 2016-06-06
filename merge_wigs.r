@@ -7,7 +7,7 @@ colnames(data)=c('V1','V2','V3',paste(files[1],'_prop',sep=''))
 for(i in 2:length(files)){
 file=read.delim(files[i],head=F,skip=1)
 file=file[,1:4]
-colnames(file)=c('V1','V2','V3',paste(files[i],'_prop',sep=''))
+colnames(file)=c('V1','V2','V3',paste(files[1],'_prop',sep=''))
 temp=merge(data,file,by=c('V1','V2','V3'),all=T)
 data=temp
 }
