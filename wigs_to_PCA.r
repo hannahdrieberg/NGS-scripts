@@ -30,6 +30,9 @@ pdf(file=paste0(context,"_hclust_tree.pdf"))
 plot(hclust(dd))
 dev.off()
 
+name = as.numeric(regexec(pattern="_C", text=colnames(a)))
+colnames(a) = substr(x=colnames(a), start=1, stop=name-1)
+
 pc=prcomp(a)
 pdf(file=paste0(context,"_pca.pdf"))
 plot(pc, type ='l' , main='Variance of PCs')
