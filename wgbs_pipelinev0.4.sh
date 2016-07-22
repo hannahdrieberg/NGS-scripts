@@ -504,13 +504,14 @@ mv $fq_file2 0_rawfastq
 #bismark
 mkdir 4_bismark_alignment
 cd 4_bismark_alignment
-bismark -n 2 -l 20 --un ../../$genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark -n 2 -l 20 --bowtie1 --sam --un ../../$genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #part 2 - SE directional on unmapped R1
-bismark -n 2 -l 20 ../../$genome_path  ${fq_file1%%.fastq*}_val_1.fq_unmapped_reads_1.fq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark -n 2 -l 20 --bowtie1 --sam ../../$genome_path  ${fq_file1%%.fastq*}_val_1.fq_unmapped_reads_1.fq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #part 3 - SE directional pbat on unmapped R2
-bismark -n 2 -l 20 --pbat ../../$genome_path  ${fq_file2%%.fastq*}_val_2.fq_unmapped_reads_2.fq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark -n 2 -l 20 --bowtie1 --sam  ../../$genome_path  ${fq_file2%%.fastq*}_val_2.fq_unmapped_reads_2.fq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+#bismark -n 2 -l 20 --bowtie1 --sam --pbat ../../$genome_path  ${fq_file2%%.fastq*}_val_2.fq_unmapped_reads_2.fq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #methylation extraction PE
 bismark_methylation_extractor --comprehensive --report --buffer_size 8G -p --no_overlap --gzip ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.sam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
