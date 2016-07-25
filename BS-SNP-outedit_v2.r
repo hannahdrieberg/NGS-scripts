@@ -6,4 +6,3 @@ a <- a[complete.cases(a),]
 a <- a[order(a[,1], a[,2]),]
 write.table(a, file=paste0(fl[i],".edit"), sep='\t', quote=F, row.names=F)
 }
-

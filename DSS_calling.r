@@ -47,7 +47,7 @@ BSobj <- makeBSseqData(list(dat1.1,dat1.2,dat1.3,dat1.4,
 
 ##################################
 # DML testing with smoothing moving averages and conservative smoothing window
-dmlTest <- DMLtest(BSobj, group1=c("C1","C2","C3","C4"), group2=c("N1","N2","N3","N4"), smoothing=TRUE, smoothing.span=50)
+dmlTest <- DMLtest(BSobj, group1=c("C1","C2","C3","C4"), group2=c("N1","N2","N3","N4"), smoothing=TRUE,smoothing.method='ma',smoothing.span=50)
 ####################################
 
 # identify DMRs based on dmltesting
