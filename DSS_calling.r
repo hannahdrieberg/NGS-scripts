@@ -40,10 +40,7 @@ dat2.3 <- read.delim(unlist(group2)[3])
 dat2.4 <- read.delim(unlist(group2)[4])
 
 # setup bsseq object
-BSobj <- makeBSseqData(list(dat1.1,dat1.2,dat1.3,dat1.4,
-			    dat2.1,dat2.2,dat2.3,dat2.4), 
-	      sampleNames=c("C1","C2","C3","C4",
-		 	    "N1","N2","N3","N4"))
+BSobj <- makeBSseqData(list(dat1.1,dat1.2,dat1.3,dat1.4,dat2.1,dat2.2,dat2.3,dat2.4),sampleNames=c("C1","C2","C3","C4","N1","N2","N3","N4"))
 
 ##################################
 # DML testing with smoothing moving averages and conservative smoothing window
