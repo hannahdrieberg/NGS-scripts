@@ -1,6 +1,6 @@
 # In R make IGV formatted file
 
-flist=dir(pattern="bismark")
+flist=dir(pattern="bed.bismark.cov")
 
 # for(i in c(15,18,21,24)){
 for (i in 1:length(flist)){
