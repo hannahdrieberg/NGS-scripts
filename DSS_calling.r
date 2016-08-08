@@ -11,8 +11,6 @@ print(args)
 # use these arguments in order when running on server
 context = args[1]
 pvalue = args[2]
-group1 = args[3]
-group2 = args[4]
 
 library(DSS)
 
@@ -48,13 +46,19 @@ BSobj <- makeBSseqData(list(dat1.1,dat1.2,dat1.3,dat1.4,dat2.1,dat2.2,dat2.3,dat
 
 ##################################
 # DML testing with smoothing moving averages and conservative smoothing window
-dmlTest <- DMLtest(BSobj,group1=c("C1","C2","C3","C4"), group2=c("N1","N2","N3","N4"),smoothing=TRUE,smoothing.span=50)
+dmlTest <- DMLtest(BSobj,group1=c("C1","C2","C3","C4"), group2=c("N1","N2","N3","N4"),smoothing=TRUE,smoothing.span=100)
 ####################################
 
-# identify DMRs based on dmltesting
+# identify DMLs and write out
+dmls <- callDML(dmlTest, p.threshold=pvalue)
+dmls <- callDML(dmlTest, delta=0.1, p.threshold=pvalue)
+
+file2=paste0(group1, "vs", group2, "_DMLs_",context, "_p=", pvalue, ".bed")
+write.table(dmls,file=file2,quote = FALSE, sep = "\t",row.names = FALSE, col.names = TRUE)
+
+# identify DMRs based on dmltesting and write out to file
+dmrs <- callDMR(dmlTest, minlen=50, minCG=3, pct.sig=0.5, dis.merge=50, p.threshold=pvalue)
 dmrs <- callDMR(dmlTest, delta=0.1, minlen=50, minCG=3, pct.sig=0.5, dis.merge=50, p.threshold=pvalue)
 
-# write output. as bedfile so can use bedtools for later analyses
 file1=paste0(group1, "vs", group2, "_",context, "_", "p=", pvalue, ".bed")
-
 write.table(dmrs,file=file1,quote = FALSE, sep = "\t",row.names = FALSE, col.names = TRUE)
