@@ -13,5 +13,5 @@ context=$1
 
 Rscript /home/diep/scripts/DSS_file_prep.r ${context}
 
-mkdir DSS_${context}_output
-mv *_${context}_output.txt DSS_${context}_output/
+mkdir DSS_output
+mv *_output.txt DSS_output/
