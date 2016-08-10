@@ -21,8 +21,8 @@ data=temp
 }
 
 test=data[complete.cases(data),]
-test=test[test$V1 != 'Mt']
-test=test[test$V1 != 'Pt']
+test=test[test$V1 != 'Mt',]
+test=test[test$V1 != 'Pt',]
 heat <- test[4:length(test)]
 b <- as.numeric(regexec(pattern='_C', text=names(heat))
 c <- substr(names(heat), start = 1, stop = b - 1)
