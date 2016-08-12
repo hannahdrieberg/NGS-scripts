@@ -1,3 +1,5 @@
+#!/usr/bin/env Rscript
+
 # merge wigs to make pairwise correlation matrices
 # run in directory with wig files to correlate
 
@@ -23,6 +25,7 @@ data=temp
 
 test=data[complete.cases(data),]
 a <- cor(as.matrix(test[,4:length(test)]))
+hc <- hclust(as.dist(a))
 write.table(a, 'correlation_matrix.txt', sep='\t', row.names=T, col.names=T, quote=F)
 
 b <- a[hc$order, hc$order]
@@ -35,7 +38,6 @@ heatmap.2(a,
           density.info = "none",
           symm = F,
           symkey = F,
-          symbreaks = T,
           key = T,
           dendrogram='both',
           )
