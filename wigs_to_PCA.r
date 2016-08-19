@@ -31,7 +31,7 @@ name = as.numeric(regexec(pattern="_C", text=colnames(a)))
 colnames(a) = substr(x=colnames(a), start=1, stop=name-1)
 
 # Correlation as distance
-dd <- as.dist(a)
+dd <- as.dist(1-a)
 
 # PCA analysis
 pc=prcomp(a)
