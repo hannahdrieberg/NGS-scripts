@@ -23,6 +23,8 @@ data=temp
 }
 
 test=data[complete.cases(data),]
+test=test[test$V1 != 'Mt',]
+test=test[test$V1 != 'Pt',]
 
 # Correlation matrix
 a <- cor(as.matrix(test[,4:length(test)]))

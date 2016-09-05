@@ -1,9 +1,14 @@
 #!/usr/bin/env Rscript
-
 # merge wigs to make pairwise correlation matrices
 # run in directory with wig files to correlate
 
-files=dir(pattern="*.wig")
+options(echo=T)
+args = commandArgs(trailingOnly=T)
+print(args)
+context=args[1]
+
+files=dir(pattern=paste0(context,"_100bp.wig"))
+
 data <- read.delim(files[1], head=F, skip=1)
 data <- data[,1:4]
 data <- data[data$V1 != 'Mt',]
@@ -25,7 +30,7 @@ data=temp
 
 test=data[complete.cases(data),]
 a <- cor(as.matrix(test[,4:length(test)]))
-hc <- hclust(as.dist(a))
+hc <- hclust(as.dist(1-a))
 write.table(a, 'correlation_matrix.txt', sep='\t', row.names=T, col.names=T, quote=F)
 
 b <- a[hc$order, hc$order]
@@ -42,4 +47,8 @@ heatmap.2(a,
           dendrogram='both',
           )
 dev.off()
+
+# png('wig_cor_CG.png', width=800, height = 750, res=300, pointsize = 3)
+# heatmap.2(a, trace='none',density.info='none',symm=F,symkey=F,key=T,dendrogram='both',cexCol=1,cexRow=1,srtCol=45)
+# dev.off()
 
