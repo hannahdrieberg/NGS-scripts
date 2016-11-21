@@ -37,18 +37,16 @@ write.table(b, 'correlation_matrix_hc_ordered.txt', sep='\t', row.names=T, col.n
 
 library(gplots)
 
-pdf("cor.pdf")
-heatmap.2(a,
-          trace = 'none',
-          density.info = "none",
-          symm = F,
-          symkey = F,
-          key = T,
-          dendrogram='both',
-          )
-dev.off()
-
-png(file=paste0('wig_cor_',context,'.png'), width=800, height = 750, res=300, pointsize = 3)
-heatmap.2(a, trace='none',density.info='none',symm=F,symkey=F,key=T,dendrogram='both',cexCol=1,cexRow=1,srtCol=45)
+pdf(file=paste0('wig_cor_',context,'.pdf'), width=8, height = 7.5, pointsize = 10)
+heatmap.2(a, 
+	trace='none',
+	density.info='none',
+	symm=F,
+	symkey=F,
+	key=T,
+	dendrogram='both',
+	cexCol=1,
+	cexRow=1,
+	srtCol=45)
 dev.off()
 
