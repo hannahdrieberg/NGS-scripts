@@ -1,18 +1,18 @@
-#making gene to gene TAIR10 annotation
-#SRE
-#oct11th, 2016
-#
+#Using TAIR GFF file to make annotation files
+#Derived from SRE gene_to_gene.sh
 
 mkdir $(date +"%Y-%m-%d")_TAIR10_gene_to_gene_annotation
 cd *_TAIR10_gene_to_gene_annotation
 
 #get TAIR10 gene annotations
+
+###GFF file containing features (mRNA, exon, CDS,...) of ALL TAIR10 genes ,including non-protein coding genes(pseudogenes, RNA genes, transposable element genes)
 wget https://www.arabidopsis.org/download_files/Genes/TAIR10_genome_release/TAIR10_gff3/TAIR10_GFF3_genes.gff
 
-
+### GFF file containing features (mRNA, exon, CDS,...) of ALL TAIR10 genes ,including TRANSPOSABLE ELEMENTS and all non-protein coding genes (pseudogenes, RNA genes, transposable element genes)
+wget https://www.arabidopsis.org/download_files/Genes/TAIR10_genome_release/TAIR10_gff3/TAIR10_GFF3_genes_transposons.gff
 
 #make bed file of all TAIR10 genes with proper strand information
-
 
 ###########################
 R
@@ -41,13 +41,14 @@ gffRead <- function(gffFile, nrows = -1) {
      "character", "character", "character", "character"))
      colnames(gff) = c("seqname", "source", "feature", "start", "end",
              "score", "strand", "frame", "attributes")
-     cat("found", nrow(gff), "rows with classes:",
-         paste(sapply(gff, class), collapse=", "), "\n")
+	cat("found", nrow(gff), "rows with classes:",
+        paste(sapply(gff, class), collapse=", "), "\n")
      stopifnot(!any(is.na(gff$start)), !any(is.na(gff$end)))
      return(gff)
 }
 
 gene=gffRead('TAIR10_GFF3_genes.gff')
+#gene_te=gffRead('TAIR10_GFF3_genes_transposons.gff')
 
 #I am subsetting to annotated 'gene's which there are 28,775 in total for TAIR10. This may be modified if we are looking for other things.
 gene=subset(gene,gene$feature=='gene')
