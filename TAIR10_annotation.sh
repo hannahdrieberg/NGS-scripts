@@ -25,7 +25,7 @@ gene$type <- sapply(strsplit(as.character(gene$attributes), split=';'), function
 test <- as.numeric(regexec(pattern='Note', text=as.character(gene$type)))
 gene$type <- substr(x=as.character(gene$type), start = test+5, stop = nchar(as.character(gene$type)))
 
-# Make bedfile file of TAIR10 genes
+# Make bedfile file of TAIR10 te
 
 te <- subset(gene_te, feature == 'transposable_element')
 
@@ -48,6 +48,17 @@ write.table(te.out,'TAIR10_TE.bed',sep='\t',row.names=F,col.names=F,quote=F)
 
 gene_te.out = rbind(gene.out, te.out)
 write.table(gene_te.out,'TAIR10_genes_TE.bed',sep='\t',row.names=F,col.names=F,quote=F)
+
+# make bedfile of TAIR10 5'UTR
+
+futr <- subset(gene_te, feature == 'five_prime_UTR')
+
+futr$chr <- substr(as.character(futr$seqname), start=4, stop=4)
+test <- as.numeric(regexec(pattern='Parent', text=as.character(futr$attributes)))
+futr$Name <- substr(x=as.character(futr$attributes), start = test+7, stop = nchar(as.character(futr$attributes)))
+
+futr.out=futr[,c('chr','start','end','Name','score','strand')]
+write.table(futr.out,'TAIR10_5_utr.bed',sep='\t',row.names=F,col.names=F,quote=F)
 
 quit()
 n
