@@ -1,8 +1,7 @@
 #!/bin/bash
 set -u
 
-export PATH=$PATH:/home/steve/bin
-export PATH=$PATH:/home/steve/bin/
+export PATH=$PATH:/home/diep/bin/
 # 100bp_dmrs.sh
 # This script identifies 100bp windows (from bismark alignment pipeline) that display 
 # a difference (of choice) in methylation (context of choice) with a required coverage

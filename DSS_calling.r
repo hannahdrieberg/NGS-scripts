@@ -9,11 +9,12 @@ print(args)
 # biocLite("DSS")
 
 # use these arguments in order when running on server
+
 context = args[1]
 pvalue = args[2]
-cg_delta = 0.5
-chg_delta = 0.3
-chh_delta = 0.1
+cg_delta = args[3]
+chg_delta = args[4]
+chh_delta = args[5]
 
 library(DSS)
 
