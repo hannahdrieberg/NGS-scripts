@@ -86,15 +86,13 @@ echo "s = ${sitecount}"
 
 ######################
 
-Rscript /home/steve/scripts/100bp_wig_to_dmrs.r ${context} ${difference} ${coverage} ${sitecount}
-
+Rscript /home/diep/scripts/100bp_wig_to_dmrs.r ${context} ${difference} ${coverage} ${sitecount}
 
 #bedtools to intersect the bed file w. the coverage files
 for file in *${context}*.cov
 do
 	bedtools intersect -wa -wb -a 100bp_${context}_${difference}diff_${coverage}collapsed.bed -b "$file" | bedtools groupby -i stdin -g 4,1,2,3 -c 5,9,10,11 -o mean,mean,sum,sum > "${file}.${context}_${difference}diff_${coverage}.dmr"
 done
-
 
 #file structure cleanup
 mkdir 100bp_${context}_${difference}diff_${coverage}_${sitecount}_out
@@ -103,4 +101,4 @@ mv *.${context}_${difference}diff_${coverage}* 100bp_${context}_${difference}dif
 cd 100bp_${context}_${difference}diff_${coverage}_${sitecount}_out/
 
 #collapse them all into a summary table
-Rscript /home/steve/scripts/100bp_dmr_merge.r ${context} ${difference} ${coverage}
+Rscript /home/diep/scripts/100bp_dmr_merge.r ${context} ${difference} ${coverage}
