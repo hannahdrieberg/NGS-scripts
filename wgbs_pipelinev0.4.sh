@@ -60,7 +60,6 @@ mkdir 1_fastqc
 fastqc $fq_file 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv ${fq_file%%.fastq*}_fastqc* 1_fastqc #
 
-
 #trim_galore
 mkdir 2_trimgalore
 cd 2_trimgalore
@@ -71,7 +70,6 @@ cd ../
 mkdir 3_trimmed_fastqc
 fastqc 2_trimgalore/${fq_file%%.fastq*}_trimmed.fq* 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 2_trimgalore/${fq_file%%.fastq*}_trimmed_fastqc* 3_trimmed_fastqc
-
 
 mkdir 0_rawfastq
 mv $fq_file 0_rawfastq
@@ -89,6 +87,9 @@ samtools index ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a .
 #grep -v '^[[:space:]]*@' ${fq_file%%.fastq*}_trimmed*.sam | sort -k3,3 -k4,4n > ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.sam
 #methylation extraction
 bismark_methylation_extractor --comprehensive --report --buffer_size 8G -s ${fq_file%%.fastq*}_trimmed*.sam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+
+##  methylation extraction with full cytosine report 
+##  bismark_methylation_extractor --comprehensive --cytosine_report --CX --genome_folder ~/TAIR10_bs/  --report --buffer_size 8G -s *.sam
 
 #bedgraph creation
 bismark2bedGraph --CX CpG* -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
