@@ -30,10 +30,11 @@ data=temp
 
 test=data[complete.cases(data),]
 a <- cor(as.matrix(test[,4:length(test)]))
-hc <- hclust(as.dist(1-a))
-# write.table(a, 'correlation_matrix.txt', sep='\t', row.names=T, col.names=T, quote=F)
-b <- a[hc$order, hc$order]
-write.table(b, 'correlation_matrix_hc_ordered.txt', sep='\t', row.names=T, col.names=T, quote=F)
+
+# output correlation matrix with hierarchical clustering 
+# hc <- hclust(as.dist(a))
+# b <- a[hc$order, hc$order]
+# write.table(b, 'correlation_matrix_hc_ordered.txt', sep='\t', row.names=T, col.names=T, quote=F)
 
 library(gplots)
 
