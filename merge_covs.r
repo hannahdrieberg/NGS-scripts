@@ -16,6 +16,7 @@ data <- data[data$V1 != 'Pt',]
 test <- as.numeric(regexec(text=paste0(files[1]), pattern='_C'))
 name <- substr(paste0(files[1]), start=1, stop=test-1)
 colnames(data)=c('V1','V2','V3',paste(name))
+
 for(i in 2:length(files)){
 file=read.delim(files[i],head=F)
 file=file[,1:4]
@@ -30,15 +31,15 @@ data=temp
 
 test=data[complete.cases(data),]
 a <- cor(as.matrix(test[,4:length(test)]))
-hc <- hclust(as.dist(a))
-# write.table(a, 'correlation_matrix.txt', sep='\t', row.names=T, col.names=T, quote=F)
 
-b <- a[hc$order, hc$order]
-write.table(b, 'correlation_matrix_hc_ordered.txt', sep='\t', row.names=T, col.names=T, quote=F)
+# write out correlation matrix with samples hc'd
+# hc <- hclust(as.dist(a))
+# b <- a[hc$order, hc$order]
+# write.table(b, 'correlation_matrix_hc_ordered.txt', sep='\t', row.names=T, col.names=T, quote=F)
 
 library(gplots)
 
-pdf("bp_cor.pdf")
+pdf(paste0(context,"-bp_cor.pdf"))
 heatmap.2(a,
           trace = 'none',
           density.info = "none",
@@ -49,6 +50,7 @@ heatmap.2(a,
           )
 dev.off()
 
-png(file=paste0('bp_cor_',context,'.png'), width=800, height = 750, res=300, pointsize = 3)
-heatmap.2(a, trace='none',density.info='none',symm=F,symkey=F,key=T,dendrogram='both',cexCol=1,cexRow=1,srtCol=45)
-dev.off()
+# PNG output
+# png(file=paste0('bp_cor_',context,'.png'), width=800, height = 750, res=300, pointsize = 3)
+# heatmap.2(a, trace='none',density.info='none',symm=F,symkey=F,key=T,dendrogram='both',cexCol=1,cexRow=1,srtCol=45)
+# dev.off()
