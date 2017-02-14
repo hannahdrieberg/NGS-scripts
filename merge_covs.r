@@ -39,7 +39,7 @@ a <- cor(as.matrix(test[,4:length(test)]))
 
 library(gplots)
 
-pdf(paste0(context,"-bp_cor.pdf"))
+pdf(file = paste0(context,"-bp_cor.pdf"),  width=8, height = 7.5, pointsize = 10)
 heatmap.2(a,
           trace = 'none',
           density.info = "none",
