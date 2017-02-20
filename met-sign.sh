@@ -1,35 +1,64 @@
 #!/bin/bash
-set -u
+set -e
 
 # re-extract DNA methylation, at custom sequence contexts, from sam file and produce cytosine report
 # perform in 4_bismark output sub-directory of wgbs workflow
 
-if [ "$#" -ne 2 ]; then
-echo "USAGE: met-sign.sh <context> <file> "
+if [ "$#" -ne 5 ]; then
+echo "USAGE: met-sign.sh <context> <file> <file path to met bedfile> <annotation file> <outname>"
 exit 1
 fi
 
 context=$1
 fl=$2
+bedfile=$3
+annopath=$4
+outname=$5
 
-gzip -d ${file}
+echo ${context}
+echo ${fl}
+echo ${bedfile}
+echo ${annopath}
+echo ${outname}
+echo ""
 
 if [context -eq CHH]; then
-seq = (CAA, CAC, CAT, CCA, CCC, CCT, CTA, CTC, CTT)
+seq="CAA CAC CAT CCA CCC CCT CTA CTC CTT"
 fi
 
-bismark_methylation_extractor --comprehensive --cytosine_report --CX --genome_folder ~/TAIR10_bs/  --report --buffer_size 10G -s ${fls}
+echo "Extracting CX report from SAM ..."
 
-# cleanup
-gzip *sam
-mkdir seq-contexts
-mv *CX_report.txt seq-contexts
-rm *txt
-cd seq-contexts
+bismark_methylation_extractor --comprehensive --cytosine_report --CX --genome_folder ~/TAIR10_bs/  --report --buffer_size 8G -s ${fl}
+
+echo "done"
+
+echo "grepping & bedtools ..."
+echo ${seq}
+
+awk '{print $1 "\t" $2 "\t" $2+1 "\t" $3 "\t" $4 "\t" $5 "\t" $6 "\t" $7}' ${fl::-3}.CX_report.txt > ${fl::-3}.CX_report.bed
 
 # use grep to get output of specific sequence context from report files
-for SEQ in seq
+for FILE in $seq
 do
-grep -e $seq -f *.CX_report.txt > out_${seq}.bed
+grep $FILE ${fl::-3}.CX_report.bed > ${FILE}.bed
+intersectBed -wo -a ${FILE}.bed -b ${bedfile} > ${context}-${FILE}.bed
+sort -k1,1 -k2,2n ${context}-${FILE}.bed -o sorted-${context}-${FILE}.bed
+closestBed -D "ref" -a sorted-${context}-${FILE}.bed -b ${annopath} > ${outname}-${context}-${FILE}.bed
+awk -F$'\t' '$NF<1000 && $NF>-1000' ${outname}-${context}-${FILE}.bed > ${outname}-${context}-${FILE}.1k.bed
 done
+
+echo "done"
+echo "cleaning ..."
+
+rm *bedGraph.gz
+rm *cov.gz
+rm ${FILE}.bed
+rm ${context}-${FILE}.bed
+rm sorted-${context}-${FILE}.bed
+rm ${outname}-${context}-${FILE}.bed
+rm *context*bismark.sam.gz.txt
+rm *M-bias.txt
+rm *splitting_report.txt
+
+echo "done"
 
