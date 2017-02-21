@@ -24,6 +24,10 @@ echo "done"
 
 echo "grepping & bedtools ..."
 
+if [ ${context} = CHH ]; then
+seq="CAA CAC CAT CCA CCC CCT CTA CTC CTT"
+fi
+
 echo ${context}
 echo ${fl}
 echo ${bedfile}
@@ -32,16 +36,12 @@ echo ${sample}
 echo ${outname}
 echo ${seq}
 
-if [context -eq CHH]; then
-seq="CAA CAC CAT CCA CCC CCT CTA CTC CTT"
-fi
-
 awk '{print $1 "\t" $2 "\t" $2+1 "\t" $3 "\t" $4 "\t" $5 "\t" $6 "\t" $7}' ${fl::-3}.CX_report.txt > ${fl::-3}.CX_report.bed
 
 # use grep to get output of specific sequence context from report files
 for FILE in $seq
 do
-grep ${FILE} *CX_report.bed > ${FILE}.bed
+grep ${FILE} ${fl::-3}.CX_report.bed > ${FILE}.bed
 intersectBed -wo -a ${FILE}.bed -b ${bedfile} > ${context}-${FILE}.bed
 sort -k1,1 -k2,2n ${context}-${FILE}.bed -o sorted-${context}-${FILE}.bed
 closestBed -D "ref" -a sorted-${context}-${FILE}.bed -b ${annopath} > ${outname}-${context}-${FILE}.bed
