@@ -48,4 +48,5 @@ rm *cov.gz
 rm *context*bismark.sam.gz.txt
 rm *M-bias.txt
 rm *splitting_report.txt
-echo "done"
+echo "done ... r plotting"
+Rscript ~/scripts/rel_methylation_plots-v2.r ${sample} ${outname} {context}
