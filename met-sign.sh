@@ -64,7 +64,7 @@ rm *splitting_report.txt
 
 echo "done ... r plotting"
 
-Rscript ~/scripts/rel_methylation_plots-v2.r ${sample} ${outname} {context}
+Rscript ~/scripts/rel_methylation_plots-v2.r ${sample} ${outname} ${context}
 
 rm *1k.bed
 rm *CX*

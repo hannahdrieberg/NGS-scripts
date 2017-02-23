@@ -4,11 +4,11 @@ library(fields)
 args=commandArgs(trailingOnly=T)
 print(args)
 
-smplname <- args[1]
-outname <- args[2]
-context <- args[3]
+smplname <- as.character(paste0(args[1]))
+outname <- as.character(paste0(args[2]))
+context <- as.character(paste0(args[3]))
 
-if(context=="CHH"){seq=list("CAA", "CAT", "CCA", "CCC", "CCT", "CTA", "CTC", "CTT")}
+if(context=="CHH"){seq=c("CAA", "CAT", "CCA", "CCC", "CCT", "CTA", "CTC", "CTT")}
 out <- NULL
 for(i in seq){
 # read in files
