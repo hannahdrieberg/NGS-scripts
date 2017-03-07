@@ -94,11 +94,18 @@ input.flt$gene2 <- as.factor(input.flt$gene2)
 input.flt$strand2 <- ifelse(input.flt$strand2=='.',NA,as.character(input.flt$strand2))
 input.flt$strand2 <- as.factor(input.flt$strand2)
 input.flt$distance <- ifelse(is.na(input.flt$chr2)==T,NA,input.flt$distance)
+input.flt <- na.omit(input.flt)
+input.flt <- subset(input.flt, input.flt$chr1 != 'M')
+input.flt <- subset(input.flt, input.flt$chr1 != 'C')
 
-input.flt$flag <- ifelse(input.flt$distance==0,'overlap','nonoverlap')
-#there are 568 records in which the distance equals 0. This indicates overlapping gene annotations on the same strand (???) not sure what that is all about.
+# there are still overlapping records
+# These appear to be either microRNAs or closely adjacent genes with one having a long secondary transcript
+# just omit these; can browse too
+test <- subset(input.flt, input.flt$distance == 0)
+output <- subset(input.flt, input.flt$distance != 0)
 
-write.table(input.flt,'TAIR10_gene_to_gene.samestrand.anno',sep='\t',row.names=F,quote=F)
+# write.table(input.flt,'TAIR10_gene_to_gene.samestrand.anno',sep='\t',row.names=F,quote=F)
+write.table(output,'Araport11_gene_to_gene.samestrand.bed',sep='\t',col.names=F,row.names=F,quote=F)
 
 quit()
 n
