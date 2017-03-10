@@ -68,4 +68,5 @@ Rscript ~/scripts/rel_methylation_plots-v2.r ${sample} ${outname} ${context}
 
 rm *1k.bed
 rm *CX*
+
 echo "DONE"
