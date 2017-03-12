@@ -89,20 +89,19 @@ mv ${fq2%%.fastq*}_fastqc* 1_fastqc
 mkdir 2_scythe_sickle
 cd 2_scythe_sickle
 
-scythe -a /home/diep/scripts/TruSeq-adapters.fa -p 0.1 ../$fq1 > ${fq1%%.fastq*}_noadapt.fastq
+scythe -a /home/diep/scripts/TruSeq-adapters.fa -p 0.1 ../$fq1 > ${fq1%%.fastq*}_noadapt.fastq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-gzip ${fq1%%.fastq*}_noadapt.fastq
+scythe -a /home/diep/scripts/TruSeq-adapters.fa -p 0.1 ../$fq2 > ${fq2%%.fastq*}_noadapt.fastq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-scythe -a /home/diep/scripts/TruSeq-adapters.fa -p 0.1 ../$fq2 > ${fq2%%.fastq*}_noadapt.fastq
+sickle pe -g -f ${fq1%%.fastq*}_noadapt.fastq.gz -r ${fq2%%.fastq*}_noadapt.fastq -o ${fq1%%.fastq*}_trimmed.fastq -p ${fq2%%.fastq*}_trimmed.fastq -s trimmed.singles.fastq -t sanger -q 20 -l 20 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-gzip ${fq2%%.fastq*}_noadapt.fastq 
-
-sickle pe -g -f ${fq1%%.fastq*}_noadapt.fastq.gz -r ${fq2%%.fastq*}_noadapt.fastq.gz -o ${fq1%%.fastq*}_trimmed.fastq.gz -p ${fq2%%.fastq*}_trimmed.fastq.gz -s trimmed.singles.fastq.gz -t sanger -q 20 -l 20
+rm ${fq1%%.fastq*}_noadapt.fastq
+rm ${fq2%%.fastq*}_noadapt.fastq
 cd ../
 
 # fastqc again
 mkdir 3_trimmed_fastqc
-fastqc 2_scythe_sickle/${fq1%%.fastq*}_trimmed.fastq.gz 2_scythe_sickle/${fq2%%.fastq*}_trimmed.fastq.gz
+fastqc 2_scythe_sickle/${fq1%%.fastq*}_trimmed.fastq 2_scythe_sickle/${fq2%%.fastq*}_trimmed.fastq
 
 mv 2_scythe_sickle/${fq1%%.fastq*}_trimmed_fastqc* -t 3_trimmed_fastqc
 mv 2_scythe_sickle/${fq2%%.fastq*}_trimmed_fastqc* -t 3_trimmed_fastqc
@@ -117,23 +116,71 @@ mv 2_scythe_sickle/${fq1%%.fastq*}_trimmed.fastq.gz -t 4_subread-align/
 mv 2_scythe_sickle/${fq2%%.fastq*}_trimmed.fastq.gz -t 4_subread-align/
 cd 4_subread-align/
 
-# gzip input weirdness ... won't work
-# use subread on gzipped paired read files
-# subread-align -T 5 -H -t 1 -u -i ${index} --gzFASTQinput -r ${fq1%%.fastq*}_trimmed.fastq.gz -R ${fq2%%.fastq*}_trimmed.fastq.gz -o "${fileID}.sam"
+echo "Beginning alignment ..."
 
-# align un-zipped read pair files
-if [[ ${fq1%%.fastq*}_trimmed.fastq.gz == *".gz" ]]; then gzip -d ${fq1%%.fastq*}_trimmed.fastq.gz; fi
-if [[ ${fq2%%.fastq*}_trimmed.fastq.gz == *".gz" ]]; then gzip -d ${fq2%%.fastq*}_trimmed.fastq.gz; fi
+subread-align -T 5 -H -t 1 -u -i ${index} -r ${fq1%%.fastq*}_trimmed.fastq -R ${fq2%%.fastq*}_trimmed.fastq -o "${fileID}.sam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-subread-align -T 5 -H -t 1 -u -i ${index} -r ${fq1%%.fastq*}_trimmed.fastq -R ${fq2%%.fastq*}_trimmed.fastq -o "${fileID}.sam"
+if [[ $fq1%%.fastq}* != *".gz" ]]; then gzip ${fq1%%.fastq*}_trimmed.fastq; fi
+if [[ $fq2%%.fastq}* != *".gz" ]]; then gzip ${fq2%%.fastq*}_trimmed.fastq; fi
 
-# sam to bam
-samtools view -S -u $outsam > ${tmpbam}
-samtools sort -m 2G -o $outbam ${tmpbam}
-samtools index ${outbam}
+echo "Alignment complete ... making sorted bam file with index ..."
 
-samtools view -b -S -h ${fq_file%%.fastq*}_trimmed*.sam > ${fq_file%%.fastq*}_trimmed.fq_bismark.bam
-samtools sort ${fq_file%%.fastq*}_trimmed.fq_bismark.bam ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-samtools index ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+# samtools view to convert the sam file to bam file
+tmpbam="${fileID}.temp.bam"
+outbam="${fileID}.sorted"
+
+samtools view -S -u ${fileID}.sam > ${tmpbam}
+
+# Sort the temporary bam file by chromosomal position, and save the sorted file.
+samtools sort -m 2G ${tmpbam} $outbam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+# Make an index of the sorted bam file
+samtools index ${outbam}.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+
+# delete temp bam and gzip sam
+rm -v ${tmpbam}
+gzip ${fileID}.sam
+mv *trimmed.fastq.gz ../2_scythe_sickle/
+
+# feature Counts
+# make sure to have genome size file 
+# samtools faidx tair10.fa
+# cut -f1,2 tair10.fa.fai > tair10.sizes.genome
+
+# could probably make separate file e.g. bam_to_TDF.sh
+echo "Produce tiled data files from bam ..."
+
+# bam to tdf
+# Extract properly-paired reads and their mates (ie flags 99/147/163/83) from paired-end BAM files
+# https://gist.github.com/mtw/7175143
+# http://seqanswers.com/forums/showthread.php?t=29399
+# make sure there are indexed chromosome files with samtools faidx
+
+samtools view -b -f99 "${outbam}.bam" > ${outbam}.R1F.bam
+samtools view -b -f147 "${outbam}.bam" > ${outbam}.R2R.bam
+samtools merge -f ${outbam}.forward.bam ${outbam}.R1F.bam ${outbam}.R2R.bam
+
+samtools view -b -f163 "${outbam}.bam" > ${outbam}.R2F.bam
+samtools view -b -f83 "${outbam}.bam" > ${outbam}.R1R.bam
+samtools merge -f ${outbam}.reverse.bam ${outbam}.R1R.bam ${outbam}.R2F.bam
+
+rm ${outbam}*.R*.bam
+
+echo "Bedgraph"
+
+# tdf from stranded bedgraphs
+mkdir stranded-tdf/
+mv ${outbam}.forward.bam ${outbam}.reverse.bam -t stranded-tdf/
+cd stranded-tdf/
+
+# plus strand
+bedtools genomecov -bga -split -ibam ${outbam}.reverse.bam -g /home/diep/TAIR10/subread_index/tair10.sizes.genome > ${outbam}.plus.bedgraph
+
+# minus strand
+bedtools genomecov -bga -split -ibam ${outbam}.forward.bam -g /home/diep/TAIR10/subread_index/tair10.sizes.genome > ${outbam}.minus.bedgraph
+
+# make tdf
+igvtools toTDF ${outbam}.plus.bedgraph ${outbam}.plus.tdf /home/diep/araport11_igv_genome/Araport11.genome
+igvtools toTDF ${outbam}.minus.bedgraph ${outbam}.minus.tdf /home/diep/araport11_igv_genome/Araport11.genome
+
 
 
