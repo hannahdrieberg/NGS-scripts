@@ -146,41 +146,4 @@ mv *trimmed.fastq.gz ../2_scythe_sickle/
 # samtools faidx tair10.fa
 # cut -f1,2 tair10.fa.fai > tair10.sizes.genome
 
-# could probably make separate file e.g. bam_to_TDF.sh
-echo "Produce tiled data files from bam ..."
-
-# bam to tdf
-# Extract properly-paired reads and their mates (ie flags 99/147/163/83) from paired-end BAM files
-# https://gist.github.com/mtw/7175143
-# http://seqanswers.com/forums/showthread.php?t=29399
-# make sure there are indexed chromosome files with samtools faidx
-
-samtools view -b -f99 "${outbam}.bam" > ${outbam}.R1F.bam
-samtools view -b -f147 "${outbam}.bam" > ${outbam}.R2R.bam
-samtools merge -f ${outbam}.forward.bam ${outbam}.R1F.bam ${outbam}.R2R.bam
-
-samtools view -b -f163 "${outbam}.bam" > ${outbam}.R2F.bam
-samtools view -b -f83 "${outbam}.bam" > ${outbam}.R1R.bam
-samtools merge -f ${outbam}.reverse.bam ${outbam}.R1R.bam ${outbam}.R2F.bam
-
-rm ${outbam}*.R*.bam
-
-echo "Bedgraph"
-
-# tdf from stranded bedgraphs
-mkdir stranded-tdf/
-mv ${outbam}.forward.bam ${outbam}.reverse.bam -t stranded-tdf/
-cd stranded-tdf/
-
-# plus strand
-bedtools genomecov -bga -split -ibam ${outbam}.reverse.bam -g /home/diep/TAIR10/subread_index/tair10.sizes.genome > ${outbam}.plus.bedgraph
-
-# minus strand
-bedtools genomecov -bga -split -ibam ${outbam}.forward.bam -g /home/diep/TAIR10/subread_index/tair10.sizes.genome > ${outbam}.minus.bedgraph
-
-# make tdf
-igvtools toTDF ${outbam}.plus.bedgraph ${outbam}.plus.tdf /home/diep/araport11_igv_genome/Araport11.genome
-igvtools toTDF ${outbam}.minus.bedgraph ${outbam}.minus.tdf /home/diep/araport11_igv_genome/Araport11.genome
-
-
 
