@@ -3,35 +3,36 @@
 # taking BAM alignment output and converting in tiled data files for viewing delight
 # run in directory with sam converted, sorted, indexed  bam file
 
-set -e 
-set -x 
+set -u  
 
 if [ "$#" -lt 3 ]; then
 echo "Missing arguments!"
-echo "USAGE: bam_to_tdf.sh <sample> <SE,PE_stranded,unstranded> <igv genome path>"
-echo "eg. bam_to_tdf.sh col0-H3K9me2-r1 SE-stranded /home/diep/araport11_igv_genome/Araport11.genome"
+echo "USAGE: bam_to_tdf.sh <sample> <PE_stranded, SE_unstranded> <igv genome path>"
+echo "eg. bam_to_tdf.sh col0-H3K9me2-r1 SE_unstranded /home/diep/araport11_igv_genome/Araport11.genome"
 exit 1
 fi
 
-$smp="$1.sorted.bam"
-$lay=$2
-$igvnome=$3
+smp="$1.sorted.bam"
+lay=$2
+igvnome=$3
 
 echo "sample = $1"
 echo "layout = $2"
 echo "igv genome path = $3"
 
-echo "Produce $2 tiled data files from $sample ..."
+echo "Produce ${2} tiled data files from ${smp} ..."
 
 if [[ "$lay" == "SE_unstranded" ]]; then
 
-echo "Bedgraph"
+echo ""
+echo "tdf from non-stranded bedgraph"
+echo ""
 
 # non-stranded bedgraph
 bedtools genomecov -bga -split -ibam $smp -g /home/diep/TAIR10/subread_index/tair10.sizes.genome > ${smp%%sorted.bam*}.bedgraph
 
 # make tdf
-igvtools toTDF ${${smp%%sorted.bam*}.bedgraph ${1}.tdf ${igvnome}
+igvtools toTDF ${smp%%sorted.bam*}.bedgraph ${1}.tdf ${igvnome}
 
 fi
 
@@ -54,7 +55,10 @@ samtools merge -f ${outbam}.reverse.bam ${outbam}.R1R.bam ${outbam}.R2F.bam
 
 rm ${outbam}*.R*.bam
 
-echo "Bedgraph"
+echo ""
+echo "tdf from stranded bedgraphs"
+echo ""
+
 
 # tdf from stranded bedgraphs
 mkdir stranded-tdf/
