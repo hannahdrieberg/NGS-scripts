@@ -71,9 +71,9 @@ cd 2_scythe_sickle
 
 scythe -a /home/diep/scripts/TruSeq-adapters.fa -p 0.1 ../$fq > ${fq%%.fastq*}_noadapt.fastq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-sickle se -g -f ${fq%%.fastq*}_noadapt.fastq -o ${fq%%.fastq*}_trimmed.fastq -t sanger -q 20 -l 20 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+sickle se -f ${fq%%.fastq*}_noadapt.fastq -o ${fq%%.fastq*}_trimmed.fastq -t sanger -q 20 -l 20 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-rm ${fq%%.fastq*}_noadapt.fastq.gz
+rm ${fq%%.fastq*}_noadapt.fastq
 cd ../
 
 # fastqc again
@@ -92,7 +92,7 @@ cd 4_subread-align/
 
 echo "Beginning alignment ..."
 
-subread-align -T 5 -t 1 -u -H -i $index -r ${fq%%.fastq*}_trimmed.fastq -o -o "${fileID}.sam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+subread-align -T 5 -t 1 -u -H -i $index -r ${fq%%.fastq*}_trimmed.fastq -o "${fileID}.sam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 if [[ $fq%%.fastq}* != *".gz" ]]; then gzip ${fq%%.fastq*}_trimmed.fastq; fi
 
@@ -122,7 +122,7 @@ mv *trimmed.fastq.gz ../2_scythe_sickle/
 fi
 
 #### 
-## PAIRED END
+# PAIRED END
 ####
 
 if [ "$1" == "PE" ] then
@@ -182,7 +182,7 @@ scythe -a /home/diep/scripts/TruSeq-adapters.fa -p 0.1 ../$fq1 > ${fq1%%.fastq*}
 
 scythe -a /home/diep/scripts/TruSeq-adapters.fa -p 0.1 ../$fq2 > ${fq2%%.fastq*}_noadapt.fastq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-sickle pe -g -f ${fq1%%.fastq*}_noadapt.fastq -r ${fq2%%.fastq*}_noadapt.fastq -o ${fq1%%.fastq*}_trimmed.fastq -p ${fq2%%.fastq*}_trimmed.fastq -s trimmed.singles.fastq -t sanger -q 20 -l 20 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+sickle pe -f ${fq1%%.fastq*}_noadapt.fastq -r ${fq2%%.fastq*}_noadapt.fastq -o ${fq1%%.fastq*}_trimmed.fastq -p ${fq2%%.fastq*}_trimmed.fastq -s trimmed.singles.fastq -t sanger -q 20 -l 20 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 rm ${fq1%%.fastq*}_noadapt.fastq
 rm ${fq2%%.fastq*}_noadapt.fastq
