@@ -13,9 +13,9 @@ set -x
 # build index
 # subread-buildindex -o TAIR10_subread_index TAIR10_chr1.fas TAIR10_chr2.fas TAIR10_chr3.fas TAIR10_chr4.fas TAIR10_chr5.fas TAIR10_chrC.fas TAIR10_chrM.fas
 
-if [ "$#" -lt 5 ]; then
+if [ "$#" -lt 4 ]; then
 echo "Missing required arguments!"
-echo "USAGE: chip-seq_v0.1.sh <SE, PE> <fastq R1> <R2> <ref genome> <indexed genome> <fileID output>"
+echo "USAGE: chip-seq_v0.1.sh <SE, PE> <fastq R1> <R2> <indexed genome> <fileID output>"
 exit 1
 fi
 
@@ -28,16 +28,15 @@ if [ "$1" == "SE" ] then
 # require
 if [ "$#" -ne 4 ]; then
 echo "Missing required arguments for single-end!"
-echo "USAGE: chip-seq_v0.1.sh <-se> <R1> <ref genome> <indexed ref> <fileID output>"
+echo "USAGE: chip-seq_v0.1.sh <SE> <R1> <subread indexed ref genome> <fileID output>"
 exit 1
 fi
 
 #gather input variables
 type=$1
 fq=$2;
-genome=$3; #path to genome
-index=$4; #path to genome index
-fileID=$5;
+index=$3; #path to subread indexed reference genome
+fileID=$4;
 dow=$(date +"%F-%H-%m-%S")
 
 echo "##################"
@@ -127,9 +126,9 @@ fi
 
 if [ "$1" == "PE" ] then
 
-if [ "$#" -ne 6 ]; then
+if [ "$#" -ne 5 ]; then
 echo "Missing required arguments for paired-end!"
-echo "USAGE: chip-seq_v0.1.sh <PE> <R1> <R2> <ref genome> <indexed genome> <fileID output>"
+echo "USAGE: chip-seq_v0.1.sh <PE> <R1> <R2> <subread indexed genome> <fileID output>"
 exit 1
 fi
 
@@ -137,9 +136,8 @@ fi
 type=$1
 fq1=$2;
 fq2=$3;
-genome=$4; #path to genome
-index=$5; #path to genome index
-fileID=$6;
+index=$4; #path to genome index
+fileID=$5;
 dow=$(date +"%F-%H-%m-%S")
 
 echo "##################"
