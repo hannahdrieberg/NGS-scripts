@@ -7,7 +7,7 @@ set -u
 
 if [ "$#" -lt 3 ]; then
 echo "Missing arguments!"
-echo "USAGE: bam_to_tdf.sh <sample> <PE_stranded, SE_unstranded> <igv genome path>"
+echo "USAGE: bam_to_tdf.sh <sample name> <PE_stranded, SE_unstranded> <igv genome path>"
 echo "eg. bam_to_tdf.sh col0-H3K9me2-r1 SE_unstranded /home/diep/araport11_igv_genome/Araport11.genome"
 exit 1
 fi
@@ -33,6 +33,8 @@ bedtools genomecov -bga -split -ibam $smp -g /home/diep/TAIR10/subread_index/tai
 
 # make tdf
 igvtools toTDF ${smp%%sorted.bam*}.bedgraph ${1}.tdf ${igvnome}
+
+rm ${smp%%sorted.bam*}.bedgraph
 
 fi
 
@@ -74,6 +76,9 @@ bedtools genomecov -bga -split -ibam ${outbam}.forward.bam -g /home/diep/TAIR10/
 # make tdf
 igvtools toTDF ${outbam}.plus.bedgraph ${outbam}.plus.tdf ${igvnome}
 igvtools toTDF ${outbam}.minus.bedgraph ${outbam}.minus.tdf ${igvnome}
+
+rm ${outbam}.plus.bedgraph
+rm ${outbam}.minus.bedgraph
 
 fi
 
