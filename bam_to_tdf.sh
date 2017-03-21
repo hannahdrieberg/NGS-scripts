@@ -7,8 +7,8 @@ set -u
 
 if [ "$#" -lt 3 ]; then
 echo "Missing arguments!"
-echo "USAGE: bam_to_tdf.sh <sample name> <PE_stranded, SE_unstranded> <igv genome path>"
-echo "eg. bam_to_tdf.sh col0-H3K9me2-r1 SE_unstranded /home/diep/araport11_igv_genome/Araport11.genome"
+echo "USAGE: bam_to_tdf.sh <sample name> <unstranded, SE_stranded, PE_stranded> <igv genome path>"
+echo "eg. bam_to_tdf.sh col0-H3K9me2-r1 unstranded /home/diep/araport11_igv_genome/Araport11.genome"
 exit 1
 fi
 
@@ -22,7 +22,7 @@ echo "igv genome path = $3"
 
 echo "Produce ${2} tiled data files from ${smp} ..."
 
-if [[ "$lay" == "SE_unstranded" ]]; then
+if [[ "$lay" == "unstranded" ]]; then
 
 echo ""
 echo "tdf from non-stranded bedgraph"
@@ -36,6 +36,10 @@ igvtools toTDF ${smp%%sorted.bam*}.bedgraph ${1}.tdf ${igvnome}
 
 rm ${smp%%sorted.bam*}.bedgraph
 
+fi
+
+if [[ "$lay" == "SE_stranded" ]];then
+echo "blah"
 fi
 
 if [[ "$lay" == "PE_stranded" ]];then
@@ -60,7 +64,6 @@ rm ${outbam}*.R*.bam
 echo ""
 echo "tdf from stranded bedgraphs"
 echo ""
-
 
 # tdf from stranded bedgraphs
 mkdir stranded-tdf/

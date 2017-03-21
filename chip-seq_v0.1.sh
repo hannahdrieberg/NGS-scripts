@@ -1,13 +1,11 @@
 #!/bin/bash
+set -e
+set -u
 
 # Take raw ChIP-seq reads, align and produce files to view distribution of histone marks in IGV
 # Will eventually introduce peak caller
 # H3K9me2 for now
 # based on pedrocrisp/NGS-pipelines/RNAseqPipe3
-
-# exit if error and echo steps
-set -e
-set -x
 
 # make sure genome index has been built
 # build index
@@ -15,7 +13,7 @@ set -x
 
 if [ "$#" -lt 4 ]; then
 echo "Missing required arguments!"
-echo "USAGE: chip-seq_v0.1.sh <SE, PE> <fastq R1> <R2> <indexed genome> <fileID output>"
+echo "USAGE: chip-seq_v0.1.sh <SE, PE> <fastq R1> <R2> <subread indexed genome> <fileID output>"
 exit 1
 fi
 
@@ -23,9 +21,9 @@ fi
 # SINGLE END
 ###
 
-if [ "$1" == "SE" ] then
+if [ "$1" == "SE" ]; then
 
-# require
+# requirements
 if [ "$#" -ne 4 ]; then
 echo "Missing required arguments for single-end!"
 echo "USAGE: chip-seq_v0.1.sh <SE> <R1> <subread indexed ref genome> <fileID output>"
@@ -43,7 +41,6 @@ echo "##################"
 echo "Performing ChIP-seq alignment with the following parameters:"
 echo "Type: $type"
 echo "Input Files: $fq"
-echo "genome: $genome"
 echo "genome index: $index"
 echo "Output ID: $fileID"
 echo "Time of analysis: $dow"
@@ -124,7 +121,7 @@ fi
 # PAIRED END
 ####
 
-if [ "$1" == "PE" ] then
+if [ "$1" == "PE" ]; then
 
 if [ "$#" -ne 5 ]; then
 echo "Missing required arguments for paired-end!"
@@ -144,7 +141,6 @@ echo "##################"
 echo "Performing ChIP-seq alignment with the following parameters:"
 echo "Type: $type"
 echo "Input Files: $fq1 $fq2"
-echo "genome: $genome"
 echo "genome index: $index"
 echo "Output ID: $fileID"
 echo "Time of analysis: $dow"
@@ -199,8 +195,8 @@ mv $fq2 0_fastq
 
 # subread align
 mkdir 4_subread-align
-mv 2_scythe_sickle/${fq1%%.fastq*}_trimmed.fastq.gz -t 4_subread-align/
-mv 2_scythe_sickle/${fq2%%.fastq*}_trimmed.fastq.gz -t 4_subread-align/
+mv 2_scythe_sickle/${fq1%%.fastq*}_trimmed.fastq -t 4_subread-align/
+mv 2_scythe_sickle/${fq2%%.fastq*}_trimmed.fastq -t 4_subread-align/
 cd 4_subread-align/
 
 echo "Beginning alignment ..."
@@ -232,5 +228,4 @@ mv *trimmed.fastq.gz ../2_scythe_sickle/
 # make sure to have genome size file 
 # samtools faidx tair10.fa
 # cut -f1,2 tair10.fa.fai > tair10.sizes.genome
-
-
+fi

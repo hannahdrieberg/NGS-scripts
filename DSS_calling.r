@@ -34,22 +34,22 @@ group2 = el1hr
 dat1.1 <- read.delim(unlist(group1)[1])
 dat1.2 <- read.delim(unlist(group1)[2])
 dat1.3 <- read.delim(unlist(group1)[3])
-dat1.4 <- read.delim(unlist(group1)[4])
-dat1.5 <- read.delim(unlist(group1)[5])
-dat1.6 <- read.delim(unlist(group1)[6])
+#dat1.4 <- read.delim(unlist(group1)[4])
+#dat1.5 <- read.delim(unlist(group1)[5])
+#dat1.6 <- read.delim(unlist(group1)[6])
 
 dat2.1 <- read.delim(unlist(group2)[1])
 dat2.2 <- read.delim(unlist(group2)[2])
 dat2.3 <- read.delim(unlist(group2)[3])
-dat2.4 <- read.delim(unlist(group2)[4])
-dat2.5 <- read.delim(unlist(group2)[5])
-dat2.6 <- read.delim(unlist(group2)[6])
+#dat2.4 <- read.delim(unlist(group2)[4])
+#dat2.5 <- read.delim(unlist(group2)[5])
+#dat2.6 <- read.delim(unlist(group2)[6])
 
 # setup bsseq object
-BSobj <- makeBSseqData(list(dat1.1,dat1.2,dat1.3,dat1.4,dat2.1,dat2.2,dat2.3,dat2.4),sampleNames=c("C1","C2","C3","C4","N1","N2","N3","N4"))
+BSobj <- makeBSseqData(list(dat1.1,dat1.2,dat1.3,dat2.1,dat2.2,dat2.3),sampleNames=c("C1","C2","C3","N1","N2","N3"))
 
 # Estimation of methylation means with smoothing by moving averages and smaller smoothing window
-dmlTest <- DMLtest(BSobj,group1=c("C1","C2","C3","C4"), group2=c("N1","N2","N3","N4"),smoothing=TRUE,smoothing.span=100)
+dmlTest <- DMLtest(BSobj,group1=c("C1","C2","C3"), group2=c("N1","N2","N3"),smoothing=TRUE,smoothing.span=100)
 
 # identify DMLs and write out
 dmls <- callDML(dmlTest, delta=0.1, p.threshold=pvalue)
@@ -57,7 +57,7 @@ file2=paste0(group1, "vs", group2, "_DMLs_",context, "_p=", pvalue, ".bed")
 write.table(dmls,file=file2,quote = FALSE, sep = "\t",row.names = FALSE, col.names = TRUE)
 
 # identify DMRs based on dmltesting and write out to file
-dmrs <- callDMR(dmlTest, delta=0.1, minlen=50, minCG=3, pct.sig=0.5, dis.merge=50, p.threshold=pvalue)
+dmrs <- callDMR(dmlTest, delta=0.2, minlen=50, minCG=3, pct.sig=0.5, dis.merge=50, p.threshold=pvalue)
 
 file1=paste0(group1, "vs", group2, "_",context, "_", "p=", pvalue, ".bed")
 write.table(dmrs,file=file1,quote = FALSE, sep = "\t",row.names = FALSE, col.names = TRUE)
