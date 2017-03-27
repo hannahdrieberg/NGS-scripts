@@ -27,7 +27,7 @@ write.table(cov,paste(flist[i],".igv",sep=''),sep='\t',row.names=F,quote=F)
 
 for FILE in *.igv
 do
-java -Xmx26g -Djava.awt.headless=true -jar /home/diep/bin/IGVTools/igvtools.jar toTDF $FILE ${FILE}.tdf /home/diep/bin/IGVTools/genomes/TAIR10_All.genome
+java -Xmx26g -Djava.awt.headless=true -jar /home/diep/bin/IGVTools/igvtools.jar toTDF $FILE ${FILE}.tdf /home/diep/araport11_igv_genome/Araport11.genome
 done
 
 
