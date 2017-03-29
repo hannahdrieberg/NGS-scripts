@@ -47,7 +47,6 @@ heatmap.2(a,
 	key=T,
 	dendrogram='both',
 	cexCol=1,
-	cexRow=1,
-	srtCol=45)
+	cexRow=1)
 dev.off()
 
