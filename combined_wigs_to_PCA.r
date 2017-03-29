@@ -18,6 +18,8 @@ data=temp
 }
 
 test=data[complete.cases(data),]
+test=test[test$V1 != 'Mt',]
+test=test[test$V1 != 'Pt',]
 
 # Correlation matrix
 a <- cor(as.matrix(test[,4:length(test)]))
@@ -25,15 +27,10 @@ a <- cor(as.matrix(test[,4:length(test)]))
 name = as.numeric(regexec(pattern="_100", text=colnames(a)))
 colnames(a) = substr(x=colnames(a), start=1, stop=name-1)
 
-# Use correlation as distance
-dd <- as.dist(1-a)
-names(dd) = colnames(a)
-
 # PCA 
 pc=prcomp(a)
 
-pdf(file=paste0("100bp_combined_hclust_PCA.pdf"))
-plot(hclust(dd), main='hclust on 100bp wigs', cex=0.5)
+pdf(file=paste0("100bp_allmC_PCA.pdf"))
 plot(pc, type ='l' , main='Variance of PCs')
 plot(pc$x[1,], pc$x[2,], xlab = 'PC1', ylab='PC2', main = 'PCA on 100bp wigs', cex=0.5)
 text(pc$x[1,], pc$x[2,], colnames(a), cex = 0.5, pos=4)
