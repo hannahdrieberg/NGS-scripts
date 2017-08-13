@@ -2,9 +2,9 @@
 set -e
 set -u
 
-# Take raw ChIP-seq reads, align and produce files to view distribution of histone marks in IGV
-# Will eventually introduce peak caller
-# H3K9me2 for now
+# RNAseq pipeline; Quality control and align raw RNAseq reads
+# Make bedgraphs to look at coverage/raw expression across genome
+# Perform featurecounts to get DEGs (to add)
 # based on pedrocrisp/NGS-pipelines/RNAseqPipe3
 
 # make sure genome index has been built
@@ -13,7 +13,7 @@ set -u
 
 if [ "$#" -lt 4 ]; then
 echo "Missing required arguments!"
-echo "USAGE: chip-seq_v0.1.sh <SE, PE> <fastq R1> <R2> <subread indexed genome> <fileID output>"
+echo "USAGE: RNAseq_v0.1.sh <SE, PE> <fastq R1> <R2> <subread indexed genome> <fileID output>"
 exit 1
 fi
 
@@ -26,7 +26,7 @@ if [ "$1" == "SE" ]; then
 # requirements
 if [ "$#" -ne 4 ]; then
 echo "Missing required arguments for single-end!"
-echo "USAGE: chip-seq_v0.1.sh <SE> <R1> <subread indexed ref genome> <fileID output>"
+echo "USAGE: RNAseq_v0.1.sh <SE> <R1> <subread indexed ref genome> <fileID output>"
 exit 1
 fi
 
@@ -38,7 +38,7 @@ fileID=$4;
 dow=$(date +"%F-%H-%m-%S")
 
 echo "##################"
-echo "Performing ChIP-seq alignment with the following parameters:"
+echo "Performing single-end RNA-seq alignment with the following parameters:"
 echo "Type: $type"
 echo "Input Files: $fq"
 echo "genome index: $index"
@@ -47,9 +47,9 @@ echo "Time of analysis: $dow"
 echo "##################"
 
 # make sample work directory
-mkdir ${fileID}_ChIP_${dow}
-mv $fq ${fileID}_ChIP_${dow}
-cd ${fileID}_ChIP_${dow}
+mkdir ${fileID}_RNA_${dow}
+mv $fq ${fileID}_RNA_${dow}
+cd ${fileID}_RNA_${dow}
 
 if [[ $fq != *.gz ]];then
 gzip $fq
@@ -110,6 +110,11 @@ rm -v ${tmpbam}
 gzip ${fileID}.sam
 mv *trimmed.fastq.gz ../2_scythe_sickle/
 
+# feature Counts
+# make sure to have genome size file 
+# samtools faidx tair10.fa
+# cut -f1,2 tair10.fa.fai > tair10.sizes.genome
+
 fi
 
 #### 
@@ -120,7 +125,7 @@ if [ "$1" == "PE" ]; then
 
 if [ "$#" -ne 5 ]; then
 echo "Missing required arguments for paired-end!"
-echo "USAGE: chip-seq_v0.1.sh <PE> <R1> <R2> <subread indexed genome> <fileID output>"
+echo "USAGE: RNA-seq_v0.1.sh <PE> <R1> <R2> <subread indexed genome> <fileID output>"
 exit 1
 fi
 
@@ -133,7 +138,7 @@ fileID=$5;
 dow=$(date +"%F-%H-%m-%S")
 
 echo "##################"
-echo "Performing ChIP-seq alignment with the following parameters:"
+echo "Performing paired-end RNA-seq alignment with the following parameters:"
 echo "Type: $type"
 echo "Input Files: $fq1 $fq2"
 echo "genome index: $index"
@@ -142,10 +147,10 @@ echo "Time of analysis: $dow"
 echo "##################"
 
 # make sample work directory
-mkdir ${fileID}_ChIP_${dow}
-mv $fq1 ${fileID}_ChIP_${dow}
-mv $fq2 ${fileID}_ChIP_${dow}
-cd ${fileID}_ChIP_${dow}
+mkdir ${fileID}_RNA_${dow}
+mv $fq1 ${fileID}_RNA_${dow}
+mv $fq2 ${fileID}_RNA_${dow}
+cd ${fileID}_RNA_${dow}
 
 if [[ $fq1 != *.gz ]];then
 gzip $fq1
@@ -219,4 +224,16 @@ rm -v ${tmpbam}
 gzip ${fileID}.sam
 mv *trimmed.fastq.gz ../2_scythe_sickle/
 
+## BAM to BedGraph
+
+# use genomecov|bedtools to get coverage levels across genome
+# -bga report in bedgraph format including regions with 0 coverage
+# -ibam sorted BAM input file
+
+# bedtools genomecov -bg -ibam -i ${outbam}.bam -g /home/diep/araport11_igv_genome/Araport11.genome
+
+# feature Counts
+# make sure to have genome size file 
+# samtools faidx tair10.fa
+# cut -f1,2 tair10.fa.fai > tair10.sizes.genome
 fi
