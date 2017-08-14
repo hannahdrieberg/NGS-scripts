@@ -14,6 +14,7 @@ set -u
 if [ "$#" -lt 4 ]; then
 echo "Missing required arguments!"
 echo "USAGE: RNAseq_v0.1.sh <SE, PE> <fastq R1> <R2> <subread indexed genome> <fileID output>"
+echo "EXAMPLE: RNAseq_v0.1.sh SE sample.fastq ~/TAIR10/subread_index/TAIR10_subread_index sample-r1"
 exit 1
 fi
 
@@ -27,6 +28,7 @@ if [ "$1" == "SE" ]; then
 if [ "$#" -ne 4 ]; then
 echo "Missing required arguments for single-end!"
 echo "USAGE: RNAseq_v0.1.sh <SE> <R1> <subread indexed ref genome> <fileID output>"
+echo "EXAMPLE: RNAseq_v0.1.sh SE sample.fastq ~/TAIR10/subread_index/TAIR10_subread_index sample-r1"
 exit 1
 fi
 
@@ -126,6 +128,7 @@ if [ "$1" == "PE" ]; then
 if [ "$#" -ne 5 ]; then
 echo "Missing required arguments for paired-end!"
 echo "USAGE: RNA-seq_v0.1.sh <PE> <R1> <R2> <subread indexed genome> <fileID output>"
+echo "EXAMPLE: RNAseq_v0.1.sh SE sample.fastq ~/TAIR10/subread_index/TAIR10_subread_index sample-r1"
 exit 1
 fi
 
@@ -168,6 +171,8 @@ fastqc $fq1 $fq2 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv ${fq1%%.fastq*}_fastqc* 1_fastqc
 mv ${fq2%%.fastq*}_fastqc* 1_fastqc
 
+echo "Performing adapter and low-quality read trimming... "
+
 # adapter and quality trimming using scythe and sickle 
 mkdir 2_scythe_sickle
 cd 2_scythe_sickle
@@ -178,9 +183,13 @@ scythe -a /home/diep/scripts/TruSeq-adapters.fa -p 0.1 ../$fq2 > ${fq2%%.fastq*}
 
 sickle pe -f ${fq1%%.fastq*}_noadapt.fastq -r ${fq2%%.fastq*}_noadapt.fastq -o ${fq1%%.fastq*}_trimmed.fastq -p ${fq2%%.fastq*}_trimmed.fastq -s trimmed.singles.fastq -t sanger -q 20 -l 20 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
+echo "Done... cleaning ..."
+
 rm ${fq1%%.fastq*}_noadapt.fastq
 rm ${fq2%%.fastq*}_noadapt.fastq
 cd ../
+
+echo "FASTQC..."
 
 # fastqc again
 mkdir 3_trimmed_fastqc
