@@ -13,7 +13,7 @@ set -u
 
 if [ "$#" -lt 4 ]; then
 echo "Missing required arguments!"
-echo "USAGE: RNAseq_v0.1.sh <SE, PE> <fastq R1> <R2> <subread indexed genome> <fileID output>"
+echo "USAGE: RNAseq_v0.1.sh <SE,PE> <fastq R1> <R2> <subread indexed genome> <fileID output>"
 echo "EXAMPLE: RNAseq_v0.1.sh SE sample.fastq ~/TAIR10/subread_index/TAIR10_subread_index sample-r1"
 exit 1
 fi
@@ -28,7 +28,7 @@ if [ "$1" == "SE" ]; then
 if [ "$#" -ne 4 ]; then
 echo "Missing required arguments for single-end!"
 echo "USAGE: RNAseq_v0.1.sh <SE> <R1> <subread indexed ref genome> <fileID output>"
-echo "EXAMPLE: RNAseq_v0.1.sh SE sample.fastq ~/TAIR10/subread_index/TAIR10_subread_index sample-r1"
+echo "EXAMPLE: RNAseq_v0.1.sh SE sample.fastq /home/diep/TAIR10/subread_index/TAIR10_subread_index sample-r1"
 exit 1
 fi
 
@@ -63,6 +63,8 @@ mkdir 1_fastqc
 fastqc $fq 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv ${fq%%.fastq*}_fastqc* 1_fastqc
 
+echo "Performing adapter and low-quality read trimming... "
+
 # adapter and quality trimming using scythe and sickle 
 mkdir 2_scythe_sickle
 cd 2_scythe_sickle
@@ -71,8 +73,12 @@ scythe -a /home/diep/scripts/TruSeq-adapters.fa -p 0.1 ../$fq > ${fq%%.fastq*}_n
 
 sickle se -f ${fq%%.fastq*}_noadapt.fastq -o ${fq%%.fastq*}_trimmed.fastq -t sanger -q 20 -l 20 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
+echo "Done... cleaning ..."
+
 rm ${fq%%.fastq*}_noadapt.fastq
 cd ../
+
+echo "FASTQC..."
 
 # fastqc again
 mkdir 3_trimmed_fastqc
@@ -94,7 +100,7 @@ subread-align -T 5 -t 1 -u -H -i $index -r ${fq%%.fastq*}_trimmed.fastq -o "${fi
 
 if [[ $fq%%.fastq}* != *".gz" ]]; then gzip ${fq%%.fastq*}_trimmed.fastq; fi
 
-echo "Alignment complete ... making sorted bam file with index ..."
+echo "Alignment complete ... making sorted bam file with indexs..."
 
 # samtools view to convert the sam file to bam file
 tmpbam="${fileID}.temp.bam"
@@ -111,6 +117,10 @@ samtools index ${outbam}.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 rm -v ${tmpbam}
 gzip ${fileID}.sam
 mv *trimmed.fastq.gz ../2_scythe_sickle/
+
+echo "bam to bedgraph"
+
+# non-stranded bedgraph
 
 # feature Counts
 # make sure to have genome size file 
@@ -233,13 +243,34 @@ rm -v ${tmpbam}
 gzip ${fileID}.sam
 mv *trimmed.fastq.gz ../2_scythe_sickle/
 
-## BAM to BedGraph
+echo 'split F and R reads into plus and minus strand taking into account PE'
+# http://seqanswers.com/forums/showthread.php?t=29399
+# stranded PE bams
 
-# use genomecov|bedtools to get coverage levels across genome
-# -bga report in bedgraph format including regions with 0 coverage
-# -ibam sorted BAM input file
+#R1 forward strand
+samtools view -f 99 -b ${outbam}.bam > ${outbam}.R1F.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+#R2 reverse strand
+samtools view -f 147 -b ${outbam}.bam > ${outbam}.R2R.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+#FORWARD '+' reads
+samtools merge -f ${outbam}.forward.bam ${outbam}.R1F.bam ${outbam}.R2R.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-# bedtools genomecov -bg -ibam -i ${outbam}.bam -g /home/diep/araport11_igv_genome/Araport11.genome
+#R1 reverse strand
+samtools view -f 83 -b ${outbam}.bam > ${outbam}.R1R.bam | tee -a ../${fileID}_logs_${dow}.log
+#R2 forward strand
+samtools view -f 163 -b ${outbam}.bam > ${outbam}.R2F.bam | tee -a ../${fileID}_logs_${dow}.log
+# REVERSE '-' reads
+samtools merge -f ${outbam}.reverse.bam ${outbam}.R1R.bam ${outbam}.R2F.bam | tee -a ../${fileID}_logs_${dow}.log
+rm ${fileID}*.R*.bam
+
+echo 'bam to bedgraph for stranded PE'
+# size of all 7 chromosomes
+chrc_sizes=/home/diep/TAIR10/subread_index/tair10.sizes.genome
+# non-stranded bedgraph
+bedtools genomecov -bga -split -ibam ${outbam}.bam -g $chrc_sizes > ${fileID}.bg 
+
+## stranded_PE bam to BedGraph
+
+# CAN MAKE BIGWIGS OR TDF HERE
 
 # feature Counts
 # make sure to have genome size file 

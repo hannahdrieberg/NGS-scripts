@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# taking BAM alignment output and converting in tiled data files for viewing delight
-# run in directory with sam converted, sorted, indexed  bam file
+# Produce tiled data files for RNAseq or ChIP data from sorted BAMs for viewing delight
+# Run in directory with sam converted, sorted, indexed  bam file
 
 set -u  
 
