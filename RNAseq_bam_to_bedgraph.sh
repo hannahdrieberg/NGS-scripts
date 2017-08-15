@@ -17,7 +17,7 @@ smp="$1.sorted.bam"
 lay=$2
 
 # file for length of all 7 chromosomes
-chrc_sizes=chrc_sizes=/home/diep/TAIR10/subread_index/tair10.sizes.genome
+chrc_sizes=chrc_sizes=/home/diep/TAIR10/Arabidopsis_thaliana.TAIR10.22.dna.genome.fa.len
 
 echo "sample = $1"
 echo "layout = $2"
