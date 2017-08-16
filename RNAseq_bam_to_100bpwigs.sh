@@ -49,3 +49,5 @@ echo 'subset to +1k/-1k ...'
 # awk to subset
 awk -F$'\t' '$NF<1000 && $NF>-1000' ${bam%%.sorted*}_$out.bed > ${bam%%.sorted*}_$out.1k.bed
 
+rm temp.bed *TE.bed *100bp.bed
+
