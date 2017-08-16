@@ -6,6 +6,7 @@ set -u
 # based on pedrocrisp/NGS-pipelines/RNAseqPipe3
 
 # Make sure genome index has been built using subread
+# split all.fasta into chromosomes: samtools faidx genome.fasta chrX > chrX.fasta
 # subread-buildindex -o TAIR10_subread_index TAIR10_Chr1.fasta TAIR10_Chr2.fasta TAIR10_Chr3.fasta TAIR10_Chr4.fasta TAIR10_Chr5.fasta TAIR10_ChrC.fasta TAIR10_ChrM.fasta
 
 if [ "$#" -lt 4 ]; then

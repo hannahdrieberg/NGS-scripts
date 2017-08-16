@@ -1,14 +1,14 @@
 #!/bin/bash
 set -u
-# Bisulfite sequence analysis pipeline v0.1
-# SRE
-# Updated 29-5-2014
+# Based on SRE Bisulfite sequence analysis pipeline
 ###################
 # This script it designed to take a single end fastq file and process it through the 
 # bismark aligner call methylated cytosines, and develop per-c bed files and 100bp 
 # window wig files for CpG, CHG, and CHH methylation levels
 #
-#
+# Genome indexing
+# Bowtie: bismark_genome_preparation /path/to/genome
+# Bowtie2: bismark_genome_preparation --bowtie2 /path/to/genome
 ###################
 #
 #usage:
