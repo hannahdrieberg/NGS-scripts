@@ -3,8 +3,8 @@ set -e
 set -u
 # Use bedgraph files from RNAseq_bam_to_bedgraph.sh to produce bigwigs or TDFs for viewing delight 
 # Run in directory with bedgraph filese
-# Ensure subread indexed genome & chromosome sizes are prepared eg TAIR10/subread_index/tair10.sizes.genome
-# samtools faidx tair10.fa | cut -f1,2 tair10.fa.fai > tair10.sizes.genome
+# Ensure subread indexed genome & chromosome sizes are prepared eg TAIR10/TAIR10_Chr.all.fasta.len
+# samtools faidx TAIR10_Chr.all.fasta | cut -f1,2 TAIR10_Chr.all.fasta.fai > TAIR10_Chr.all.fasta.len
 
 if [ "$#" -lt 2 ]; then
 echo "Missing arguments!"
@@ -18,7 +18,7 @@ lay=$2
 igv_genome=$3
 
 # file for length of all 7 chromosomes
-chrc_sizes=chrc_sizes=/home/diep/TAIR10/subread_index/tair10.sizes.genome
+chrc_sizes=chrc_sizes=/home/diep/TAIR10/TAIR10_Chr.all.fasta.len
 
 echo "sample = $1"
 echo "layout = $2"

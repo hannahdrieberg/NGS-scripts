@@ -8,7 +8,7 @@ set -eu
 if [ "$#" -lt 2 ]; then
 echo "Missing arguments!"
 echo "USAGE: RNAseq_bam_to_100bpwigs.sh <bam file> <genome fasta>"
-echo "EXAMPLE: RNAseq_bam_to_100bpwigs.sh col0-r1 /home/diep/TAIR10/Arabidopsis_thaliana.TAIR10.22.dna.genome.fa"
+echo "EXAMPLE: RNAseq_bam_to_100bpwigs.sh col0-r1 /home/diep/TAIR10/TAIR10_Chr.all.fasta"
 exit 1
 fi
 

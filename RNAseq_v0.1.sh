@@ -5,14 +5,13 @@ set -u
 # RNAseq pipeline; Quality control, align and index raw RNAseq reads for downstream analyses
 # based on pedrocrisp/NGS-pipelines/RNAseqPipe3
 
-# make sure genome index has been built
-# build index
-# subread-buildindex -o TAIR10_subread_index TAIR10_chr1.fas TAIR10_chr2.fas TAIR10_chr3.fas TAIR10_chr4.fas TAIR10_chr5.fas TAIR10_chrC.fas TAIR10_chrM.fas
+# Make sure genome index has been built using subread
+# subread-buildindex -o TAIR10_subread_index TAIR10_Chr1.fasta TAIR10_Chr2.fasta TAIR10_Chr3.fasta TAIR10_Chr4.fasta TAIR10_Chr5.fasta TAIR10_ChrC.fasta TAIR10_ChrM.fasta
 
 if [ "$#" -lt 4 ]; then
 echo "Missing required arguments!"
 echo "USAGE: RNAseq_v0.1.sh <SE,PE> <fastq R1> <R2> <subread indexed genome> <fileID output>"
-echo "EXAMPLE: RNAseq_v0.1.sh SE sample.fastq ~/TAIR10/subread_index/TAIR10_subread_index sample-r1"
+echo "EXAMPLE: RNAseq_v0.1.sh SE sample.fastq ~/TAIR10/chromosomes/TAIR10_subread_index sample-r1"
 exit 1
 fi
 
@@ -26,7 +25,7 @@ if [ "$1" == "SE" ]; then
 if [ "$#" -ne 4 ]; then
 echo "Missing required arguments for single-end!"
 echo "USAGE: RNAseq_v0.1.sh <SE> <R1> <subread indexed ref genome> <fileID output>"
-echo "EXAMPLE: RNAseq_v0.1.sh SE sample.fastq /home/diep/TAIR10/subread_index/TAIR10_subread_index sample-r1"
+echo "EXAMPLE: RNAseq_v0.1.sh SE sample.fastq /home/diep/TAIR10/chromosomes/TAIR10_subread_index sample-r1"
 exit 1
 fi
 
@@ -127,7 +126,7 @@ if [ "$1" == "PE" ]; then
 if [ "$#" -ne 5 ]; then
 echo "Missing required arguments for paired-end!"
 echo "USAGE: RNA-seq_v0.1.sh <PE> <R1> <R2> <subread indexed genome> <fileID output>"
-echo "EXAMPLE: RNAseq_v0.1.sh SE sample.fastq ~/TAIR10/subread_index/TAIR10_subread_index sample-r1"
+echo "EXAMPLE: RNAseq_v0.1.sh SE sample.fastq /home/diep/TAIR10/chromosomes/TAIR10_subread_index sample-r1"
 exit 1
 fi
 

@@ -3,8 +3,8 @@ set -e
 set -u
 # Produce coverage data from BAM files for RNAseq or ChIP data in bedgraph format
 # Run in directory with sam converted, sorted, indexed  bam file
-# Ensure subread indexed genome & chromosome sizes are prepared eg TAIR10/subread_index/tair10.sizes.genome
-# samtools faidx tair10.fa | cut -f1,2 tair10.fa.fai > tair10.sizes.genome
+# Ensure subread indexed genome & chromosome sizes are prepared eg TAIR10/TAIR10_Chr.all.fasta.len
+# samtools faidx TAIR10_Chr.all.fasta | cut -f1,2 TAIR10_Chr.all.fasta.fai > TAIR10_Chr.all.fasta.len
 
 if [ "$#" -lt 2 ]; then
 echo "Missing arguments!"
