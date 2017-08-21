@@ -1,5 +1,6 @@
-# not quite working automatically, need to enter manually
-# DSS DMR calling, make sure files are converted into right format using DSS_file_prep
+# Script to perform DSS DMR calling 
+# Need to enter manually; not setup for running
+# Make sure files are converted into right format using DSS_file_prep.r
 options(echo=T)
 args=commandArgs(trailingOnly=T)
 print(args)
@@ -8,42 +9,30 @@ print(args)
 # source("http://bioconductor.org/biocLite.R")
 # biocLite("DSS")
 
-# use these arguments in order when running on server
-
+# Define following
 context = args[1]
-pvalue = args[2]
-cg_delta = args[3]
-chg_delta = args[4]
-chh_delta = args[5]
+pvalue = args[2] #q-val=0.05
+cg_delta = args[3] # 0.4
+chg_delta = args[4] # 0.2
+chh_delta = args[5] # 0.2
 
 library(DSS)
 
-#read in files, edited from DSS_file_prep.sh.
+# Read in correctly formatted files
 files <- dir(pattern = paste0(context,".output"))
 
-# sample groups
-control <- list(files[5:8])
-el1hr <- list(files[9:12])
-el1hr_rec <- list(files[1:4])
-
-# define group 1 and group 2 for comparison
-group1 = control
-group2 = el1hr
+# Define sample groups
+group1 <- files[condition1]
+group2 <- files[condition2]
 
 # read input files in DSS format (chr, pos, N, X)
 dat1.1 <- read.delim(unlist(group1)[1])
 dat1.2 <- read.delim(unlist(group1)[2])
 dat1.3 <- read.delim(unlist(group1)[3])
-#dat1.4 <- read.delim(unlist(group1)[4])
-#dat1.5 <- read.delim(unlist(group1)[5])
-#dat1.6 <- read.delim(unlist(group1)[6])
 
 dat2.1 <- read.delim(unlist(group2)[1])
 dat2.2 <- read.delim(unlist(group2)[2])
 dat2.3 <- read.delim(unlist(group2)[3])
-#dat2.4 <- read.delim(unlist(group2)[4])
-#dat2.5 <- read.delim(unlist(group2)[5])
-#dat2.6 <- read.delim(unlist(group2)[6])
 
 # setup bsseq object
 BSobj <- makeBSseqData(list(dat1.1,dat1.2,dat1.3,dat2.1,dat2.2,dat2.3),sampleNames=c("C1","C2","C3","N1","N2","N3"))
@@ -52,7 +41,7 @@ BSobj <- makeBSseqData(list(dat1.1,dat1.2,dat1.3,dat2.1,dat2.2,dat2.3),sampleNam
 dmlTest <- DMLtest(BSobj,group1=c("C1","C2","C3"), group2=c("N1","N2","N3"),smoothing=TRUE,smoothing.span=100)
 
 # identify DMLs and write out
-dmls <- callDML(dmlTest, delta=0.1, p.threshold=pvalue)
+dmls <- callDML(dmlTest, delta=0.2, p.threshold=pvalue)
 file2=paste0(group1, "vs", group2, "_DMLs_",context, "_p=", pvalue, ".bed")
 write.table(dmls,file=file2,quote = FALSE, sep = "\t",row.names = FALSE, col.names = TRUE)
 
