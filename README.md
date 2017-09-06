@@ -17,10 +17,13 @@ First step of *100bp_dmrs.v0.1.sh* that makes pairwise comparisons of windows sh
 Script to perform SNP calling from aligned bisulfite converted reads. Use on sorted BAM file.
 
 ### C_context_window_SREedits.pl	
+SRE perl script to create 100bp windows from bismark methylation extractor report files. 
 
-### DSS_calling.r	
+### DSS_calling.r
+Script for performing DSS DMR calling on re-formatted (using DSS_file_prep.r) bed.cov file output.
 
-### DSS_file_prep.r	
+### DSS_file_prep.r
+Script for re-formatting bed.cov file methylation output for input to DSS.
 
 ### RNAseq_DEGanalysis.sh
 
@@ -31,16 +34,16 @@ Script to perform SNP calling from aligned bisulfite converted reads. Use on sor
 ### RNAseq_bedgraph_to_bigwig_tdf.sh
 
 ### RNAseq_v0.1.sh
+Master script for performing quality trimming and subread alignment of RNA-seq reads. Sorted BAM as output for down-stream analysis.
 
 ### TruSeq-adapters.fa
+FASTA file containing illumina adapter sequences for scythe step in RNA-seq alignment.
 
 ### average_cov.sh
 
 ### bed_to_rel_dist.sh
 
 ### chip-seq_v0.1.sh
-
-### combined_wigs_to_PCA.r
 
 ### conversion_rate_check.sh
 
@@ -57,6 +60,8 @@ Script to perform SNP calling from aligned bisulfite converted reads. Use on sor
 ### met-sign.sh
 
 ### methylation_tiling.sh
+
+### rel_expression_plots.r
 
 ### rel_methylation_plots-v2.r
 
