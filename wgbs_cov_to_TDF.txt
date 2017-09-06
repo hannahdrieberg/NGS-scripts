@@ -2,7 +2,8 @@
 
 flist=dir(pattern="bed.bismark.cov")
 
-# for(i in c(15,18,21,24)){
+# For mC
+
 for (i in 1:length(flist)){
 cov=read.delim(flist[i],head=F)
 cov$V2=cov$V2-1
@@ -13,7 +14,6 @@ write.table(cov,paste(flist[i],".igv",sep=''),sep='\t',row.names=F,quote=F)
 
 # For coverage of C's
 
-# for(i in c(15,18,21,24)){
 for (i in 1:length(flist)){
 cov=read.delim(flist[i],head=F)
 cov$V2=cov$V2-1
@@ -27,7 +27,7 @@ write.table(cov,paste(flist[i],".igv",sep=''),sep='\t',row.names=F,quote=F)
 
 for FILE in *.igv
 do
-java -Xmx26g -Djava.awt.headless=true -jar /home/diep/bin/IGVTools/igvtools.jar toTDF $FILE ${FILE}.tdf /home/diep/araport11_igv_genome/Araport11.genome
+java -Xmx26g -Djava.awt.headless=true -jar /home/diep/bin/IGVTools/igvtools.jar toTDF $FILE ${FILE}.tdf /home/diep/Araport11/Araport11.genome
 done
 
 
