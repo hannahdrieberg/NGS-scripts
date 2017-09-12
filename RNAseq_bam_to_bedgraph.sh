@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e 
 set -u
+
 # Produce coverage data from BAM files for RNAseq or ChIP data in bedgraph format
+# Then produce binary TDFs or BigWigs for viewing delight
 # Run in directory with sam converted, sorted, indexed  bam file
 # Ensure subread indexed genome & chromosome sizes are prepared eg TAIR10/TAIR10_Chr.all.fasta.len
 # samtools faidx TAIR10_Chr.all.fasta | cut -f1,2 TAIR10_Chr.all.fasta.fai > TAIR10_Chr.all.fasta.len
@@ -17,12 +19,14 @@ smp="$1.sorted.bam"
 lay=$2
 
 # file for length of all 7 chromosomes
-chrc_sizes=chrc_sizes=/home/diep/TAIR10/Arabidopsis_thaliana.TAIR10.22.dna.genome.fa.len
+chrc_sizes=/home/diep/TAIR10/TAIR10_Chr.all.fasta.len
 
 echo "sample = $1"
 echo "layout = $2"
 
 echo "Produce ${2} tiled data files from ${smp} ..."
+
+echo "BAM to bedgraph"
 
 if [[ "$lay" == "unstranded" ]]; then
 echo "non-stranded bedgraph"
@@ -31,6 +35,9 @@ bedtools genomecov -bga -split -ibam $smp -g $chrc_sizes > ${smp%%sorted.bam*}.b
 
 # non-stranded bedgraph with splicing & nt resolution
 bedtools genomecov -d -split -ibam $smp -g $chrc_sizes > ${smp%%sorted.bam*}.bed | tee -a ../${1}*.log
+
+echo "TDFs..."
+igvtools toTDF ${smp%%sorted.bam*}.bedgraph $${smp%%sorted.bam*}.tdf $chrc_sizes
 
 fi
 
@@ -66,6 +73,19 @@ samtools view -f 163 -b ${smp} > ${smp%%bam}R2F.bam | tee -a ../${1}*.log
 # REVERSE '-' reads
 samtools merge -f ${smp%%bam}reverse.bam ${smp%%bam}R1R.bam ${smp%%bam}R2F.bam | tee -a ../${1}*.log
 # clean
-rm ${smp%%bam}*.R*.bam
+rm ${smp%%bam}*R*bam -v
+
+echo "Produce ${2} tiled data files from ${smp} ..."
+
+echo "BAM to bedgraph"
+# stranded bedgraphs - do not use '-strand +' flag to allow accounting of PE reads
+# minus strand
+bedtools genomecov -bga -split -ibam ${smp%%bam}reverse.bam -g $chrc_sizes > ${smp%%bam}minus.bg
+# plus strand
+bedtools genomecov -bga -split -ibam ${smp%%bam}forward.bam -g $chrc_sizes > ${smp%%bam}plus.bg
+
+echo "bigWigs..."
+/home/diep/bin/kentUtils/bin/bedGraphToBigWig ${smp%%bam}plus.bg ${chrc_sizes}  ${smp%%bam}plus.bigWig
+/home/diep/bin/kentUtils/bin/bedGraphToBigWig ${smp%%bam}minus.bg ${chrc_sizes} ${smp%%bam}minus.bigWig
 
 fi
