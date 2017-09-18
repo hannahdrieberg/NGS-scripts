@@ -45,8 +45,12 @@ heatmap.2(a,
 	symm=F,
 	symkey=F,
 	key=T,
+	colsep = 1:ncol(a),
+	rowsep = 1:nrow(a),
+	sepcolor = "white",
+	sepwidth = c(0.01,0.001),
 	dendrogram='both',
-	cexCol=1,
-	cexRow=1)
+	cexCol=0.8,
+	cexRow=0.8)
 dev.off()
 
