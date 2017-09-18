@@ -80,7 +80,7 @@ echo "Produce ${2} tiled data files from ${smp} ..."
 echo "BAM to bedgraph"
 # stranded bedgraphs - do not use '-strand +' flag to allow accounting of PE reads
 # minus strand
-bedtools genomecov -bga -split -ibam ${smp%%bam}reverse.bam -g $chrc_sizes > ${smp%%bam}minus.bg
+bedtools genomecov -bga -split -scale -1 -ibam ${smp%%bam}reverse.bam -g $chrc_sizes > ${smp%%bam}minus.bg
 # plus strand
 bedtools genomecov -bga -split -ibam ${smp%%bam}forward.bam -g $chrc_sizes > ${smp%%bam}plus.bg
 
