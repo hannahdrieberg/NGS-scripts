@@ -7,7 +7,7 @@ set -u
 # window wig files for CpG, CHG, and CHH methylation levels
 #
 # Genome indexing
-# Bowtie: bismark_genome_preparation /path/to/genome
+# Bowtie1: bismark_genome_preparation --bowtie1 /path/to/genome
 # Bowtie2: bismark_genome_preparation --bowtie2 /path/to/genome
 ###################
 #
