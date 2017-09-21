@@ -81,7 +81,7 @@ bismark --bowtie1 --sam -n 2 -l 20 ../../$genome_path ../2_trimgalore/${fq_file%
 
 #sam to bam
 samtools view -b -S -h ${fq_file%%.fastq*}_trimmed*.sam > ${fq_file%%.fastq*}_trimmed.fq_bismark.bam
-samtools sort ${fq_file%%.fastq*}_trimmed.fq_bismark.bam ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools sort ${fq_file%%.fastq*}_trimmed.fq_bismark.bam -o ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 samtools index ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 #sam sort for MethylKit
 #grep -v '^[[:space:]]*@' ${fq_file%%.fastq*}_trimmed*.sam | sort -k3,3 -k4,4n > ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.sam
@@ -224,7 +224,7 @@ bismark --bowtie1 --sam -n 2 -l 20 ../../$genome_path ../2_trimgalore/${fq_file%
 
 #sam to bam
 samtools view -b -S -h ${fq_file%%.fastq*}_trimmed*.sam > ${fq_file%%.fastq*}_trimmed.fq_bismark.bam
-samtools sort ${fq_file%%.fastq*}_trimmed.fq_bismark.bam ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools sort ${fq_file%%.fastq*}_trimmed.fq_bismark.bam -o ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 samtools index ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 #sam sort for MethylKit
 #grep -v '^[[:space:]]*@' ${fq_file%%.fastq*}_trimmed*.sam | sort -k3,3 -k4,4n > ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.sam
@@ -363,12 +363,15 @@ mv $fq_file2 0_rawfastq
 mkdir 4_bismark_alignment
 cd 4_bismark_alignment
 bismark --bowtie1 --sam -n 2 -l 20 ../../$genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+
 #sam to bam
 samtools view -b -S -h ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.sam > ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.bam
-samtools sort ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.bam ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.sorted 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools sort ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.bam -o ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 samtools index ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+
 #sam sort for MethylKit
 #grep -v '^[[:space:]]*@' ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.sam | sort -k3,3 -k4,4n > ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.sorted.sam
+
 #methylation extraction PAIRED END (-p)
 bismark_methylation_extractor --comprehensive --report --buffer_size 8G -p ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.sam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
@@ -449,9 +452,10 @@ if [ "$1" == "-pese" ];then
 
 if [ "$#" -ne 5 ]; then
 echo "Missing required arguments for paired-end pbat!"
-echo "USAGE: wgbs_se_pipelinev0.2.sh <-pese> <in fastq R1> <in fastq R2> <path to bismark genome folder> <fileID for output files>"
+echo "USAGE: wgbs_pipelinev0.4.sh <-pese> <R1> <R2> <path to bismark genome folder> <fileID for output files>"
 exit 1
 fi
+
 #gather input variables
 type=$1; #identifying paired end or single end mode
 fq_file1=$2; #the input R1 fastq reads
@@ -531,7 +535,7 @@ samtools view -b -S -h ${fq_file2%%.fastq*}_val_2.fq*_unmapped_reads_2.fq_bismar
 #make combined bam file
 samtools merge -h ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.sam ${fq_file1%%.fastq*}_bismark_combined.bam ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.bam ${fq_file1%%.fastq*}_val_1.fq_bismark_se1.bam ${fq_file2%%.fastq*}_val_2.fq_bismark_se2.bam
 #sort combined bam file
-samtools sort ${fq_file1%%.fastq*}_bismark_combined.bam ${fq_file1%%.fastq*}_bismark_combined.sorted 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools sort ${fq_file1%%.fastq*}_bismark_combined.bam -o ${fq_file1%%.fastq*}_bismark_combined.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 #index combined bam file
 samtools index ${fq_file1%%.fastq*}_bismark_combined.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 #make combined sam file
