@@ -8,13 +8,13 @@ set -u
 #
 # Genome indexing
 # Bowtie1: bismark_genome_preparation --bowtie1 /path/to/genome
-# Bowtie2: bismark_genome_preparation --bowtie2 /path/to/genome
 ###################
 #
+
 #usage:
 if [ "$#" -lt 4 ]; then
 echo "Missing required arguments!"
-echo "USAGE: wgbs_se_pipelinev0.4.sh <-pe, -se, -se_epi, or -pese> <in fastq R1> <in fastq R2 (if PE)> <path to bismark genome folder> <fileID for output files>"
+echo "USAGE: wgbs_pipelinev0.4.sh <-pe, -se, -se_epi, or -pese> <R1> <R2> <path to bismark genome> <fileID for output>"
 exit 1
 fi
 
@@ -83,13 +83,15 @@ bismark --bowtie1 --sam -n 2 -l 20 ../../$genome_path ../2_trimgalore/${fq_file%
 samtools view -b -S -h ${fq_file%%.fastq*}_trimmed*.sam > ${fq_file%%.fastq*}_trimmed.fq_bismark.bam
 samtools sort ${fq_file%%.fastq*}_trimmed.fq_bismark.bam -o ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 samtools index ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+
 #sam sort for MethylKit
 #grep -v '^[[:space:]]*@' ${fq_file%%.fastq*}_trimmed*.sam | sort -k3,3 -k4,4n > ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.sam
+
 #methylation extraction
 bismark_methylation_extractor --comprehensive --report --buffer_size 8G -s ${fq_file%%.fastq*}_trimmed*.sam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 ##  methylation extraction with full cytosine report 
-##  bismark_methylation_extractor --comprehensive --cytosine_report --CX --genome_folder ~/TAIR10_bs/  --report --buffer_size 8G -s *.sam
+##  bismark_methylation_extractor --comprehensive --cytosine_report --CX --genome_folder ~/TAIR10/  --report --buffer_size 8G -s *.sam
 
 #bedgraph creation
 bismark2bedGraph --CX CpG* -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
