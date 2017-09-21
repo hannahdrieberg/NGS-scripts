@@ -106,14 +106,14 @@ echo "Alignment complete ... making sorted bam file with indexs..."
 
 # samtools view to convert the sam file to bam file
 tmpbam="${fileID}.temp.bam"
-outbam="${fileID}.sorted"
+outbam="${fileID}.sorted.bam"
 
 samtools view -S -u ${fileID}.sam > ${tmpbam}
 
 # Sort the temporary bam file by chromosomal position, and save the sorted file.
-samtools sort -m 2G ${tmpbam} $outbam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools sort -m 2G ${tmpbam} -o $outbam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 # Make an index of the sorted bam file
-samtools index ${outbam}.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools index $outbam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 # delete temp bam and gzip sam
 rm -v ${tmpbam}
@@ -226,14 +226,14 @@ echo "Alignment complete ... making sorted bam file with index ..."
 
 # samtools view to convert the sam file to bam file
 tmpbam="${fileID}.temp.bam"
-outbam="${fileID}.sorted"
+outbam="${fileID}.sorted.bam"
 
 samtools view -S -u ${fileID}.sam > ${tmpbam}
 
 # Sort the temporary bam file by chromosomal position, and save the sorted file.
-samtools sort -m 2G ${tmpbam} $outbam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools sort -m 2G ${tmpbam} -o $outbam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 # Make an index of the sorted bam file
-samtools index ${outbam}.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools index $outbam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 # delete temp bam and gzip sam
 rm -v ${tmpbam}
