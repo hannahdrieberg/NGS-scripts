@@ -6,11 +6,11 @@ echo "Conversion % in $1"
 
 file=$1
 
-echo "chrC"
-grep "C"  ${file} | awk '{ met+= $5} { unmet += $6} { total = met + unmet } END {print 100-((met / total)*100)}'
-echo "chrM"
-grep "M"  ${file} | awk '{ met+= $5} { unmet += $6} { total = met + unmet } END {print 100-((met / total)*100)}'
-echo "chrPt"
+echo "ChrC"
+grep "ChrC"  ${file} | awk '{ met+= $5} { unmet += $6} { total = met + unmet } END {print 100-((met / total)*100)}'
+echo "ChrM"
+grep "ChrM"  ${file} | awk '{ met+= $5} { unmet += $6} { total = met + unmet } END {print 100-((met / total)*100)}'
+echo "Pt"
 grep "Pt"  ${file} | awk '{ met+= $5} { unmet += $6} { total = met + unmet } END {print 100-((met / total)*100)}'
-echo "chrMt"
+echo "Mt"
 grep "Mt"  ${file} | awk '{ met+= $5} { unmet += $6} { total = met + unmet } END {print 100-((met / total)*100)}'
