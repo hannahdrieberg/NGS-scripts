@@ -28,7 +28,7 @@ if [ "$1" == "-se" ];then
 #require arguments
 if [ "$#" -ne 4 ]; then
 echo "Missing required arguments for single-end!"
-echo "USAGE: wgbs_se_pipelinev0.2.sh <-se> <in fastq R1> <path to bismark genome folder> <fileID for output files>"
+echo "USAGE: wgbs_pipelinev0.4.sh <-se> <R1> <path to bismark genome> <fileID for output>"
 exit 1
 fi
 
@@ -74,24 +74,23 @@ mv 2_trimgalore/${fq_file%%.fastq*}_trimmed_fastqc* 3_trimmed_fastqc
 mkdir 0_rawfastq
 mv $fq_file 0_rawfastq
 
-#bismark
+#bismark & sort BAM output
 mkdir 4_bismark_alignment
 cd 4_bismark_alignment
-bismark --bowtie1 --sam -n 2 -l 20 ../../$genome_path ../2_trimgalore/${fq_file%%.fastq*}_trimmed.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+
+bismark --bowtie1 -n 2 -l 20 ../../$genome_path ../2_trimgalore/${fq_file%%.fastq*}_trimmed.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+
+samtools sort ${fq_file%%.fastq*}_trimmed*_bismark.bam -o ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools index ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+rm ${fq_file%%.fastq*}_trimmed*_bismark.bam
 
 #sam to bam
-samtools view -b -S -h ${fq_file%%.fastq*}_trimmed*.sam > ${fq_file%%.fastq*}_trimmed.fq_bismark.bam
-samtools sort ${fq_file%%.fastq*}_trimmed.fq_bismark.bam -o ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-samtools index ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-
-#sam sort for MethylKit
-#grep -v '^[[:space:]]*@' ${fq_file%%.fastq*}_trimmed*.sam | sort -k3,3 -k4,4n > ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.sam
+#samtools view -b -S -h ${fq_file%%.fastq*}_trimmed*.sam > ${fq_file%%.fastq*}_trimmed.fq_bismark.bam
+#samtools sort ${fq_file%%.fastq*}_trimmed.fq_bismark.bam -o ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+#samtools index ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #methylation extraction
-bismark_methylation_extractor --comprehensive --report --buffer_size 8G -s ${fq_file%%.fastq*}_trimmed*.sam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-
-##  methylation extraction with full cytosine report 
-##  bismark_methylation_extractor --comprehensive --cytosine_report --CX --genome_folder ~/TAIR10/  --report --buffer_size 8G -s *.sam
+bismark_methylation_extractor --comprehensive --report --buffer_size 8G -s ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #bedgraph creation
 bismark2bedGraph --CX CpG* -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
@@ -136,7 +135,6 @@ if [[ $fq_file != *gz* ]];then
 	raw_reads=$(($raw_reads / 4 ))
 fi
 
-
 if [[ $fq_file == *gz* ]];then
 	flt_reads=$(zcat 2_trimgalore/*.gz | wc -l)
 	flt_reads=$(($flt_reads / 4))
@@ -147,22 +145,14 @@ if [[ $fq_file != *gz* ]];then
 	flt_reads=$(($flt_reads / 4))
 fi
 
-
 #add it to the full pipeline logfile
 printf "${dow}\t${fq_file}\t${fileID}\t${genome_path##../}\t${type:1}\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${unique_aln}\t${no_aln}\t${multi_aln}\t${cpg_per}\t${chg_per}\t${chh_per}\n"
 printf "${dow}\t${fq_file}\t${fileID}\t${genome_path##../}\t${type:1}\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${unique_aln}\t${no_aln}\t${multi_aln}\t${cpg_per}\t${chg_per}\t${chh_per}\n" >> $HOME/wgbs_se_pipeline_analysis_record.log
 
-echo "####################"
-echo "compressing all sam files..."
-echo "####################"
-#compress sam and unsorted bam files
-find -name "*.sam" | xargs pigz
-find -name "*bismark.bam" | xargs rm
-
 fi
 
 ######################################
-# SINGLE END Epignome - All this does differently is trip the first 6bp from the fastq reads per epicentre protocol to eliminate issues of random hexamer binding
+# SINGLE END Epignome - Hard cut on first 6bp from raw reads per epicentre protocol to eliminate issues of random hexamer binding
 ######################################
 
 #confirm single-end
@@ -171,7 +161,7 @@ if [ "$1" == "-se_epi" ];then
 #require arguments
 if [ "$#" -ne 4 ]; then
 echo "Missing required arguments for single-end!"
-echo "USAGE: wgbs_se_pipelinev0.2.sh <-se> <in fastq R1> <path to bismark genome folder> <fileID for output files>"
+echo "USAGE: wgbs_pipelinev0.4.sh <-se> <R1> <path to bismark genome> <fileID for output>"
 exit 1
 fi
 
@@ -203,7 +193,6 @@ mkdir 1_fastqc
 fastqc $fq_file 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv ${fq_file%%.fastq*}_fastqc* 1_fastqc #
 
-
 #trim_galore
 mkdir 2_trimgalore
 cd 2_trimgalore
@@ -215,23 +204,20 @@ mkdir 3_trimmed_fastqc
 fastqc 2_trimgalore/${fq_file%%.fastq*}_trimmed.fq* 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 2_trimgalore/${fq_file%%.fastq*}_trimmed_fastqc* 3_trimmed_fastqc
 
-
 mkdir 0_rawfastq
 mv $fq_file 0_rawfastq
 
-#bismark
+#bismark & sort BAM output
 mkdir 4_bismark_alignment
 cd 4_bismark_alignment
-bismark --bowtie1 --sam -n 2 -l 20 ../../$genome_path ../2_trimgalore/${fq_file%%.fastq*}_trimmed.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark --bowtie1 -n 2 -l 20 ../../$genome_path ../2_trimgalore/${fq_file%%.fastq*}_trimmed.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-#sam to bam
-samtools view -b -S -h ${fq_file%%.fastq*}_trimmed*.sam > ${fq_file%%.fastq*}_trimmed.fq_bismark.bam
-samtools sort ${fq_file%%.fastq*}_trimmed.fq_bismark.bam -o ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools sort ${fq_file%%.fastq*}_trimmed*_bismark.bam -o ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 samtools index ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-#sam sort for MethylKit
-#grep -v '^[[:space:]]*@' ${fq_file%%.fastq*}_trimmed*.sam | sort -k3,3 -k4,4n > ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.sam
+rm ${fq_file%%.fastq*}_trimmed*_bismark.bam
+
 #methylation extraction
-bismark_methylation_extractor --comprehensive --report --buffer_size 8G -s ${fq_file%%.fastq*}_trimmed*.sam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark_methylation_extractor --comprehensive --report --buffer_size 8G -s ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #bedgraph creation
 bismark2bedGraph --CX CpG* -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
@@ -242,7 +228,6 @@ mkdir 5_output_files
 mv 4_bismark_alignment/*.bed* 5_output_files
 
 #100bp window creation
-
 perl $HOME/scripts/C_context_window_SREedits.pl 4_bismark_alignment/CpG* 100 0 ${fileID}_CpG 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 4_bismark_alignment/CpG*.wig 5_output_files/${fileID}_CpG_100bp.wig
 perl $HOME/scripts/C_context_window_SREedits.pl 4_bismark_alignment/CHG* 100 0 ${fileID}_CHG 2>&1 | tee -a ${fileID}_logs_${dow}.log
@@ -276,7 +261,6 @@ if [[ $fq_file != *gz* ]];then
 	raw_reads=$(($raw_reads / 4 ))
 fi
 
-
 if [[ $fq_file == *gz* ]];then
 	flt_reads=$(zcat 2_trimgalore/*.gz | wc -l)
 	flt_reads=$(($flt_reads / 4))
@@ -287,17 +271,9 @@ if [[ $fq_file != *gz* ]];then
 	flt_reads=$(($flt_reads / 4))
 fi
 
-
 #add it to the full pipeline logfile
 printf "${dow}\t${fq_file}\t${fileID}\t${genome_path##../}\t${type:1}\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${unique_aln}\t${no_aln}\t${multi_aln}\t${cpg_per}\t${chg_per}\t${chh_per}\n"
 printf "${dow}\t${fq_file}\t${fileID}\t${genome_path##../}\t${type:1}\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${unique_aln}\t${no_aln}\t${multi_aln}\t${cpg_per}\t${chg_per}\t${chh_per}\n" >> $HOME/wgbs_se_pipeline_analysis_record.log
-
-echo "####################"
-echo "compressing all sam files..."
-echo "####################"
-#compress sam and unsorted bam files
-find -name "*.sam" | xargs pigz
-find -name "*bismark.bam" | xargs rm
 
 fi
 
@@ -309,9 +285,10 @@ if [ "$1" == "-pe" ];then
 
 if [ "$#" -ne 5 ]; then
 echo "Missing required arguments for paired-end!"
-echo "USAGE: wgbs_se_pipelinev0.2.sh <-pe> <in fastq R1> <in fastq R2> <path to bismark genome folder> <fileID for output files>"
+echo "USAGE: wgbs_pipelinev0.4.sh <-pe> <R1> <R2> <path to bismark genome> <fileID for output>"
 exit 1
 fi
+
 #gather input variables
 type=$1; #identifying paired end or single end mode
 fq_file1=$2; #the input R1 fastq reads
@@ -343,7 +320,6 @@ fastqc $fq_file1 $fq_file2 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv ${fq_file1%%.fastq*}_fastqc* 1_fastqc #
 mv ${fq_file2%%.fastq*}_fastqc* 1_fastqc #
 
-
 #trim_galore
 mkdir 2_trimgalore
 cd 2_trimgalore
@@ -356,7 +332,6 @@ fastqc 2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* 2_trimgalore/${fq_file2%%.fas
 mv 2_trimgalore/${fq_file1%%.fastq*}_val_1_fastqc* 3_trimmed_fastqc
 mv 2_trimgalore/${fq_file2%%.fastq*}_val_2_fastqc* 3_trimmed_fastqc
 
-
 mkdir 0_rawfastq
 mv $fq_file1 0_rawfastq
 mv $fq_file2 0_rawfastq
@@ -364,18 +339,19 @@ mv $fq_file2 0_rawfastq
 #bismark
 mkdir 4_bismark_alignment
 cd 4_bismark_alignment
-bismark --bowtie1 --sam -n 2 -l 20 ../../$genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark --bowtie1 -n 2 -l 20 ../../$genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+
+samtools sort ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.bam -o ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools index ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+rm ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.bam
 
 #sam to bam
-samtools view -b -S -h ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.sam > ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.bam
-samtools sort ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.bam -o ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-samtools index ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-
-#sam sort for MethylKit
-#grep -v '^[[:space:]]*@' ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.sam | sort -k3,3 -k4,4n > ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.sorted.sam
+#samtools view -b -S -h ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.sam > ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.bam
+#samtools sort ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.bam -o ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+#samtools index ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #methylation extraction PAIRED END (-p)
-bismark_methylation_extractor --comprehensive --report --buffer_size 8G -p ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.sam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark_methylation_extractor --comprehensive --report --buffer_size 8G -p ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #bedgraph creation
 bismark2bedGraph --CX CpG* -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
@@ -410,8 +386,6 @@ cpg_per=$(grep 'C methylated in CpG context:' 4_bismark_alignment/${fq_file1%%.f
 chg_per=$(grep 'C methylated in CHG context:' 4_bismark_alignment/${fq_file1%%.fastq*}_val_1.fq*_bismark_PE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
 chh_per=$(grep 'C methylated in CHH context:' 4_bismark_alignment/${fq_file1%%.fastq*}_val_1.fq*_bismark_PE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
 
-
-
 if [[ $fq_file1 == *gz* ]];then
 	raw_reads=$(zcat 0_rawfastq/*.gz | wc -l)
 	raw_reads=$(($raw_reads / 4 ))
@@ -436,13 +410,6 @@ fi
 #add it to the full pipeline logfile
 printf "${dow}\t${fq_file1}\t${fileID}\t${genome_path##../}\t${type:1}\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${unique_aln}\t${no_aln}\t${multi_aln}\t${cpg_per}\t${chg_per}\t${chh_per}\n"
 printf "${dow}\t${fq_file1}\t${fileID}\t${genome_path##../}\t${type:1}\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${unique_aln}\t${no_aln}\t${multi_aln}\t${cpg_per}\t${chg_per}\t${chh_per}\n" >> $HOME/wgbs_se_pipeline_analysis_record.log
-
-echo "####################"
-echo "compressing all sam files..."
-echo "####################"
-#compress sam and unsorted bam files
-find -name "*.sam" | xargs pigz
-find -name "*pe.bam" | xargs rm
 
 fi
 
@@ -503,7 +470,6 @@ fastqc 2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* 2_trimgalore/${fq_file2%%.fas
 mv 2_trimgalore/${fq_file1%%.fastq*}_val_1_fastqc* 3_trimmed_fastqc
 mv 2_trimgalore/${fq_file2%%.fastq*}_val_2_fastqc* 3_trimmed_fastqc
 
-
 mkdir 0_rawfastq
 mv $fq_file1 0_rawfastq
 mv $fq_file2 0_rawfastq
@@ -511,28 +477,22 @@ mv $fq_file2 0_rawfastq
 #bismark
 mkdir 4_bismark_alignment
 cd 4_bismark_alignment
-bismark -n 2 -l 20 --bowtie1 --sam --un ../../$genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark -n 2 -l 20 --bowtie1 --un ../../$genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #part 2 - SE directional on unmapped R1
-bismark -n 2 -l 20 --bowtie1 --sam ../../$genome_path  ${fq_file1%%.fastq*}_val_1.fq_unmapped_reads_1.fq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark -n 2 -l 20 --bowtie1 ../../$genome_path  ${fq_file1%%.fastq*}_val_1.fq_unmapped_reads_1.fq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #part 3 - SE directional pbat on unmapped R2
-bismark -n 2 -l 20 --bowtie1 --sam  ../../$genome_path  ${fq_file2%%.fastq*}_val_2.fq_unmapped_reads_2.fq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-#bismark -n 2 -l 20 --bowtie1 --sam --pbat ../../$genome_path  ${fq_file2%%.fastq*}_val_2.fq_unmapped_reads_2.fq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark -n 2 -l 20 --bowtie1 ../../$genome_path  ${fq_file2%%.fastq*}_val_2.fq_unmapped_reads_2.fq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #methylation extraction PE
-bismark_methylation_extractor --comprehensive --report --buffer_size 8G -p --no_overlap --gzip ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.sam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark_methylation_extractor --comprehensive --report --buffer_size 8G -p --no_overlap --gzip ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #methylation extraction SE1
-bismark_methylation_extractor --comprehensive --report --buffer_size 8G -s --gzip ${fq_file1%%.fastq*}_val_1.fq*_unmapped_reads_1.fq_bismark.sam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark_methylation_extractor --comprehensive --report --buffer_size 8G -s --gzip ${fq_file1%%.fastq*}_val_1.fq*_unmapped_reads_1.fq_bismark.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #methylation extraction SE2
-bismark_methylation_extractor --comprehensive --report --buffer_size 8G -s --gzip ${fq_file2%%.fastq*}_val_2.fq*_unmapped_reads_2.fq_bismark.sam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-
-#make bam files for each line of output:
-samtools view -b -S -h ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.sam > ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.bam
-samtools view -b -S -h ${fq_file1%%.fastq*}_val_1.fq*_unmapped_reads_1.fq_bismark.sam > ${fq_file1%%.fastq*}_val_1.fq_bismark_se1.bam
-samtools view -b -S -h ${fq_file2%%.fastq*}_val_2.fq*_unmapped_reads_2.fq_bismark.sam > ${fq_file2%%.fastq*}_val_2.fq_bismark_se2.bam
+bismark_methylation_extractor --comprehensive --report --buffer_size 8G -s --gzip ${fq_file2%%.fastq*}_val_2.fq*_unmapped_reads_2.fq_bismark.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #make combined bam file
 samtools merge -h ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.sam ${fq_file1%%.fastq*}_bismark_combined.bam ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.bam ${fq_file1%%.fastq*}_val_1.fq_bismark_se1.bam ${fq_file2%%.fastq*}_val_2.fq_bismark_se2.bam
@@ -540,8 +500,6 @@ samtools merge -h ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.sam ${fq_file1%%.fas
 samtools sort ${fq_file1%%.fastq*}_bismark_combined.bam -o ${fq_file1%%.fastq*}_bismark_combined.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 #index combined bam file
 samtools index ${fq_file1%%.fastq*}_bismark_combined.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-#make combined sam file
-#samtools view -h ${fq_file1%%.fastq*}_bismark_combined.sorted.bam > ${fq_file1%%.fastq*}_bismark_combined.sorted.sam
 
 #merge the met_extract results from each alignment
 zcat CpG*.txt.gz > CpG_context_${fileID}_merged.txt
@@ -597,8 +555,6 @@ multi_aln3=$(grep 'Sequences did not map uniquely:' 4_bismark_alignment/${fq_fil
 cpg_per3=$(grep 'C methylated in CpG context:' 4_bismark_alignment/${fq_file2%%.fastq*}_val_2.fq_unmapped_reads_2.fq_bismark_SE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
 chg_per3=$(grep 'C methylated in CHG context:' 4_bismark_alignment/${fq_file2%%.fastq*}_val_2.fq_unmapped_reads_2.fq_bismark_SE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
 chh_per3=$(grep 'C methylated in CHH context:' 4_bismark_alignment/${fq_file2%%.fastq*}_val_2.fq_unmapped_reads_2.fq_bismark_SE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
-
-
 
 if [[ $fq_file1 == *gz* ]];then
 	raw_reads=$(zcat 0_rawfastq/*.gz | wc -l)
