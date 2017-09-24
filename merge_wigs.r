@@ -11,8 +11,8 @@ files=dir(pattern=paste0(context,"_100bp.wig"))
 
 data <- read.delim(files[1], head=F, skip=1)
 data <- data[,1:4]
-data <- data[data$V1 != 'Mt',]
-data <- data[data$V1 != 'Pt',]
+data <- data[data$V1 != 'Mt' & data != "ChrM" & data != "M",]
+data <- data[data$V1 != 'Pt' & data != "ChrC" & data != "C",]
 test <- as.numeric(regexec(text=paste0(files[1]), pattern='_C'))
 name <- substr(paste0(files[1]), start=1, stop=test-1)
 colnames(data)=c('V1','V2','V3',paste(name))
