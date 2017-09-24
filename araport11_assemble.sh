@@ -54,17 +54,15 @@ ara=gffRead('Araport11_GFF3_genes_transposons.201606.gff')
 gene=subset(ara,ara$feature=='gene')
 gene$Name=getAttributeField(gene$attributes, 'Name')
 gene$ID=getAttributeField(gene$attributes, 'ID')
-gene$chr <- sapply(strsplit(gene$seqname, 'Chr'), function(l) l[2])
-gene.out=gene[,c('chr','start','end','Name','score','strand')]
+gene.out=gene[,c('seqname','start','end','Name','score','strand')]
 
-write.table(gene.out,'Araport11_genes.bed',sep='\t',row.names=F,col.names=F,quote=F)
+write.table(gene.out,'Araport11_mRNA.bed',sep='\t',row.names=F,col.names=F,quote=F)
 
 # TE annotation
 te=subset(ara,ara$feature=='transposable_element')
 te$Name=getAttributeField(te$attributes, 'Name')
 te$ID=getAttributeField(te$attributes, 'ID')
-te$chr <- sapply(strsplit(te$seqname, 'Chr'), function(l) l[2])
-te.out=te[,c('chr','start','end','Name','score','strand')]
+te.out=te[,c('seqname','start','end','Name','score','strand')]
 
 write.table(te.out,'Araport11_TE.bed',sep='\t',row.names=F,col.names=F,quote=F)
 
