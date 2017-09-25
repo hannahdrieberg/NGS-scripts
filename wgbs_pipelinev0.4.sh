@@ -74,23 +74,14 @@ mv 2_trimgalore/${fq_file%%.fastq*}_trimmed_fastqc* 3_trimmed_fastqc
 mkdir 0_rawfastq
 mv $fq_file 0_rawfastq
 
-#bismark & sort BAM output
+#bismark to BAM
 mkdir 4_bismark_alignment
 cd 4_bismark_alignment
-
 bismark --bowtie1 -n 2 -l 20 ../../$genome_path ../2_trimgalore/${fq_file%%.fastq*}_trimmed.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-
-samtools sort ${fq_file%%.fastq*}_trimmed*_bismark.bam -o ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-samtools index ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-rm ${fq_file%%.fastq*}_trimmed*_bismark.bam
-
-#sam to bam
-#samtools view -b -S -h ${fq_file%%.fastq*}_trimmed*.sam > ${fq_file%%.fastq*}_trimmed.fq_bismark.bam
-#samtools sort ${fq_file%%.fastq*}_trimmed.fq_bismark.bam -o ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-#samtools index ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools index ${fq_file%%.fastq*}_trimmed*_bismark.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #methylation extraction
-bismark_methylation_extractor --comprehensive --report --buffer_size 8G -s ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark_methylation_extractor --comprehensive --report --buffer_size 8G -s ${fq_file%%.fastq*}_trimmed*_bismark.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #bedgraph creation
 bismark2bedGraph --CX CpG* -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
@@ -207,17 +198,15 @@ mv 2_trimgalore/${fq_file%%.fastq*}_trimmed_fastqc* 3_trimmed_fastqc
 mkdir 0_rawfastq
 mv $fq_file 0_rawfastq
 
-#bismark & sort BAM output
+#bismark to BAM
 mkdir 4_bismark_alignment
 cd 4_bismark_alignment
 bismark --bowtie1 -n 2 -l 20 ../../$genome_path ../2_trimgalore/${fq_file%%.fastq*}_trimmed.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-
-samtools sort ${fq_file%%.fastq*}_trimmed*_bismark.bam -o ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-samtools index ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools index ${fq_file%%.fastq*}_trimmed*_bismark.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 rm ${fq_file%%.fastq*}_trimmed*_bismark.bam
 
 #methylation extraction
-bismark_methylation_extractor --comprehensive --report --buffer_size 8G -s ${fq_file%%.fastq*}_trimmed.fq_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark_methylation_extractor --comprehensive --report --buffer_size 8G -s ${fq_file%%.fastq*}_trimmed*_bismark.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #bedgraph creation
 bismark2bedGraph --CX CpG* -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
@@ -336,14 +325,11 @@ mkdir 0_rawfastq
 mv $fq_file1 0_rawfastq
 mv $fq_file2 0_rawfastq
 
-#bismark
+#bismark to BAM
 mkdir 4_bismark_alignment
 cd 4_bismark_alignment
 bismark --bowtie1 -n 2 -l 20 ../../$genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-
-samtools sort ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.bam -o ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-samtools index ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-rm ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.bam
+samtools index ${fq_file1%%.fastq*}_val_1*_bismark_pe.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #sam to bam
 #samtools view -b -S -h ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.sam > ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.bam
@@ -351,7 +337,7 @@ rm ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.bam
 #samtools index ${fq_file1%%.fastq*}_val_1.fq_bismark_pe.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #methylation extraction PAIRED END (-p)
-bismark_methylation_extractor --comprehensive --report --buffer_size 8G -p ${fq_file1%%.fastq*}_val_1.fq*_bismark_pe.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark_methylation_extractor --comprehensive --report --buffer_size 8G -p ${fq_file1%%.fastq*}_val_1*_bismark_pe.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #bedgraph creation
 bismark2bedGraph --CX CpG* -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
@@ -362,7 +348,6 @@ mkdir 5_output_files
 mv 4_bismark_alignment/*.bed* 5_output_files
 
 #100bp window creation
-
 perl $HOME/scripts/C_context_window_SREedits.pl 4_bismark_alignment/CpG* 100 0 ${fileID}_CpG 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 4_bismark_alignment/CpG*.wig 5_output_files/${fileID}_CpG_100bp.wig
 perl $HOME/scripts/C_context_window_SREedits.pl 4_bismark_alignment/CHG* 100 0 ${fileID}_CHG 2>&1 | tee -a ${fileID}_logs_${dow}.log
@@ -395,7 +380,6 @@ if [[ $fq_file1 != *gz* ]];then
 	raw_reads=$(wc -l < 0_rawfastq/$fq_file1)
 	raw_reads=$(($raw_reads / 4 ))
 fi
-
 
 if [[ $fq_file1 == *gz* ]];then
 	flt_reads=$(zcat 2_trimgalore/*.gz | wc -l)
@@ -455,7 +439,6 @@ mkdir 1_fastqc
 fastqc $fq_file1 $fq_file2 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv ${fq_file1%%.fastq*}_fastqc* 1_fastqc #
 mv ${fq_file2%%.fastq*}_fastqc* 1_fastqc #
-
 
 #trim_galore
 mkdir 2_trimgalore
