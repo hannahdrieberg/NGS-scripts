@@ -1,6 +1,6 @@
-# execute R file to produce DSS input files
+#!/usr/bin/env Rscript
+# Produce DSS input files from bismark cov files
 # run in folder with cov files of interest and tell which context you want to merge together
-# take cov files and change file structure for input to DSS
 # USAGE: DSS_file_prep.r <context: CpG, CHG, CHH>
 
 options(echo=T)
