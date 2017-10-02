@@ -67,8 +67,11 @@ echo "Performing adapter and low-quality read trimming... "
 mkdir 2_scythe_sickle
 cd 2_scythe_sickle
 
+echo "scythe adapters ..."
+
 scythe -a /home/diep/scripts/TruSeq-adapters.fa -p 0.1 ../$fq > ${fq%%.fastq*}_noadapt.fastq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
+echo "sickle low-quality ..."
 sickle se -f ${fq%%.fastq*}_noadapt.fastq -o ${fq%%.fastq*}_trimmed.fastq -t sanger -q 20 -l 20 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 echo "Done... cleaning ..."
@@ -180,9 +183,13 @@ echo "Performing adapter and low-quality read trimming... "
 mkdir 2_scythe_sickle
 cd 2_scythe_sickle
 
+echo "scythe adapters ..."
+
 scythe -a /home/diep/scripts/TruSeq-adapters.fa -p 0.1 ../$fq1 > ${fq1%%.fastq*}_noadapt.fastq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 scythe -a /home/diep/scripts/TruSeq-adapters.fa -p 0.1 ../$fq2 > ${fq2%%.fastq*}_noadapt.fastq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+
+echo "sickle low-quality ..."
 
 sickle pe -f ${fq1%%.fastq*}_noadapt.fastq -r ${fq2%%.fastq*}_noadapt.fastq -o ${fq1%%.fastq*}_trimmed.fastq -p ${fq2%%.fastq*}_trimmed.fastq -s trimmed.singles.fastq -t sanger -q 20 -l 20 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
