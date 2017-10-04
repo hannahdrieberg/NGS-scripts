@@ -3,7 +3,7 @@ set -e
 set -u
 
 # Produce coverage data from BAM files for RNAseq or ChIP data in bedgraph format
-# Then produce binary TDFs or BigWigs for viewing delight
+# Then produce bigWigs files for viewing delight
 # Run in directory with sam converted, sorted, indexed  bam file
 # Ensure subread indexed genome & chromosome sizes are prepared eg TAIR10/TAIR10_Chr.all.fasta.len
 # samtools faidx TAIR10_Chr.all.fasta | cut -f1,2 TAIR10_Chr.all.fasta.fai > TAIR10_Chr.all.fasta.len
@@ -56,7 +56,7 @@ if [[ "$lay" == "PE" ]] && [[ "$str"  == "unstranded" ]] ; then
 
 echo "BAM to bedgraph ..."
 # unstranded bedgraph
-bedtools genomecov -bga -split -ibam $smp -g $chrc_sizes > ${smp%%sorted.bam*}.bg
+bedtools genomecov -bga -split -ibam $smp -g $chrc_sizes > ${smp%%sorted.bam*}bg
 
 # bg to bigWig
 echo "bigWig ..."
@@ -94,8 +94,8 @@ echo "bigWigs..."
 /home/diep/bin/kentUtils/bin/bedGraphToBigWig ${smp%%bam}plus.bg ${chrc_sizes}  ${smp%%bam}plus.bigWig
 /home/diep/bin/kentUtils/bin/bedGraphToBigWig ${smp%%bam}minus.bg ${chrc_sizes} ${smp%%bam}minus.bigWig
 
-# clean
+fi
+
+# clean up tmps
 rm ${smp%%bam}*bam -v
 rm ${smp%%bam}*bg -v
-
-fi
