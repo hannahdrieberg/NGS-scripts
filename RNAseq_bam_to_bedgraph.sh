@@ -34,11 +34,11 @@ if [[ "$lay" == "SE" ]] && [[ "$str"  == "unstranded" ]] ; then
 
 echo "BAM to bedgraph ..."
 # unstranded bedgraph
-bedtools genomecov -bga -split -ibam $smp -g $chrc_sizes > ${smp%%sorted.bam*}.bg
+bedtools genomecov -bga -split -ibam $smp -g $chrc_sizes > ${smp%%sorted.bam*}bg
 
 # bg to bigWig
 echo "bigWig ..."
-/home/diep/bin/kentUtils/bin/bedGraphToBigWig ${smp%%bam}bg ${chrc_sizes} ${smp%%bam}bigWig
+/home/diep/bin/kentUtils/bin/bedGraphToBigWig ${smp%%sorted.bam*}bg ${chrc_sizes} ${smp%%bam}bigWig
 
 fi
 
@@ -60,7 +60,7 @@ bedtools genomecov -bga -split -ibam $smp -g $chrc_sizes > ${smp%%sorted.bam*}bg
 
 # bg to bigWig
 echo "bigWig ..."
-/home/diep/bin/kentUtils/bin/bedGraphToBigWig ${smp%%bam}bg ${chrc_sizes} ${smp%%bam}bigWig
+/home/diep/bin/kentUtils/bin/bedGraphToBigWig ${smp%%sorted.bam*}bg ${chrc_sizes} ${smp%%bam}bigWig
 
 fi
 
@@ -97,5 +97,7 @@ echo "bigWigs..."
 fi
 
 # clean up tmps
-rm ${smp%%bam}*bam -v
-rm ${smp%%bam}*bg -v
+rm ${smp%%.bam}*R*bam -v
+rm ${smp%%.bam}*forward*bam -v
+rm ${smp%%.bam}*reverse*bam -v
+rm ${smp%%.sorted.bam}*bg -v
