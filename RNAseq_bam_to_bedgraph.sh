@@ -67,7 +67,7 @@ fi
 
 if [[ "$lay" == "PE" ]] && [[ "$str"  == "stranded" ]] ; then
 
-echo "Extract properly-paired reads and their mates (+ flags 99/147; - flags 83/163) from paired-end BAM files"
+echo "Extract properly-paired read mates (+ flags 99/147; - flags 83/163) from paired-end BAM files"
 # http://seqanswers.com/forums/showthread.php?t=29399
 
 # R1 forward
@@ -94,10 +94,12 @@ echo "bigWigs..."
 /home/diep/bin/kentUtils/bin/bedGraphToBigWig ${smp%%bam}plus.bg ${chrc_sizes}  ${smp%%bam}plus.bigWig
 /home/diep/bin/kentUtils/bin/bedGraphToBigWig ${smp%%bam}minus.bg ${chrc_sizes} ${smp%%bam}minus.bigWig
 
+rm ${smp%%.bam}*R1*bam -v
+rm ${smp%%.bam}*R2*bam -v
+rm ${smp%%.bam}*forward*bam -v
+rm ${smp%%.bam}*reverse*bam -v
+
 fi
 
 # clean up tmps
-rm ${smp%%.bam}*R*bam -v
-rm ${smp%%.bam}*forward*bam -v
-rm ${smp%%.bam}*reverse*bam -v
 rm ${smp%%.sorted.bam}*bg -v
