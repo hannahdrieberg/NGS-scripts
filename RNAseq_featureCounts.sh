@@ -1,11 +1,12 @@
 #!/bin/bash
 # Use featureCounts to perform feature counting on BAM files
-set -ex
+set -eu
 
 if [ "$#" -lt 5 ]; then
 echo "Missing arguments!"
-echo "USAGE: RNAseq_featureCounts.sh <filename> <SE/PE> <0 (unstranded)/ 1(stranded) / 2 (reverse stranded)> <bedfile> <outname>"
+echo "USAGE: RNAseq_featureCounts.sh <filename> <SE/PE> <0/1/2> <bedfile> <outname>"
 echo "EXAMPLE: RNAseq_featureCounts.sh col0-r1 PE 1 /home/diep/Araport11/annotations/Araport11_mRNA.bed mRNA"
+echo "0 = unstranded, 1 = stranded, 2 = reverse stranded"
 exit 1
 fi
 
@@ -24,29 +25,35 @@ echo ""
 echo "$layout $strand featureCounts on $bedfile ($outname) in $sample ..."
 echo ""
 
-if [ $layout == "SE" ] ; then 
+# SAF formatted file from BED file anno
+awk -F'\t' '{print $4"\t"$1"\t"$2"\t"$3"\t"$6}' $bedfile > temp.saf
+awk 'BEGIN {print "GeneID""\t""Chr""\t""Start""\t""End""\t""Strand"}{print}' temp.saf > temp2.saf
+
+if [[ $layout == "SE" ]]; then 
 
 featureCounts\
-	-F SAF\
+	-F 'SAF'\
 	-C\
 	-T 2\
 	-s $strand\
-	-a $bedfile\
+	-a temp2.saf\
 	-o "${sample}_${outname}.counts"\
-	"${sample}"
+	$sample
 fi
 	
-if [ $layout == "PE" ] ; then 
+if [[ $layout == "PE" ]]; then 
 
 featureCounts\
 	-F SAF\
 	-p\
 	-C\
-	-T 2\	
-	-s $strand;
-	-a $bedfile;
+	-T 2\
+	-s $strand\
+	-a temp2.saf\
 	-o "${sample}_${outname}.counts"\
-	"${sample}"
+	$sample
 fi
+
+rm temp*.saf -v
 
 echo "DONE"
