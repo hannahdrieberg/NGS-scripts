@@ -37,7 +37,7 @@ featureCounts\
 	-T 2\
 	-s $strand\
 	-a temp2.saf\
-	-o "${sample}_${outname}.counts"\
+	-o "${sample%%sorted.bam.*}_${outname}.counts"\
 	$sample
 fi
 	
@@ -50,7 +50,7 @@ featureCounts\
 	-T 2\
 	-s $strand\
 	-a temp2.saf\
-	-o "${sample}_${outname}.counts"\
+	-o "${sample%%sorted.bam.*}_${outname}.counts"\
 	$sample
 fi
 
