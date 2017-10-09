@@ -10,7 +10,7 @@ set -u
 
 if [ "$#" -lt 3 ]; then
 echo "Missing arguments!"
-echo "USAGE: bam_to_bedgraph.sh <sample name> <SE, PE> <unstranded, stranded>"
+echo "USAGE: RNAseq_bam_to_bedgraph.sh <sample name> <SE, PE> <unstranded, stranded>"
 echo "EXAMPLE: RNAseq_bam_to_bedgraph.sh col0-r1 PE unstranded"
 exit 1
 fi
