@@ -5,12 +5,12 @@ set -eu
 if [ "$#" -lt 5 ]; then
 echo "Missing arguments!"
 echo "USAGE: RNAseq_featureCounts.sh <filename> <SE/PE> <0/1/2> <bedfile> <outname>"
-echo "EXAMPLE: RNAseq_featureCounts.sh col0-r1 PE 1 /home/diep/Araport11/annotations/Araport11_mRNA.bed mRNA"
+echo "EXAMPLE: RNAseq_featureCounts.sh col0-r1.sorted.bam PE 1 /home/diep/Araport11/annotations/Araport11_mRNA.bed mRNA"
 echo "0 = unstranded, 1 = stranded, 2 = reverse stranded"
 exit 1
 fi
 
-sample="$1.sorted.bam"
+sample=$1
 layout=$2
 strand=$3
 bedfile=$4
@@ -37,7 +37,7 @@ featureCounts\
 	-T 2\
 	-s $strand\
 	-a temp2.saf\
-	-o "${1}_${outname}.counts"\
+	-o "${1%%.bam*}_${outname}.counts"\
 	$sample
 fi
 	
@@ -50,7 +50,7 @@ featureCounts\
 	-T 2\
 	-s $strand\
 	-a temp2.saf\
-	-o "${1}_${outname}.counts"\
+	-o "${1%%.bam*}_${outname}.counts"\
 	$sample
 fi
 
