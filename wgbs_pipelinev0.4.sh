@@ -81,13 +81,13 @@ cd 4_bismark_alignment
 
 bismark --bowtie1 -n 2 -l 20 ../../$genome_path ../2_trimgalore/${fq_file%%.fastq*}_trimmed.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-samtools sort ${fq_file%%.fastq*}_trimmed*_bismark.bam -o ${fq_file%%.fastq*}_trimmed*_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-samtools index ${fq_file%%.fastq*}_trimmed*_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools sort ${fq_file%%.fastq*}_trimmed*_bismark.bam -o ${fq_file%%.fastq*}_trimmed_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools index ${fq_file%%.fastq*}_trimmed_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 rm -v *bismark.bam
 
 #methylation extraction
-bismark_methylation_extractor --comprehensive --report --buffer_size 8G -s ${fq_file%%.fastq*}_trimmed*_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark_methylation_extractor --comprehensive --report --buffer_size 8G -s ${fq_file%%.fastq*}_trimmed_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #bedgraph creation
 bismark2bedGraph --CX CpG* -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log

@@ -25,13 +25,14 @@ Script for performing DSS DMR calling on re-formatted (using DSS_file_prep.r) be
 ### DSS_file_prep.r
 Script for re-formatting bed.cov file methylation output for input to DSS.
 
-### RNAseq_DEGanalysis.sh
-
 ### RNAseq_bam_to_100bpwigs.sh
+Produce 100bp windows (100bp.bed) of RNAseq coverage from BAMs across annotations of interest.
 
 ### RNAseq_bam_to_bedgraph.sh	
+Produce coverage data from BAM files for RNAseq or ChIP data in bedgraph format, subsequently converting to bigWig files (IGV browsing). 
 
-### RNAseq_bedgraph_to_bigwig_tdf.sh
+### RNAseq_featureCounts.sh
+Perform feature counts on aligned reads on annotation file of interest for differential expression analysis.
 
 ### RNAseq_v0.1.sh
 Master script for performing quality trimming and subread alignment of RNA-seq reads. Sorted BAM as output for down-stream analysis.
@@ -39,7 +40,10 @@ Master script for performing quality trimming and subread alignment of RNA-seq r
 ### TruSeq-adapters.fa
 FASTA file containing illumina adapter sequences for scythe step in RNA-seq alignment.
 
+### araport11_assemble.sh
+
 ### average_cov.sh
+Calculate average depth using samtools depth on sorted BAM file.
 
 ### bed_to_rel_dist.sh
 
