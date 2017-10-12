@@ -152,7 +152,7 @@ if [ "$1" == "PE" ];then
 
 if [ "$#" -ne 5 ]; then
 echo "Missing required arguments for paired-end!"
-echo "USAGE: wgbs_pipelinev0.5.sh <-pe> <R1> <R2> <path to bismark genome folder> <fileID for output files>"
+echo "USAGE: wgbs_pipelinev0.5.sh <PE> <R1> <R2> <path to bismark genome folder> <fileID for output files>"
 exit 1
 fi
 #gather input variables

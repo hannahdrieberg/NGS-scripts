@@ -46,16 +46,18 @@ FASTA file containing illumina adapter sequences for scythe step in RNA-seq alig
 Calculate average depth using samtools depth on sorted BAM file.
 
 ### bed_to_rel_dist.sh
+Produce genome summarised methylation plots across features of interest e.g. gene models.
 
 ### chip-seq_v0.1.sh
+Perform quality trimming and align raw reads from ChIP-seq experiments using SubRead (Subjunc).
 
 ### conversion_rate_check.sh
+Calculate bisulfite conversion efficiency by calclulating percent methylated in the chloroplast genome, which itself should be completely unmethylated.
 
 ### dmr_merge.r
+Supplemental file for 100bp DMR calling to produce final DMR table.
 
 ### gene_to_gene_anno.sh
-
-### genome_wigs_heatmap.r
 
 ### merge_covs.r
 
@@ -80,6 +82,4 @@ Calculate average depth using samtools depth on sorted BAM file.
 ### wgbs_cov_to_TDF.txt
 
 ### wgbs_pipelinev0.4.sh
-
-### wgbs_wig_PCA.r
 
