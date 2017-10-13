@@ -76,7 +76,7 @@ mv $fq_file 0_rawfastq
 mkdir 4_bismark_alignment
 cd 4_bismark_alignment
 
-bismark ../../$genome_path ../2_trimgalore/${fq_file%%.fastq*}_trimmed.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark $genome_path ../2_trimgalore/${fq_file%%.fastq*}_trimmed.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 samtools sort ${fq_file%%.fastq*}_trimmed*_bismark*.bam -o ${fq_file%%.fastq*}_trimmed_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 samtools index ${fq_file%%.fastq*}_trimmed_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
@@ -209,14 +209,14 @@ mkdir 4_bismark_alignment
 cd 4_bismark_alignment
 
 #PE alignment
-bismark --un ../../$genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark --un $genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 samtools index ${fq_file1%%.fastq*}*_bismark_bt2_pe.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #SE directional on unmapped R1
-bismark ../../$genome_path  ${fq_file1%%.fastq*}_val_1.*unmapped_reads_1.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark $genome_path  ${fq_file1%%.fastq*}_val_1.*unmapped_reads_1.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #SE directional on unmapped R2
-bismark ../../$genome_path  ${fq_file2%%.fastq*}_val_2.*unmapped_reads_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark $genome_path  ${fq_file2%%.fastq*}_val_2.*unmapped_reads_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #merge & sort SE remapped BAMs
 samtools merge ${fq_file1%%.fastq*}_SEremapped.bam ${fq_file1%%.fastq*}*unmapped_reads_1*bt2.bam ${fq_file1%%.fastq*}*unmapped_reads_2*bt2.bam | tee -a ../${fileID}_logs_${dow}.log
