@@ -210,7 +210,6 @@ cd 4_bismark_alignment
 
 #PE alignment
 bismark --un $genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-samtools index ${fq_file1%%.fastq*}*_bismark_bt2_pe.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #SE directional on unmapped R1
 bismark $genome_path  ${fq_file1%%.fastq*}_val_1.*unmapped_reads_1.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
@@ -219,7 +218,7 @@ bismark $genome_path  ${fq_file1%%.fastq*}_val_1.*unmapped_reads_1.fq* 2>&1 | te
 bismark $genome_path  ${fq_file2%%.fastq*}_val_2.*unmapped_reads_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #merge & sort SE remapped BAMs
-samtools merge ${fq_file1%%.fastq*}_SEremapped.bam ${fq_file1%%.fastq*}*unmapped_reads_1*bt2.bam ${fq_file1%%.fastq*}*unmapped_reads_2*bt2.bam | tee -a ../${fileID}_logs_${dow}.log
+samtools merge ${fq_file1%%.fastq*}_SEremapped.bam ${fq_file1%%.fastq*}*unmapped_reads_1*bt2.bam ${fq_file2%%.fastq*}*unmapped_reads_2*bt2.bam | tee -a ../${fileID}_logs_${dow}.log
 samtools sort ${fq_file1%%.fastq*}_SEremapped.bam -o ${fq_file1%%.fastq*}_SEremapped.sorted.bam | tee -a ../${fileID}_logs_${dow}.log
 samtools index ${fq_file1%%.fastq*}_SEremapped.sorted.bam | tee -a ../${fileID}_logs_${dow}.log
 
@@ -266,10 +265,10 @@ echo "#####################"
 bismark_version=$(bismark --version | grep "Bismark Version:" | cut -d":" -f2 | tr -d ' ')
 samtools_version=$(samtools 3>&1 1>&2 2>&3 | grep "Version:" | cut -d' ' -f2 | tr -d ' ')
 
-map_ef=$(grep 'Mapping efficiency:' 4_bismark_alignment/${fq_file1%%.fastq*}_PE_multireports.txt | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
-cpg_per=$(grep 'C methylated in CpG context:' 4_bismark_alignment/${fq_file1%%.fastq*}_PE_multireports.txt | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
-chg_per=$(grep 'C methylated in CHG context:' 4_bismark_alignment/${fq_file1%%.fastq*}_PE_multireports.txt | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
-chh_per=$(grep 'C methylated in CHH context:' 4_bismark_alignment/${fq_file1%%.fastq*}_PE_multireports.txt | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
+map_ef=$(grep 'Mapping efficiency:' 4_bismark_alignment/${fq_file1%%.fastq*}*_PE_multireports_bt2.txt | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
+cpg_per=$(grep 'C methylated in CpG context:' 4_bismark_alignment/${fq_file1%%.fastq*}*_PE_multireports_bt2.txt | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
+chg_per=$(grep 'C methylated in CHG context:' 4_bismark_alignment/${fq_file1%%.fastq*}*_PE_multireports_bt2.txt | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
+chh_per=$(grep 'C methylated in CHH context:' 4_bismark_alignment/${fq_file1%%.fastq*}*_PE_multireports_bt2.txt | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
 
 if [[ $fq_file1 == *gz* ]];then
 	raw_reads=$(zcat 0_rawfastq/*.gz | wc -l)
