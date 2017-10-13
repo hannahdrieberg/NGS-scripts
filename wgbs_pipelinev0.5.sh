@@ -239,10 +239,12 @@ zcat CpG*.txt.gz > CpG_context_${fileID}_merged.txt
 zcat CHG*.txt.gz > CHG_context_${fileID}_merged.txt
 zcat CHH*.txt.gz > CHH_context_${fileID}_merged.txt
 
+rm C*txt.gz -v
+
 #bedgraph creation on merged results
-bismark2bedGraph --CX CpG*txt -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-bismark2bedGraph --CX CHG*txt -o ${fileID}_CHG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-bismark2bedGraph --CX CHH*txt -o ${fileID}_CHH.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark2bedGraph --multicore 2 --CX CpG*txt -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark2bedGraph --multicore 2 --CX CHG*txt -o ${fileID}_CHG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark2bedGraph --multicore 2 --CX CHH*txt -o ${fileID}_CHH.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 cd ../
 mkdir 5_output_files
