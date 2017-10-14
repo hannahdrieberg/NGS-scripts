@@ -110,13 +110,13 @@ echo "#####################"
 bismark_version=$(bismark --version | grep "Bismark Version:" | cut -d":" -f2 | tr -d ' ')
 samtools_version=$(samtools 3>&1 1>&2 2>&3 | grep "Version:" | cut -d' ' -f2 | tr -d ' ')
 
-map_ef=$(grep 'Mapping efficiency:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed.fq*_bismark_SE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
-unique_aln=$(grep 'Number of alignments with a unique best hit from the different alignments:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed.fq*_bismark_SE_report.txt  | cut -d: -f2 | tr -d '\t')
-no_aln=$(grep 'Sequences with no alignments under any condition:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed.fq*_bismark_SE_report.txt  | cut -d: -f2 | tr -d '\t')
-multi_aln=$(grep 'Sequences did not map uniquely:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed.fq*_bismark_SE_report.txt  | cut -d: -f2 | tr -d '\t')
-cpg_per=$(grep 'C methylated in CpG context:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed.fq*_bismark_SE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
-chg_per=$(grep 'C methylated in CHG context:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed.fq*_bismark_SE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
-chh_per=$(grep 'C methylated in CHH context:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed.fq*_bismark_SE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
+map_ef=$(grep 'Mapping efficiency:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed.fq*_bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
+unique_aln=$(grep 'Number of alignments with a unique best hit from the different alignments:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed.fq*_bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t')
+no_aln=$(grep 'Sequences with no alignments under any condition:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed.fq*_bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t')
+multi_aln=$(grep 'Sequences did not map uniquely:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed.fq*_bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t')
+cpg_per=$(grep 'C methylated in CpG context:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed.fq*_bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
+chg_per=$(grep 'C methylated in CHG context:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed.fq*_bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
+chh_per=$(grep 'C methylated in CHH context:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed.fq*_bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
 
 if [[ $fq_file == *gz* ]];then
 	raw_reads=$(zcat 0_rawfastq/*.gz | wc -l)
@@ -127,7 +127,6 @@ if [[ $fq_file != *gz* ]];then
 	raw_reads=$(wc -l < 0_rawfastq/$fq_file)
 	raw_reads=$(($raw_reads / 4 ))
 fi
-
 
 if [[ $fq_file == *gz* ]];then
 	flt_reads=$(zcat 2_trimgalore/*.gz | wc -l)
@@ -140,8 +139,8 @@ if [[ $fq_file != *gz* ]];then
 fi
 
 #add it to the full pipeline logfile
-printf "${dow}\t${fq_file}\t${fileID}\t${genome_path##../}\t${type:1}\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${unique_aln}\t${no_aln}\t${multi_aln}\t${cpg_per}\t${chg_per}\t${chh_per}\n"
-printf "${dow}\t${fq_file}\t${fileID}\t${genome_path##../}\t${type:1}\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${unique_aln}\t${no_aln}\t${multi_aln}\t${cpg_per}\t${chg_per}\t${chh_per}\n" >> $HOME/wgbs_se_pipeline_analysis_record.log
+printf "${dow}\t${fq_file}\t${fileID}\t${genome_path/}\t${type}\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${unique_aln}\t${no_aln}\t${multi_aln}\t${cpg_per}\t${chg_per}\t${chh_per}\n"
+printf "${dow}\t${fq_file}\t${fileID}\t${genome_path/}\t${type}\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${unique_aln}\t${no_aln}\t${multi_aln}\t${cpg_per}\t${chg_per}\t${chh_per}\n" >> $HOME/wgbs_se_pipeline_analysis_record.log
 
 fi
 
@@ -241,9 +240,9 @@ zcat CHH*.txt.gz > CHH_context_${fileID}_merged.txt
 rm C*txt.gz -v
 
 #bedgraph creation on merged results
-bismark2bedGraph --multicore 2 --CX CpG*txt -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-bismark2bedGraph --multicore 2 --CX CHG*txt -o ${fileID}_CHG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-bismark2bedGraph --multicore 2 --CX CHH*txt -o ${fileID}_CHH.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark2bedGraph --CX CpG*txt -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark2bedGraph --CX CHG*txt -o ${fileID}_CHG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark2bedGraph --CX CHH*txt -o ${fileID}_CHH.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 cd ../
 mkdir 5_output_files
@@ -291,7 +290,7 @@ if [[ $fq_file1 != *gz* ]];then
 fi
 
 #add it to the full pipeline logfile
-printf "${dow}\t${fq_file1}\t${fileID}\t${genome_path##../}\t${type:1}\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${cpg_per}\t${chg_per}\t${chh_per}\n"
-printf "${dow}\t${fq_file1}\t${fileID}\t${genome_path##../}\t${type:1}\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${cpg_per}\t${chg_per}\t${chh_per}\n" >> $HOME/wgbs_se_pipeline_analysis_record.log
+printf "${dow}\t${fq_file1}\t${fileID}\t${genome_path}\t${type:1}\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${cpg_per}\t${chg_per}\t${chh_per}\n"
+printf "${dow}\t${fq_file1}\t${fileID}\t${genome_path}\t${type:1}\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${cpg_per}\t${chg_per}\t${chh_per}\n" >> $HOME/wgbs_se_pipeline_analysis_record.log
 
 fi
