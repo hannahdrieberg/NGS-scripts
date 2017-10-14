@@ -213,15 +213,15 @@ bismark --un $genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 .
 #SE directional on unmapped R1
 bismark $genome_path  ${fq_file1%%.fastq*}_val_1.*unmapped_reads_1.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-#SE directional on unmapped R2
-bismark $genome_path  ${fq_file2%%.fastq*}_val_2.*unmapped_reads_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+#SE non-directional on unmapped R2
+bismark --non_directional $genome_path  ${fq_file2%%.fastq*}_val_2.*unmapped_reads_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #merge & sort SE remapped BAMs
 samtools merge ${fq_file1%%.fastq*}_SEremapped.bam ${fq_file1%%.fastq*}*unmapped_reads_1*bt2.bam ${fq_file2%%.fastq*}*unmapped_reads_2*bt2.bam | tee -a ../${fileID}_logs_${dow}.log
 samtools sort ${fq_file1%%.fastq*}_SEremapped.bam -o ${fq_file1%%.fastq*}_SEremapped.sorted.bam | tee -a ../${fileID}_logs_${dow}.log
 samtools index ${fq_file1%%.fastq*}_SEremapped.sorted.bam | tee -a ../${fileID}_logs_${dow}.log
 
-cat *report.txt > ${fq_file1%%.fastq*}_PE_multireports_bt2.txt
+cat *report.txt > ${fq_file1%%.fastq*}_PE_SE_multireports_bt2.txt
 rm *_report.txt -v
 rm *unmapped*.bam -v
 rm *SEremapped.bam -v
