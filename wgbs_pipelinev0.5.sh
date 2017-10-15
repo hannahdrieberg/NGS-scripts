@@ -223,7 +223,7 @@ samtools index ${fq_file1%%.fastq*}_SEremapped.sorted.bam | tee -a ../${fileID}_
 
 cat *report.txt > ${fq_file1%%.fastq*}_PE_SE_multireports_bt2.txt
 rm *_report.txt -v
-rm *unmapped*.bam -v
+rm *unmapped_reads* -v
 rm *SEremapped.bam -v
 
 #methylation extraction PE (-p)
@@ -290,7 +290,7 @@ if [[ $fq_file1 != *gz* ]];then
 fi
 
 #add it to the full pipeline logfile
-printf "${dow}\t${fq_file1}\t${fileID}\t${genome_path}\t${type:1}\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${cpg_per}\t${chg_per}\t${chh_per}\n"
-printf "${dow}\t${fq_file1}\t${fileID}\t${genome_path}\t${type:1}\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${cpg_per}\t${chg_per}\t${chh_per}\n" >> $HOME/wgbs_se_pipeline_analysis_record.log
+printf "${dow}\t${fq_file1}\t${fileID}\t${genome_path}\t${type}\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${cpg_per}\t${chg_per}\t${chh_per}\n"
+printf "${dow}\t${fq_file1}\t${fileID}\t${genome_path}\t${type}\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${cpg_per}\t${chg_per}\t${chh_per}\n" >> $HOME/wgbs_se_pipeline_analysis_record.log
 
 fi
