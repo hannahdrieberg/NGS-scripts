@@ -222,9 +222,9 @@ samtools sort ${fq_file1%%.fastq*}_SEremapped.bam -o ${fq_file1%%.fastq*}_SErema
 samtools index ${fq_file1%%.fastq*}_SEremapped.sorted.bam | tee -a ../${fileID}_logs_${dow}.log
 
 cat *report.txt > ${fq_file1%%.fastq*}_PE_SE_multireports_bt2.txt
-rm *_report.txt -v
-rm *unmapped_reads* -v
-rm *SEremapped.bam -v
+rm -v *_report.txt
+rm -v *_unmapped_reads_*
+rm -v *SEremapped.bam
 
 #methylation extraction PE (-p)
 bismark_methylation_extractor --comprehensive --report --multicore 2 --buffer_size 8G -p --gzip ${fq_file1%%.fastq*}_val_1.fq*_bismark_bt2_pe.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
@@ -264,10 +264,10 @@ echo "#####################"
 bismark_version=$(bismark --version | grep "Bismark Version:" | cut -d":" -f2 | tr -d ' ')
 samtools_version=$(samtools 3>&1 1>&2 2>&3 | grep "Version:" | cut -d' ' -f2 | tr -d ' ')
 
-map_ef=$(grep 'Mapping efficiency:' 4_bismark_alignment/${fq_file1%%.fastq*}*_PE_multireports_bt2.txt | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
-cpg_per=$(grep 'C methylated in CpG context:' 4_bismark_alignment/${fq_file1%%.fastq*}*_PE_multireports_bt2.txt | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
-chg_per=$(grep 'C methylated in CHG context:' 4_bismark_alignment/${fq_file1%%.fastq*}*_PE_multireports_bt2.txt | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
-chh_per=$(grep 'C methylated in CHH context:' 4_bismark_alignment/${fq_file1%%.fastq*}*_PE_multireports_bt2.txt | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
+map_ef=$(grep 'Mapping efficiency:' 4_bismark_alignment/${fq_file1%%.fastq*}*_PE_SE_multireports_bt2.txt | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
+cpg_per=$(grep 'C methylated in CpG context:' 4_bismark_alignment/${fq_file1%%.fastq*}*_PE_SE_multireports_bt2.txt | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
+chg_per=$(grep 'C methylated in CHG context:' 4_bismark_alignment/${fq_file1%%.fastq*}*_PE_SE_multireports_bt2.txt | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
+chh_per=$(grep 'C methylated in CHH context:' 4_bismark_alignment/${fq_file1%%.fastq*}*_PE_SE_multireports_bt2.txt | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
 
 if [[ $fq_file1 == *gz* ]];then
 	raw_reads=$(zcat 0_rawfastq/*.gz | wc -l)
