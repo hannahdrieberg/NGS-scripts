@@ -76,7 +76,7 @@ mv $fq_file 0_rawfastq
 mkdir 4_bismark_alignment
 cd 4_bismark_alignment
 
-bismark $genome_path ../2_trimgalore/${fq_file%%.fastq*}_trimmed.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark --multicore 2 $genome_path ../2_trimgalore/${fq_file%%.fastq*}_trimmed.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 samtools sort ${fq_file%%.fastq*}_trimmed*_bismark*.bam -o ${fq_file%%.fastq*}_trimmed_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 samtools index ${fq_file%%.fastq*}_trimmed_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
