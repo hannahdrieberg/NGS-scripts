@@ -211,7 +211,7 @@ cd 4_bismark_alignment
 bismark --un $genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #SE directional on unmapped R1
-bismark $genome_path  ${fq_file1%%.fastq*}_val_1.*unmapped_reads_1.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark --multicore 2 $genome_path ${fq_file1%%.fastq*}_val_1.*unmapped_reads_1.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #SE non-directional on unmapped R2
 bismark --non_directional $genome_path  ${fq_file2%%.fastq*}_val_2.*unmapped_reads_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
