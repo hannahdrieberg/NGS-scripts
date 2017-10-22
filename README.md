@@ -58,22 +58,28 @@ Calculate bisulfite conversion efficiency by calclulating percent methylated in 
 Supplemental file for 100bp DMR calling to produce final DMR table.
 
 ### gene_to_gene_anno.sh
+Set of commands (bash & R) to take TAIR GFF files and produce annotation files, here specifically making a annotation file of genes in tandem orientation.
 
 ### merge_covs.r
+Merge bismark cov file outputs to produce correlation matrices with hierarchical clustering of samples of interest.
 
 ### merge_wigs.r
+Merge 100bp tiled methylation files (wig) to produce correlation matrices with hierarchical clustering of samples of interest.
 
 ### met-sign.sh
+Extract cytosine reports for methylation at non-canonical methylation sequence contexts (see Gouil & Baulcombe, PLoS Gen 2015).
 
 ### methylation_tiling.sh
+Use WIG files to obtain methylation values across features of interest (similar to bed_to_rel.sh but without binning values).
 
 ### rel_expression_plots.r
-
-### rel_methylation_plots-v2.r
+Get raw read coverage across features of interest from RNA WIG files (see RNAseq_bam_to_100bpwigs).
 
 ### rel_methylation_plots.r
+Supplementary R script for bed_to_rel.sh to produce binned methylation values summarised across supplied features of interest.
 
-### repeat_methylation_plots.r
+### rel_methylation_plots_v2.r
+Variation on rel_methylation_plots.r to get binned summarised methylation values for non-canonical sequence contexts.
 
 ### scatman_smooth.sh
 
@@ -81,5 +87,7 @@ Supplemental file for 100bp DMR calling to produce final DMR table.
 
 ### wgbs_cov_to_TDF.txt
 
-### wgbs_pipelinev0.4.sh
+### wgbs_pipeline_v0.4.sh
+
+### wgbs_pipeline_v0.5.sh
 
