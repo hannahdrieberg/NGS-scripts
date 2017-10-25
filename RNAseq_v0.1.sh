@@ -105,7 +105,7 @@ subjunc -T 5 -u -H -i $index  -r ${fq%%.fastq*}_trimmed.fastq -o  "${fileID}.sam
 
 if [[ $fq%%.fastq}* != *".gz" ]]; then gzip ${fq%%.fastq*}_trimmed.fastq; fi
 
-echo "Alignment complete ... making sorted bam file with indexs..."
+echo "Alignment complete... making sorted bam file..."
 
 # samtools view to convert the sam file to bam file
 tmpbam="${fileID}.temp.bam"

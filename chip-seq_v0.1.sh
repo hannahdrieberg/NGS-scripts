@@ -2,13 +2,8 @@
 set -e
 set -u
 
-# Take raw ChIP-seq reads, align and produce files to view distribution of histone marks in IGV
-# Will eventually introduce peak caller
-# H3K9me2 for now
-# based on pedrocrisp/NGS-pipelines/RNAseqPipe3
-
-# make sure genome index has been built
-# build index
+# Take raw ChIP-seq reads, perform adapter & quality trimming, align to TAIR10 genome
+# make sure genome index has been built:
 # subread-buildindex -o TAIR10_subread_index TAIR10_chr1.fas TAIR10_chr2.fas TAIR10_chr3.fas TAIR10_chr4.fas TAIR10_chr5.fas TAIR10_chrC.fas TAIR10_chrM.fas
 
 if [ "$#" -lt 4 ]; then
@@ -88,26 +83,27 @@ cd 4_subread-align/
 
 echo "Beginning alignment ..."
 
-subread-align -T 5 -t 1 -u -H -i $index -r ${fq%%.fastq*}_trimmed.fastq -o "${fileID}.sam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+## Subread aligner
+# subread-align -T 5 -t 1 -u -H -i $index -r ${fq%%.fastq*}_trimmed.fastq -o "${fileID}.sam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+
+## Subjunc aligner
+subjunc -T 5 -u -H -i $index -r ${fq%%.fastq*}_trimmed.fastq -o "${fileID}.sam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 if [[ $fq%%.fastq}* != *".gz" ]]; then gzip ${fq%%.fastq*}_trimmed.fastq; fi
 
-echo "Alignment complete ... making sorted bam file with index ..."
+echo "Alignment complete... making sorted bam files..."
 
-# samtools view to convert the sam file to bam file
+# SAM to BAM
 tmpbam="${fileID}.temp.bam"
 outbam="${fileID}.sorted"
 
 samtools view -S -u ${fileID}.sam > ${tmpbam}
-
-# Sort the temporary bam file by chromosomal position, and save the sorted file.
 samtools sort -m 2G ${tmpbam} $outbam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-# Make an index of the sorted bam file
 samtools index ${outbam}.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-# delete temp bam and gzip sam
+# delete temp bam and sam
 rm -v ${tmpbam}
-gzip ${fileID}.sam
+rm ${fileID}.sam
 mv *trimmed.fastq.gz ../2_scythe_sickle/
 
 fi
