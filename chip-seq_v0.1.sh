@@ -60,12 +60,18 @@ mv ${fq%%.fastq*}_fastqc* 1_fastqc
 mkdir 2_scythe_sickle
 cd 2_scythe_sickle
 
+echo "adapter trimming ..."
+
 scythe -a /home/diep/scripts/TruSeq-adapters.fa -p 0.1 ../$fq > ${fq%%.fastq*}_noadapt.fastq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+
+echo "quality trimming ..."
 
 sickle se -f ${fq%%.fastq*}_noadapt.fastq -o ${fq%%.fastq*}_trimmed.fastq -t sanger -q 20 -l 20 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 rm ${fq%%.fastq*}_noadapt.fastq
 cd ../
+
+echo "second QC ..."
 
 # fastqc again
 mkdir 3_trimmed_fastqc
@@ -159,7 +165,11 @@ mv ${fq2%%.fastq*}_fastqc* 1_fastqc
 mkdir 2_scythe_sickle
 cd 2_scythe_sickle
 
+echo "adapter trimming ..."
+
 scythe -a /home/diep/scripts/TruSeq-adapters.fa -p 0.1 ../$fq1 > ${fq1%%.fastq*}_noadapt.fastq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+
+echo "quality trimming ..."
 
 scythe -a /home/diep/scripts/TruSeq-adapters.fa -p 0.1 ../$fq2 > ${fq2%%.fastq*}_noadapt.fastq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
@@ -168,6 +178,8 @@ sickle pe -f ${fq1%%.fastq*}_noadapt.fastq -r ${fq2%%.fastq*}_noadapt.fastq -o $
 rm ${fq1%%.fastq*}_noadapt.fastq
 rm ${fq2%%.fastq*}_noadapt.fastq
 cd ../
+
+echo "second QC ..."
 
 # fastqc again
 mkdir 3_trimmed_fastqc
