@@ -98,30 +98,23 @@ cd 4_subread-align/
 echo "Beginning alignment ..."
 
 # use subread to align
-# subread-align -T 5 -t 1 -u -H -i $index -r ${fq%%.fastq*}_trimmed.fastq -o "${fileID}.sam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+# subread-align -T 5 -t 1 -u -H -i $index -r ${fq%%.fastq*}_trimmed.fastq -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 # use subjunc to align
-subjunc -T 5 -u -H -i $index  -r ${fq%%.fastq*}_trimmed.fastq -o  "${fileID}.sam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+subjunc -T 5 -u -H -i $index  -r ${fq%%.fastq*}_trimmed.fastq -o  "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 if [[ $fq%%.fastq}* != *".gz" ]]; then gzip ${fq%%.fastq*}_trimmed.fastq; fi
 
-echo "Alignment complete... making sorted bam file..."
+echo "cleaning..."
 
-# samtools view to convert the sam file to bam file
-tmpbam="${fileID}.temp.bam"
+tmpbam="${fileID}.bam"
 outbam="${fileID}.sorted.bam"
-
-# SAM to BAM
-samtools view -S -u ${fileID}.sam > ${tmpbam}
-# Sort the temporary bam file by chromosomal position, and save the sorted file.
 samtools sort -m 2G ${tmpbam} -o $outbam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-# Make an index of the sorted bam file
 samtools index $outbam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-
-# delete temp bam and sam files
 rm -v ${tmpbam}
-rm ${fileID}.sam
 mv *trimmed.fastq.gz ../2_scythe_sickle/
+
+echo "Alignment complete"
 
 fi
 
@@ -221,30 +214,24 @@ cd 4_subread-align/
 echo "Beginning alignment ..."
 
 # use subread to align
-# subread-align -T 5 -H -t 1 -u -i ${index} -r ${fq1%%.fastq*}_trimmed.fastq -R ${fq2%%.fastq*}_trimmed.fastq -o "${fileID}.sam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+# subread-align -T 5 -H -t 1 -u -i ${index} -r ${fq1%%.fastq*}_trimmed.fastq -R ${fq2%%.fastq*}_trimmed.fastq -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 # use subjunc to align
-subjunc -T 5 -u -H -i $index -r ${fq1%%.fastq*}_trimmed.fastq -R ${fq2%%.fastq*}_trimmed.fastq -o "${fileID}.sam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+subjunc -T 5 -u -H -i $index -r ${fq1%%.fastq*}_trimmed.fastq -R ${fq2%%.fastq*}_trimmed.fastq -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+
+echo "cleaning..."
 
 if [[ $fq1%%.fastq}* != *".gz" ]]; then gzip ${fq1%%.fastq*}_trimmed.fastq; fi
 if [[ $fq2%%.fastq}* != *".gz" ]]; then gzip ${fq2%%.fastq*}_trimmed.fastq; fi
 
-echo "Alignment complete ... making sorted bam file with index ..."
-
-# samtools view to convert the sam file to bam file
-tmpbam="${fileID}.temp.bam"
+tmpbam="${fileID}.bam"
 outbam="${fileID}.sorted.bam"
 
-# SAM to BAM
-samtools view -S -u ${fileID}.sam > ${tmpbam}
-# Sort the temporary bam file by chromosomal position, and save the sorted file.
 samtools sort -m 2G ${tmpbam} -o $outbam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-# Make an index of the sorted bam file
 samtools index $outbam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-
-# delete temp bam and sam files
-rm -v ${fileID}.sam
 rm -v ${tmpbam}
 mv *trimmed.fastq.gz ../2_scythe_sickle/
+
+echo "Alignment complete"
 
 fi
