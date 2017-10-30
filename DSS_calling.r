@@ -44,7 +44,7 @@ dmlTest <- DMLtest(BSobj,group1=c("C1","C2","C3"), group2=c("N1","N2","N3"),smoo
 dmrs <- callDMR(dmlTest, delta=dlt, minlen=50, minCG=3, pct.sig=0.5, dis.merge=50, p.threshold=pvalue)
 
 # filename
-file1=paste0(group1, "vs", group2, "_",context, "_", "p=", pvalue, ".bed")
+file1=paste0(group1,"vs",group2,"_",context,"_delta=",dlt,"_p=",pvalue,".bed")
 
 # write out file
-write.table(dmrs,file=file1,quote = FALSE, sep = "\t",row.names = FALSE, col.names = TRUE)
+write.table(dmrs,file=file1,quote=FALSE,sep="\t",row.names=FALSE,col.names=FALSE)

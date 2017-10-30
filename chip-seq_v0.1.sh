@@ -102,7 +102,7 @@ if [[ $fq%%.fastq}* != *".gz" ]]; then gzip ${fq%%.fastq*}_trimmed.fastq; fi
 tmpbam="${fileID}.bam"
 outbam="${fileID}.sorted.bam"
 samtools sort -m 2G ${tmpbam} -o "${outbam}" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-samtools index ${outbam}.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools index ${outbam} 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 rm -v ${tmpbam}
 mv *trimmed.fastq.gz ../2_scythe_sickle/
 
@@ -211,7 +211,7 @@ if [[ $fq1%%.fastq}* != *".gz" ]]; then gzip ${fq1%%.fastq*}_trimmed.fastq; fi
 if [[ $fq2%%.fastq}* != *".gz" ]]; then gzip ${fq2%%.fastq*}_trimmed.fastq; fi
 
 samtools sort -m 2G ${tmpbam} $outbam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-samtools index ${outbam}.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools index ${outbam} 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 # delete temp bam and gzip sam
 rm -v ${tmpbam}
