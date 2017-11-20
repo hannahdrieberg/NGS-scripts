@@ -60,9 +60,6 @@ Supplemental file for 100bp DMR calling to produce final DMR table.
 ### gene_to_gene_anno.sh
 Set of commands (bash & R) to take TAIR GFF files and produce annotation files, here specifically making a annotation file of genes in tandem orientation.
 
-### merge_covs.r
-Merge bismark cov file outputs to produce correlation matrices with hierarchical clustering of samples of interest.
-
 ### merge_wigs.r
 Merge 100bp tiled methylation files (wig) to produce correlation matrices with hierarchical clustering of samples of interest.
 
@@ -81,13 +78,15 @@ Supplementary R script for bed_to_rel.sh to produce binned methylation values su
 ### rel_methylation_plots_v2.r
 Variation on rel_methylation_plots.r to get binned summarised methylation values for non-canonical sequence contexts.
 
-### scatman_smooth.sh
-
-### smooth_scat.r
+### scatman_smooth.sh & smooth_scat.r
+Pair of scripts (use .sh to run) to take annotation file, bed file, and feature name to make scattersmooth plots in R to correlate methylation levels and feature characteristics (e.g. 5mC vs TE length).
 
 ### wgbs_cov_to_TDF.txt
+Produce TDF files from bismark cov file of interest. Check IGV compatible genome build ready.
 
 ### wgbs_pipeline_v0.4.sh
+Bismark alignment script using Bowtie1 aligner. Has SE and PE options.
 
 ### wgbs_pipeline_v0.5.sh
+Bismark alignment script using Bowtie2 aligner. Has SE and PE options.
 
