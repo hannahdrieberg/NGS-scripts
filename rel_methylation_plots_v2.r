@@ -13,7 +13,7 @@ out <- NULL
 for(i in seq){
 # read in files
 a <- read.delim(paste0(smplname,'-',outname,'-',context,'-',i,'.1k.bed'), head=F)
-a <- subset(a,a$V1!='Mt' & a$V1!='Pt')
+a <- subset(a,a$V1!='ChrM' & a$V1!='ChrC')
 a <- a[c(1:3, 7,8,12,14:20)]
 a <- subset(a,a$V20 != -1)
 real.dist=matrix(ifelse(a$V19=='+',-1*a$V20,a$V20),ncol=1)

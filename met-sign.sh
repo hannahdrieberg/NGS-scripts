@@ -1,24 +1,31 @@
 #!/bin/bash
 set -e
 
-# re-extract DNA methylation, at custom sequence contexts, from sam file and produce cytosine report
+# re-extract DNA methylation, at custom sequence contexts, from BAM file and produce cytosine report
 # perform in 4_bismark output sub-directory of wgbs workflow
 
 if [ "$#" -ne 6 ]; then
-echo "USAGE: met-sign.sh <context> <file> <file path to met bedfile> <annotation file> <sample> <outname>"
+echo "USAGE: met-sign.sh <SE/PE> <context> <file> <annotation> <sample> <outname>"
+echo "EXAMPLE: met-sign.sh SE CHH sample.bam Araport_mRNA.sorted.bed sample mRNA"
 exit 1
 fi
 
-context=$1
-fl=$2
-bedfile=$3
+layout=$1
+context=$2
+fl=$3
 annopath=$4
 sample=$5
 outname=$6
 
-echo "Extracting CX report from SAM ..."
+echo "Extracting CX report from $1 BAM ..."
 
-bismark_methylation_extractor --comprehensive --cytosine_report --CX --genome_folder ~/TAIR10_bs/  --report --buffer_size 8G -s ${fl}
+if [ $layout == "SE" ]; then
+bismark_methylation_extractor --comprehensive --multicore 2 --cytosine_report --CX --genome_folder ~/TAIR10/  --report --buffer_size 8G -s ${fl}
+fi
+
+if [ $layout == "PE" ]; then
+bismark_methylation_extractor --comprehensive --multicore 2 --cytosine_report --CX --genome_folder ~/TAIR10/  --report --buffer_size 8G -p ${fl}
+fi
 
 echo "done"
 echo "grepping & bedtools ..."
@@ -27,42 +34,40 @@ if [ ${context} = CHH ]; then
 seq="CAA CAC CAT CCA CCC CCT CTA CTC CTT"
 fi
 
-echo ${context}
-echo ${fl}
-echo ${bedfile}
-echo ${annopath}
-echo ${sample}
-echo ${outname}
-echo ${seq}
+echo $1 $2 $3 $4 $5 $6
 
-awk '{print $1 "\t" $2 "\t" $2+1 "\t" $3 "\t" $4 "\t" $5 "\t" $6 "\t" $7}' ${fl::-3}.CX_report.txt > ${fl::-3}.CX_report.bed
+gzip -d *cov.gz
 
-# use grep to get output of specific sequence context from report files
+awk '{print $1 "\t" $2 "\t" $2+1 "\t" $3 "\t" $4 "\t" $5 "\t" $6 "\t" $7}' ${fl::-3}CX_report.txt > ${fl::-3}CX_report.bed
+
+# use grep to extract specific sequence context from report files
+echo "grep $seq contexts from $context bedfile"
+
+bedfile="${fl::-3}bismark.cov"
+sortBed -i $bedfile > ${bedfile}.sorted.bed
 
 for FILE in $seq
 do
-grep ${FILE} ${fl::-3}.CX_report.bed > ${FILE}.bed
-intersectBed -wo -a ${FILE}.bed -b ${bedfile} > ${context}-${FILE}.bed
-sort -k1,1 -k2,2n ${context}-${FILE}.bed -o sorted-${context}-${FILE}.bed
-closestBed -D "ref" -a sorted-${context}-${FILE}.bed -b ${annopath} > ${outname}-${context}-${FILE}.bed
-awk -F$'\t' '$NF<1000 && $NF>-1000' ${outname}-${context}-${FILE}.bed > ${outname}-${context}-${FILE}.1k.bed
-mv ${outname}-${context}-${FILE}.1k.bed ${sample}-${outname}-${context}-${FILE}.1k.bed
-rm ${FILE}.bed
+grep ${FILE} ${fl::-3}CX_report.bed > ${FILE}.bed
+sortBed -i {FILE}.bed > ${FILE}.sorted.bed
+intersectBed -wo -a ${FILE}.sorted.bed -b ${bedfile}.sorted.bed > ${context}-${FILE}.bed
+closestBed -D "b" -a ${context}-${FILE}.bed -b $annopath > ${outname}-${context}-${FILE}.bed
+awk -F$'\t' '$NF<1000 && $NF>-1000' ${outname}-${context}-${FILE}.bed > ${sample}-${outname}-${context}-${FILE}.1k.bed
+rm ${FILE}*.bed
 rm ${context}-${FILE}.bed
 rm sorted-${context}-${FILE}.bed
-rm ${outname}-${context}-${FILE}.bed
 done
 
-echo "done"
-echo "cleaning ..."
+echo "done... cleaning..."
 
-rm *bedGraph.gz
-rm *cov.gz
-rm *context*bismark.sam.gz.txt
-rm *M-bias.txt
+rm C*txt
 rm *splitting_report.txt
+rm *bedGraph.gz
+rm *M-bias.txt
+rm ${bedfile}
+rm ${bedfile}.sorted.bed
 
-echo "done ... r plotting"
+echo "R"
 
 Rscript ~/scripts/rel_methylation_plots-v2.r ${sample} ${outname} ${context}
 
