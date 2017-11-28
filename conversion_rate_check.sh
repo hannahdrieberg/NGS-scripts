@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu
+set -u
 # Get sodium bisulfite conversion efficiency by calculating percent unconverted C's in Clp and Mt
 
 echo "Conversion % in $1"

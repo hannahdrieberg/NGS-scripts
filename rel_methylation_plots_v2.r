@@ -8,6 +8,12 @@ smplname <- as.character(paste0(args[1]))
 outname <- as.character(paste0(args[2]))
 context <- as.character(paste0(args[3]))
 
+files <- dir(pattern="1k.bed")
+data <- data_frame(files) %>%
+mutate(file_contents = map(files, read_delim, delim='\t', col_names=F)) %>%
+unnest() %>%
+select(c(1)
+
 if(context=="CHH"){seq=c("CAA", "CAT", "CCA", "CCC", "CCT", "CTA", "CTC", "CTT")}
 out <- NULL
 for(i in seq){
