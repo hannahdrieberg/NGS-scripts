@@ -8,33 +8,18 @@ smplname <- as.character(paste0(args[1]))
 outname <- as.character(paste0(args[2]))
 context <- as.character(paste0(args[3]))
 
-files <- dir(pattern="1k.bed")
-data <- data_frame(files) %>%
-mutate(file_contents = map(files, read_delim, delim='\t', col_names=F)) %>%
-unnest() %>%
-select(c(1)
+data <- dir(pattern=paste0(smplname,"-",outname,"-sub",context,"-report.1k.bed")) %>%
+read_delim(delim = '\t', col_names=F) %>%
+mutate(rel.dist=ifelse(X13==0,ifelse(X12=="-",((X9-X2)/(X9-X8))*1000,((X2-X8)/(X9-X8))*1000),ifelse(X13>0,X13+1000,X13))) %>%
+mutate(fixy=ifelse(rel.dist<0 & X13==0,0,ifelse(rel.dist>1000 & X13==0, 1000, rel.dist)))
 
-if(context=="CHH"){seq=c("CAA", "CAT", "CCA", "CCC", "CCT", "CTA", "CTC", "CTT")}
 out <- NULL
-for(i in seq){
-# read in files
-a <- read.delim(paste0(smplname,'-',outname,'-',context,'-',i,'.1k.bed'), head=F)
-a <- subset(a,a$V1!='ChrM' & a$V1!='ChrC')
-a <- a[c(1:3, 7,8,12,14:20)]
-a <- subset(a,a$V20 != -1)
-real.dist=matrix(ifelse(a$V19=='+',-1*a$V20,a$V20),ncol=1)
-a=cbind(a,real.dist)
-rel.dist=matrix(ifelse(a$real.dist==0,ifelse(a$V19=="-",((a$V16 - a$V2)/(a$V16 - a$V15))*1000,((a$V2 - a$V15)/(a$V16 - a$V15))*1000),ifelse(a$real.dist>0,a$real.dist + 1000,a$real.dist)),ncol=1)
-a=cbind(a,rel.dist)
-fixy=ifelse(a$rel.dist < 0 & a$real.dist==0,0,ifelse(a$rel.dist >1000 & a$real.dist==0,1000,a$rel.dist))
-a$rel.dist=fixy
-a.bin=stats.bin(a$rel.dist,a$V12,N=100)
-p.a.bin=cbind(matrix(a.bin$centers,ncol=1),a.bin$stats["mean",])
-test <- as.data.frame(p.a.bin)
-colnames(test)[1] <- 'pos'
-test$sample <- paste0(smplname)
-test$context <- paste0(context)
-test$motiff <- paste0(i)
-out <- rbind(out,test)
+for(i in unique(data$X5)){
+a <- subset(data, X5 == i)
+a <- stats.bin(a$fixy,a$X6,N=100)
+temp <- as.data.frame(cbind(matrix(a$centers,ncol=1),a$stats["mean",]))
+temp$motiff <- paste0(i)
+out <- rbind(temp, out)
 }
-write.table(out,paste(smplname,'_',context,'_',outname,'.txt',sep=''),quote=F, col.names=T, row.names=F, sep='\t')
+
+write.table(out,paste0(paste(smplname,context,outname,sep='_'),'.txt'),quote=F, col.names=T, row.names=F, sep='\t')

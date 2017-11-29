@@ -38,20 +38,21 @@ bedfile="${fl::-3}bismark.cov"
 awk '{print $1 "\t" $2 "\t" $2+1 "\t" $6 "\t" $7}' ${fl::-3}CX_report.txt | grep "$context" | awk -F$'\t' ' $1 != "ChrC" && $1 != "ChrM" ' > ${fl::-3}${context}_report.bed
 
 # intersect sub-context info to bismark.cov
-intersectBed -wo -a ${fl::-3}${context}_report.bed -b $bedfile | awk 'BEGIN { OFS = "\t" } {print $1, $2, $3, $4, $5, $9}' > ${fl::-3}sub${context}_report.bed
+intersectBed -wo -a ${fl::-3}${context}_report.bed -b $bedfile | awk 'BEGIN { OFS = "\t" } {print $1, $2, $3, $4, $5, $9}' > ${sample}-${outname}-sub${context}-report.bed
 
 # closest to get info across annotation file and subset to within 1kb
-closestBed -D "b" -a ${fl::-3}sub${context}_report.bed -b $annopath | awk -F$'\t' '$NF<1000 && $NF>-1000' > ${outname}-${fl::-3}sub${context}_report.1k.bed
+closestBed -D "b" -a ${sample}-${outname}-sub${context}-report.bed -b $annopath | awk -F$'\t' '$NF<1000 && $NF>-1000' > ${sample}-${outname}-sub${context}-report.1k.bed
 
 echo "done... cleaning..."
 
 rm C*txt
+rm *_report.txt
 rm *splitting_report.txt
 rm *bedGraph.gz
 rm *M-bias.txt
 rm $bedfile
 rm ${fl::-3}${context}_report.bed
-rm ${fl::-3}sub${context}_report.bed
+rm ${sample}-${outname}-sub${context}-report.bed
 
 echo "R"
 
