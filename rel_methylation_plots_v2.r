@@ -1,5 +1,6 @@
 # produce mean 5mC levels for R plotting
 options(echo=T)
+library(tidyverse)
 library(fields)
 args=commandArgs(trailingOnly=T)
 print(args)

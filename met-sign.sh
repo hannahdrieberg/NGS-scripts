@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -u
 
 # re-extract DNA methylation, at custom sequence contexts, from BAM file and produce cytosine report
 # perform in 4_bismark output sub-directory of wgbs workflow
@@ -47,7 +47,6 @@ echo "done... cleaning..."
 
 rm C*txt
 rm *_report.txt
-rm *splitting_report.txt
 rm *bedGraph.gz
 rm *M-bias.txt
 rm $bedfile
