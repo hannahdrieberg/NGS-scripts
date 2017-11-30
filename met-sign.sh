@@ -1,5 +1,5 @@
 #!/bin/bash
-set -u
+set -eu
 
 # re-extract DNA methylation, at custom sequence contexts, from BAM file and produce cytosine report
 # perform in 4_bismark output sub-directory of wgbs workflow
@@ -27,12 +27,12 @@ if [ $layout == "PE" ]; then
 bismark_methylation_extractor --comprehensive --multicore 4 --cytosine_report --CX --genome_folder ~/TAIR10/  --report --buffer_size 8G -p ${fl}
 fi
 
-echo "reports extracted"
-echo "$seq contexts from $bedfile"
-echo $1 $2 $3 $4 $5 $6
-
 gzip -d *cov.gz
 bedfile="${fl::-3}bismark.cov"
+
+echo "reports extracted"
+echo "$context from $bedfile"
+echo $1 $2 $3 $4 $5 $6
 
 # re-organise report, grep context, and awk to remove C and M
 awk '{print $1 "\t" $2 "\t" $2+1 "\t" $6 "\t" $7}' ${fl::-3}CX_report.txt | grep "$context" | awk -F$'\t' ' $1 != "ChrC" && $1 != "ChrM" ' > ${fl::-3}${context}_report.bed
