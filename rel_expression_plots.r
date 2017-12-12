@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 # args[1] = filename
 # Run on output of RNAseq_bam_to_100bpwigs
 
@@ -10,7 +11,7 @@ print(args)
 input=read.delim(args[1],head=F)
 
 # Remove plastids and unmatched rows
-input=subset(input,input$V1!='M' & input$V1!='C')
+input=subset(input,input$V1!='ChrM' & input$V1!='ChrC')
 input=subset(input,input[,ncol(input)] != -1)
 
 rel.dist=matrix(ifelse(input$V14==0,ifelse(input[,13]=="-",((input[,10] - (input[,2]))/(input[,10] - input[,9]))*1000,(((input[,2]) - input[,9])/(input[,10] - input[,9]))*1000),ifelse(input$V14>0,input$V14 + 1000,input$V14)),ncol=1)
