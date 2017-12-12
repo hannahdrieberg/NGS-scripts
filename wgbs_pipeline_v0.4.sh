@@ -58,7 +58,7 @@ cd ${fileID}_wgbspipeline_${dow}
 #fastqc
 mkdir 1_fastqc
 fastqc $fq_file 2>&1 | tee -a ${fileID}_logs_${dow}.log
-mv ${fq_file%%.fastq*}_fastqc* 1_fastqc #
+mv ${fq_file%%.fastq*}_fastqc* 1_fastqc
 
 #trim_galore
 mkdir 2_trimgalore

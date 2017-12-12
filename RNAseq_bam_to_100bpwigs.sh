@@ -8,7 +8,7 @@ set -eu
 if [ "$#" -lt 4 ]; then
 echo "Missing arguments!"
 echo "USAGE: RNAseq_bam_to_100bpwigs.sh <sorted bam> <genome fasta> <annotation> <out>"
-echo "EXAMPLE: RNAseq_bam_to_100bpwigs.sh col0-r1 /home/diep/TAIR10/TAIR10_Chr.all.fasta /home/diep/Araport11/annotations/Araport11_TE.bed TE"
+echo "EXAMPLE: RNAseq_bam_to_100bpwigs.sh col0-r1.sorted.bam /home/diep/TAIR10/TAIR10_Chr.all.fasta /home/diep/Araport11/annotations/Araport11_TE.bed TE"
 exit 1
 fi
 
@@ -36,18 +36,17 @@ echo 'cleaning ...'
 # CLEAN
 rm temp.genome*
 
-# remove 'Chr'
-awk '{print $1=substr($1,4)"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7}' ${bam%%.sorted*}_100bp.bed > temp.bed
 # sort Bed
-sortBed -i temp.bed > ${bam%%.sorted*}_100bp.sorted.bed
+sortBed -i ${bam%%.sorted*}_100bp.bed > ${bam%%.sorted*}_100bp.sorted.bed
 
 echo 'bedtools ...'
 # bedtools to desired annotation
-closestBed -D "b" -a ${bam%%.sorted*}_100bp.sorted.bed -b $bedfile > ${bam%%.sorted*}_$out.bed
+closestBed -D "b" -a ${bam%%.sorted*}_100bp.sorted.bed -b $bedfile > ${bam%%.sorted*}_${out}.bed
 
 echo 'subset to +1k/-1k ...'
 # awk to subset
-awk -F$'\t' '$NF<1000 && $NF>-1000' ${bam%%.sorted*}_$out.bed > ${bam%%.sorted*}_$out.1k.bed
+awk -F$'\t' '$NF<1000 && $NF>-1000' ${bam%%.sorted*}_${out}.bed > ${bam%%.sorted*}_${out}.1k.bed
 
-rm temp.bed *TE.bed *100bp.bed
+echo 'final clean ...'
+rm ${bam%%.sorted*}_100bp.bed ${bam%%.sorted*}_100bp.sorted.bed ${bam%%.sorted*}_${out}.bed
 
