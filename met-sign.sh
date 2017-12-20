@@ -37,8 +37,10 @@ echo $1 $2 $3 $4 $5 $6
 # re-organise report, grep context, and awk to remove C and M
 awk '{print $1 "\t" $2 "\t" $2+1 "\t" $6 "\t" $7}' ${fl::-3}CX_report.txt | grep "$context" | awk -F$'\t' ' $1 != "ChrC" && $1 != "ChrM" ' > ${fl::-3}${context}_report.bed
 
+sortBed -i ${fl::-3}${context}_report.bed > ${fl::-3}${context}_report.sorted.bed
+
 # intersect sub-context info to bismark.cov
-intersectBed -wo -a ${fl::-3}${context}_report.bed -b $bedfile | awk 'BEGIN { OFS = "\t" } {print $1, $2, $3, $4, $5, $9}' > ${sample}-${outname}-sub${context}-report.bed
+intersectBed -wo -sorted -a ${fl::-3}${context}_report.sorted.bed -b $bedfile | awk 'BEGIN { OFS = "\t" } {print $1, $2, $3, $4, $5, $9}' > ${sample}-${outname}-sub${context}-report.bed
 
 # closest to get info across annotation file and subset to within 1kb
 closestBed -D "b" -a ${sample}-${outname}-sub${context}-report.bed -b $annopath | awk -F$'\t' '$NF<1000 && $NF>-1000' > ${sample}-${outname}-sub${context}-report.1k.bed
@@ -50,7 +52,7 @@ rm *_report.txt
 rm *bedGraph.gz
 rm *M-bias.txt
 rm $bedfile
-rm ${fl::-3}${context}_report.bed
+rm ${fl::-3}${context}_report*bed
 rm ${sample}-${outname}-sub${context}-report.bed
 
 echo "R"
