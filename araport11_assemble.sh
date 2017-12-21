@@ -62,7 +62,8 @@ write.table(gene.out,'Araport11_mRNA.bed',sep='\t',row.names=F,col.names=F,quote
 te=subset(ara,ara$feature=='transposable_element')
 te$Name=getAttributeField(te$attributes, 'Name')
 te$ID=getAttributeField(te$attributes, 'ID')
-te.out=te[,c('seqname','start','end','Name','score','strand')]
+te$alias=getAttributeField(te$attributes, 'Alias')
+te.out=te[,c('seqname','start','end','Name','score','strand','alias')]
 
 write.table(te.out,'Araport11_TE.bed',sep='\t',row.names=F,col.names=F,quote=F)
 
