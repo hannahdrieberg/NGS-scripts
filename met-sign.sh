@@ -28,7 +28,8 @@ bismark_methylation_extractor --comprehensive --multicore 4 --cytosine_report --
 fi
 
 gzip -d *cov.gz
-bedfile="${fl::-3}bismark.cov"
+sortBed -i ${fl::-3}bismark.cov > ${fl::-3}bismark.bed
+bedfile="${fl::-3}bismark.bed"
 
 echo "reports extracted"
 echo "$context from $bedfile"
@@ -52,6 +53,7 @@ rm *_report.txt
 rm *bedGraph.gz
 rm *M-bias.txt
 rm $bedfile
+rm *cov
 rm ${fl::-3}${context}_report*bed
 rm ${sample}-${outname}-sub${context}-report.bed
 
