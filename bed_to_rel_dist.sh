@@ -1,8 +1,7 @@
 #!/bin/bash
 
-#plotting DNA methylation over Brachypodium gene models
-#12-5-14
-#SRE
+#plotting DNA methylation over gene models
+
 #######################
 # REQUIREMENTS
 # bedtools
@@ -15,6 +14,7 @@ echo "USAGE: bed_to_rel_dist.sh <-wig or -bed> <input path to bed file you want 
 echo "EXAMPLE: bed_to_rel_dist.sh -bed /home/steve/brachy_annotation/genes.bed epignome.500k gene"
 exit 1
 fi
+
 type=$1
 bedpath=$2
 filename=$3
@@ -36,7 +36,6 @@ sort -k1,1 -k2,2n ${filename}_CHH_100bp.bed -o ${filename}_CHH_100bp.bed
 l1="$(cat ${filename}_CpG_100bp.bed | awk 'BEGIN{FS="\t"};{print NF}' | head -n 1)"
 l2="$(cat ${bedpath} | awk 'BEGIN{FS="\t"};{print NF}' | head -n 1)"
 
-
 #convert the wigs to bed
 ####################### some bedtools stuff
 echo "Performing closestBed of CHG methylation..."
@@ -52,7 +51,6 @@ awk -F$'\t' '$NF<1000 && $NF>-1000' ${filename}_CHG_${outname}.bed > ${filename}
 awk -F$'\t' '$NF<1000 && $NF>-1000' ${filename}_CHH_${outname}.bed > ${filename}_CHH_${outname}.1k.bed
 awk -F$'\t' '$NF<1000 && $NF>-1000' ${filename}_CpG_${outname}.bed > ${filename}_CpG_${outname}.1k.bed
 #######################
-
 
 echo "Performing R plots..."
 #initiate the R script to create the plots
