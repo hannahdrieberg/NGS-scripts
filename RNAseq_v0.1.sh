@@ -224,12 +224,8 @@ echo "cleaning..."
 if [[ $fq1%%.fastq}* != *".gz" ]]; then gzip ${fq1%%.fastq*}_trimmed.fastq; fi
 if [[ $fq2%%.fastq}* != *".gz" ]]; then gzip ${fq2%%.fastq*}_trimmed.fastq; fi
 
-tmpbam="${fileID}.bam"
-outbam="${fileID}.sorted.bam"
+samtools index "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-samtools sort -m 2G ${tmpbam} -o $outbam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-samtools index $outbam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-rm -v ${tmpbam}
 mv *trimmed.fastq.gz ../2_scythe_sickle/
 
 echo "Alignment complete"
