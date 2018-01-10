@@ -224,8 +224,6 @@ echo "cleaning..."
 if [[ $fq1%%.fastq}* != *".gz" ]]; then gzip ${fq1%%.fastq*}_trimmed.fastq; fi
 if [[ $fq2%%.fastq}* != *".gz" ]]; then gzip ${fq2%%.fastq*}_trimmed.fastq; fi
 
-samtools index "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-
 mv *trimmed.fastq.gz ../2_scythe_sickle/
 
 echo "Alignment complete"
