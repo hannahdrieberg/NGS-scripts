@@ -43,3 +43,10 @@ heatmap.2(data,
 	cexCol=0.8,
 	cexRow=0.8)
 dev.off()
+
+# PCA analysis
+# pc=prcomp(data)
+# plot(pc, type ='l' , main='Variance of PCs')
+# plot(pc$x[1,], pc$x[2,], xlab = 'PC1', ylab='PC2')
+# text(pc$x[1,], pc$x[2,], colnames(a), cex = 0.8, pos=4)
+
