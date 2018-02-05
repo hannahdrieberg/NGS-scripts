@@ -13,7 +13,7 @@ files <- dir(pattern=paste0(context,"_100bp.wig"))
 data <- data_frame(files) %>%
 mutate(file_contents = map(files, read_delim, delim='\t', col_names=F, skip=1)) %>%
 unnest() %>%
-filter(X1!='Mt'&X1!='ChrM'&X1!='Pt'&X1!='ChrC') %>%
+filter(X1 != 'Mt' & X1 != 'ChrM' & X1 != 'Pt' & X1 != 'ChrC') %>%
 mutate(sample=sapply(strsplit(files, '_'), function(l) l[1])) %>%
 mutate(genotype=sapply(strsplit(sample, '-'), function(l) l[1])) %>%
 mutate(rep=sapply(strsplit(sample, '-'), function(l) l[2])) %>%
