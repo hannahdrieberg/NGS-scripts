@@ -28,7 +28,7 @@ select(-X1, -X2, -X3) %>%
 cor() %>%
 as.matrix()
 
-pdf(file=paste0('wig_cor_',context,'.pdf'), width=8, height = 7.5, pointsize = 10)
+pdf(file=paste0('wig_cor_',context,'.pdf'), width=0, height=0, paper="a4r")
 heatmap.2(data, 
 	trace='none',
 	density.info='none',
@@ -39,7 +39,5 @@ heatmap.2(data,
 	rowsep = 1:nrow(data),
 	sepcolor = "white",
 	sepwidth = c(0.001,0.001),
-	dendrogram='both',
-	cexCol=0.8,
-	cexRow=0.8)
+	dendrogram='both')
 dev.off()
