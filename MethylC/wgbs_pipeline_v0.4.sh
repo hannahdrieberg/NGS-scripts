@@ -98,11 +98,11 @@ mkdir 5_output_files
 mv 4_bismark_alignment/*.bed* 5_output_files
 
 #100bp window creation
-perl $HOME/scripts/C_context_window_SREedits.pl 4_bismark_alignment/CpG* 100 0 ${fileID}_CpG 2>&1 | tee -a ${fileID}_logs_${dow}.log
+perl $HOME/scripts/MethylC/C_context_window_SREedits.pl 4_bismark_alignment/CpG* 100 0 ${fileID}_CpG 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 4_bismark_alignment/CpG*.wig 5_output_files/${fileID}_CpG_100bp.wig
-perl $HOME/scripts/C_context_window_SREedits.pl 4_bismark_alignment/CHG* 100 0 ${fileID}_CHG 2>&1 | tee -a ${fileID}_logs_${dow}.log
+perl $HOME/scripts/MethylC/C_context_window_SREedits.pl 4_bismark_alignment/CHG* 100 0 ${fileID}_CHG 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 4_bismark_alignment/CHG*.wig 5_output_files/${fileID}_CHG_100bp.wig
-perl $HOME/scripts/C_context_window_SREedits.pl 4_bismark_alignment/CHH* 100 0 ${fileID}_CHH 2>&1 | tee -a ${fileID}_logs_${dow}.log
+perl $HOME/scripts/MethylC/C_context_window_SREedits.pl 4_bismark_alignment/CHH* 100 0 ${fileID}_CHH 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 4_bismark_alignment/CHH*.wig 5_output_files/${fileID}_CHH_100bp.wig
 
 echo "#####################"
@@ -227,11 +227,11 @@ mkdir 5_output_files
 mv 4_bismark_alignment/*.bed* 5_output_files
 
 #100bp window creation
-perl $HOME/scripts/C_context_window_SREedits.pl 4_bismark_alignment/CpG* 100 0 ${fileID}_CpG 2>&1 | tee -a ${fileID}_logs_${dow}.log
+perl $HOME/scripts/MethylC/C_context_window_SREedits.pl 4_bismark_alignment/CpG* 100 0 ${fileID}_CpG 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 4_bismark_alignment/CpG*.wig 5_output_files/${fileID}_CpG_100bp.wig
-perl $HOME/scripts/C_context_window_SREedits.pl 4_bismark_alignment/CHG* 100 0 ${fileID}_CHG 2>&1 | tee -a ${fileID}_logs_${dow}.log
+perl $HOME/scripts/MethylC/C_context_window_SREedits.pl 4_bismark_alignment/CHG* 100 0 ${fileID}_CHG 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 4_bismark_alignment/CHG*.wig 5_output_files/${fileID}_CHG_100bp.wig
-perl $HOME/scripts/C_context_window_SREedits.pl 4_bismark_alignment/CHH* 100 0 ${fileID}_CHH 2>&1 | tee -a ${fileID}_logs_${dow}.log
+perl $HOME/scripts/MethylC/C_context_window_SREedits.pl 4_bismark_alignment/CHH* 100 0 ${fileID}_CHH 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 4_bismark_alignment/CHH*.wig 5_output_files/${fileID}_CHH_100bp.wig
 
 echo "#####################"
@@ -358,11 +358,11 @@ mkdir 5_output_files
 mv 4_bismark_alignment/*.bed* 5_output_files
 
 #100bp window creation
-perl $HOME/scripts/C_context_window_SREedits.pl 4_bismark_alignment/CpG* 100 0 ${fileID}_CpG 2>&1 | tee -a ${fileID}_logs_${dow}.log
+perl $HOME/scripts/MethylC/C_context_window_SREedits.pl 4_bismark_alignment/CpG* 100 0 ${fileID}_CpG 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 4_bismark_alignment/CpG*.wig 5_output_files/${fileID}_CpG_100bp.wig
-perl $HOME/scripts/C_context_window_SREedits.pl 4_bismark_alignment/CHG* 100 0 ${fileID}_CHG 2>&1 | tee -a ${fileID}_logs_${dow}.log
+perl $HOME/scripts/MethylC/C_context_window_SREedits.pl 4_bismark_alignment/CHG* 100 0 ${fileID}_CHG 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 4_bismark_alignment/CHG*.wig 5_output_files/${fileID}_CHG_100bp.wig
-perl $HOME/scripts/C_context_window_SREedits.pl 4_bismark_alignment/CHH* 100 0 ${fileID}_CHH 2>&1 | tee -a ${fileID}_logs_${dow}.log
+perl $HOME/scripts/MethylC/C_context_window_SREedits.pl 4_bismark_alignment/CHH* 100 0 ${fileID}_CHH 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 4_bismark_alignment/CHH*.wig 5_output_files/${fileID}_CHH_100bp.wig
 
 echo "#####################"
@@ -502,11 +502,11 @@ zcat CHH*.txt.gz > CHH_context_${fileID}_merged.txt
 #100bp window creation
 cd ../
 mkdir 5_output_files
-perl $HOME/scripts/C_context_window_SREedits.pl 4_bismark_alignment/CpG* 100 0 ${fileID}_CpG 2>&1 | tee -a ${fileID}_logs_${dow}.log
+perl $HOME/scripts/MethylC/C_context_window_SREedits.pl 4_bismark_alignment/CpG* 100 0 ${fileID}_CpG 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 4_bismark_alignment/CpG*.wig 5_output_files/${fileID}_CpG_100bp.wig
-perl $HOME/scripts/C_context_window_SREedits.pl 4_bismark_alignment/CHG* 100 0 ${fileID}_CHG 2>&1 | tee -a ${fileID}_logs_${dow}.log
+perl $HOME/scripts/MethylC/C_context_window_SREedits.pl 4_bismark_alignment/CHG* 100 0 ${fileID}_CHG 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 4_bismark_alignment/CHG*.wig 5_output_files/${fileID}_CHG_100bp.wig
-perl $HOME/scripts/C_context_window_SREedits.pl 4_bismark_alignment/CHH* 100 0 ${fileID}_CHH 2>&1 | tee -a ${fileID}_logs_${dow}.log
+perl $HOME/scripts/MethylC/C_context_window_SREedits.pl 4_bismark_alignment/CHH* 100 0 ${fileID}_CHH 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 4_bismark_alignment/CHH*.wig 5_output_files/${fileID}_CHH_100bp.wig
 
 cd 4_bismark_alignment
@@ -583,8 +583,6 @@ echo "####################"
 echo "Unmapped Read 2 SE PBAT mapping results"
 echo "####################"
 printf "${dow}\t${fq_file2}\t${fileID}\t${genome_path##../}\t${type:1}_SE2pbat\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef3}\t${unique_aln3}\t${no_aln3}\t${multi_aln3}\t${cpg_per3}\t${chg_per3}\t${chh_per3}\n"
-
-
 
 printf "${dow}\t${fq_file1}\t${fileID}\t${genome_path##../}\t${type:1}_PE\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef}\t${unique_aln}\t${no_aln}\t${multi_aln}\t${cpg_per}\t${chg_per}\t${chh_per}\n" >> $HOME/wgbs_se_pipeline_analysis_record.log
 printf "${dow}\t${fq_file1}\t${fileID}\t${genome_path##../}\t${type:1}_SE1\t${bismark_version}\t${samtools_version}\t${raw_reads}\t${flt_reads}\t${map_ef2}\t${unique_aln2}\t${no_aln2}\t${multi_aln2}\t${cpg_per2}\t${chg_per2}\t${chh_per2}\n" >> $HOME/wgbs_se_pipeline_analysis_record.log
