@@ -41,5 +41,7 @@ print(fit)
 dev.off()
 
 model = callMethylation(data = methylome, transDist = fit$transDist)
-plot(model)
+print(model)
 
+outname <- sapply(strsplit(file, "_"), function(l) l[1])
+exportMethylome(model, paste0(outname,".tsv"))
