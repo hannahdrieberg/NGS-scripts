@@ -41,9 +41,8 @@ print(methylome)
 distcor = distanceCorrelation(methylome)
 # estimate decay parameter for distancce dependeny of the transition probabilities in HMM
 fit = estimateTransDist(distcor)
-
-print(fit)
-dev.off()
+# print(fit)
+# dev.off()
 
 ## HMM for complete set using transition probabilities
 model = callMethylation(data = methylome, transDist = fit$transDist)
@@ -54,7 +53,9 @@ print(model)
 # print(model)
 
 ### METHimpute plotting
-pdf("Methimpute_plotting.pdf")
+outname <- sapply(strsplit(file, "_"), function(l) l[1])
+pdf(paste0(outname"_methimpute_HMMfit.pdf"))
+print(fit)
 plotHistogram(model, total.counts=5)
 plotScatter(model)
 plotTransitionProbs(model)
