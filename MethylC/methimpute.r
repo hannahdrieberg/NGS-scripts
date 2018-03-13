@@ -20,6 +20,7 @@ print(args)
 
 ## load library
 library(methimpute)
+library(tidyverse)
 
 ## file "CX_report.txt"
 file <- args[1]
@@ -37,12 +38,11 @@ cytosine.positions = extractCytosinesFromFASTA(fasta.file, contexts = c('CG','CH
 methylome = inflateMethylome(bismark.data,cytosine.positions)
 print(methylome)
 
-## obtain correlation parameters (methylation levels from adjacent cytosines)
+## Obtain correlation parameters (methylation levels from adjacent cytosines)
 distcor = distanceCorrelation(methylome)
-# estimate decay parameter for distancce dependeny of the transition probabilities in HMM
+
+## Estimate decay parameter for distancce dependeny of the transition probabilities in HMM
 fit = estimateTransDist(distcor)
-# print(fit)
-# dev.off()
 
 ## HMM for complete set using transition probabilities
 model = callMethylation(data = methylome, transDist = fit$transDist)
@@ -52,7 +52,7 @@ print(model)
 # model <- callMethylationSeparate(data=methylome)
 # print(model)
 
-### METHimpute plotting
+## METHimpute plotting
 outname <- sapply(strsplit(file, "_"), function(l) l[1])
 pdf(paste0(outname"_methimpute_HMMfit.pdf"))
 print(fit)
@@ -63,24 +63,34 @@ plotConvergence(model)
 plotPosteriorDistance(model$data)
 dev.off()
 
-# At genes and TE coordinates
+## At genes and TE coordinates
 data(arabidopsis_genes)
 seqlevels(arabidopsis_genes) <-  sub('chr', 'Chr', seqlevels(arabidopsis_genes))
 data(arabidopsis_TEs)
 seqlevels(arabidopsis_TEs) <- sub('chr', 'Chr', seqlevels(arabidopsis_TEs))
 
-# At enrichment plots
-pdf("METHimpute_enrichments_plots.pdf")
+## At enrichment plots
+pdf(paste0(outname"_methimpute_HMMenrichment_plots.pdf"))
 plotEnrichment(model, annotation=arabidopsis_genes)
 plotEnrichment(model, annotation=arabidopsis_TEs)
 dev.off()
 
-## Bin cytosine positions, methylation counts in equidistant windows
-# binMethylome(data, binsize, contexts = "total", columns.average = c("rc.meth.lvl"))
+## export fitted HMM model
+exportMethylome(model, paste0(outname"_methimpute_HMMfit.tsv"))
 
-## Output recalibrated methylation levels
-exportMethylome(model, filename = paste0(outname,".tsv"))
-CG_out <- model$data[model$data$context == "CG"]
-CHG_out <- model$data[model$data$context == "CHG"]
-CHH_out <- model$data[model$data$context == "CHH"]
+## Output recalibrated methylation levels for downstream analysis
+df <- methods::as(model$data, 'data.frame') %>%
+select(seqnames, start, end, strand, context, rc.meth.lvl) 
+
+df_CG <- subset(df, context == "CG") %>%
+select(-context) %>%
+utils::write.table(df_CG, file = paste0(outname"_methimpute_HMM.recalCG.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
+
+df_CHG <- subset(df, context == "CHG") %>%
+select(-context) %>%
+utils::write.table(df_CHG, file = paste0(outname"_methimpute_HMM.recalCHG.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
+
+df_CHH <- subset(df, context == "CHH") %>%
+select(-context) %>%
+utils::write.table(df_CHH, file = paste0(outname"_methimpute_HMM.recalCHH.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
 
