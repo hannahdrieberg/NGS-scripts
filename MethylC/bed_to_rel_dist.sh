@@ -54,4 +54,4 @@ awk -F$'\t' '$NF<1000 && $NF>-1000' ${filename}_CpG_${outname}.bed > ${filename}
 
 echo "Performing R plots..."
 #initiate the R script to create the plots
-Rscript $HOME/scripts/rel_methylation_plots.r ${filename} ${outname} ${l1} ${l2}
+Rscript $HOME/diep/scripts/MethylC/rel_methylation_plots.r ${filename} ${outname} ${l1} ${l2}
