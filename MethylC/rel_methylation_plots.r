@@ -63,4 +63,4 @@ dev.off()
 
 out=cbind(p.cpg.bin,p.chg.bin[,2],p.chh.bin[,2])
 colnames(out)=c('pos',paste(args[1],'-CpG',sep=''),paste(args[1],'-CHG',sep=''),paste(args[1],'-CHH',sep=''))
-write.table(out,paste(args[1],'_',args[2],'values.txt',sep=''),sep='\t')
+write.table(out,paste(args[1],'_',args[2],'values.txt',sep=''), sep='\t', row.names=F, quote=F)
