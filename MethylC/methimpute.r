@@ -49,33 +49,25 @@ fit = estimateTransDist(distcor)
 model = callMethylation(data = methylome, transDist = fit$transDist, num.threads = 3)
 # print(model)
 
-## Per context HMMs
-# model <- callMethylationSeparate(data=methylome)
-# print(model)
-
-## METHimpute plotting
-pdf(paste0(outname,"_methimpute_HMMfit.pdf"))
-print(fit)
-plotHistogram(model, total.counts=5)
-plotScatter(model)
-plotTransitionProbs(model)
-plotConvergence(model)
-plotPosteriorDistance(model$data)
-dev.off()
-
 ## At genes and TE coordinates
 data(arabidopsis_genes)
 seqlevels(arabidopsis_genes) <-  sub('chr', 'Chr', seqlevels(arabidopsis_genes))
 data(arabidopsis_TEs)
 seqlevels(arabidopsis_TEs) <- sub('chr', 'Chr', seqlevels(arabidopsis_TEs))
 
-## At enrichment plots
-pdf(paste0(outname,"_methimpute_HMMenrichment_plots.pdf"))
+## METHimpute plotting
+pdf(paste0(outname,"_methimpute_HMMfit_enrichment.pdf"))
+print(fit)
+plotHistogram(model, total.counts=5)
+plotScatter(model)
+plotTransitionProbs(model)
+plotConvergence(model)
+plotPosteriorDistance(model$data)
 plotEnrichment(model, annotation=arabidopsis_genes)
 plotEnrichment(model, annotation=arabidopsis_TEs)
 dev.off()
 
-## export fitted HMM model
+## Export full fitted HMM model
 exportMethylome(model, paste0(outname,"_methimpute_HMMfit.tsv"))
 
 ## Output recalibrated methylation levels for downstream analysis
