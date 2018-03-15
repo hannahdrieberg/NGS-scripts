@@ -46,8 +46,8 @@ distcor = distanceCorrelation(methylome)
 fit = estimateTransDist(distcor)
 
 ## HMM for complete set using transition probabilities
-model = callMethylation(data = methylome, transDist = fit$transDist)
-print(model)
+model = callMethylation(data = methylome, transDist = fit$transDist, num.threads = 3)
+# print(model)
 
 ## Per context HMMs
 # model <- callMethylationSeparate(data=methylome)
