@@ -76,7 +76,7 @@ plotEnrichment(model, annotation=arabidopsis_TEs)
 dev.off()
 
 ## export fitted HMM model
-exportMethylome(model, paste0(outname"_methimpute_HMMfit.tsv"))
+exportMethylome(model, paste0(outname,"_methimpute_HMMfit.tsv"))
 
 ## Output recalibrated methylation levels for downstream analysis
 df <- methods::as(model$data, 'data.frame') %>%
@@ -84,13 +84,13 @@ select(seqnames, start, end, strand, context, rc.meth.lvl)
 
 df_CG <- subset(df, context == "CG") %>%
 select(-context) %>%
-utils::write.table(df_CG, file = paste0(outname"_methimpute_HMM.recalCG.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(df_CG, file = paste0(outname,"_methimpute_HMM.recalCG.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 df_CHG <- subset(df, context == "CHG") %>%
 select(-context) %>%
-utils::write.table(df_CHG, file = paste0(outname"_methimpute_HMM.recalCHG.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(df_CHG, file = paste0(outname,"_methimpute_HMM.recalCHG.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 df_CHH <- subset(df, context == "CHH") %>%
 select(-context) %>%
-utils::write.table(df_CHH, file = paste0(outname"_methimpute_HMM.recalCHH.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(df_CHH, file = paste0(outname,"_methimpute_HMM.recalCHH.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
 
