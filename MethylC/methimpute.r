@@ -24,6 +24,7 @@ library(tidyverse)
 
 ## file "CX_report.txt"
 file <- args[1]
+outname <- args[2]
 
 ## chromosome lengths from methimpute
 data(arabidopsis_chromosomes)
@@ -53,8 +54,7 @@ print(model)
 # print(model)
 
 ## METHimpute plotting
-outname <- sapply(strsplit(file, "_"), function(l) l[1])
-pdf(paste0(outname"_methimpute_HMMfit.pdf"))
+pdf(paste0(outname,"_methimpute_HMMfit.pdf"))
 print(fit)
 plotHistogram(model, total.counts=5)
 plotScatter(model)
@@ -70,7 +70,7 @@ data(arabidopsis_TEs)
 seqlevels(arabidopsis_TEs) <- sub('chr', 'Chr', seqlevels(arabidopsis_TEs))
 
 ## At enrichment plots
-pdf(paste0(outname"_methimpute_HMMenrichment_plots.pdf"))
+pdf(paste0(outname,"_methimpute_HMMenrichment_plots.pdf"))
 plotEnrichment(model, annotation=arabidopsis_genes)
 plotEnrichment(model, annotation=arabidopsis_TEs)
 dev.off()
