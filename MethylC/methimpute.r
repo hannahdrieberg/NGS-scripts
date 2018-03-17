@@ -76,13 +76,13 @@ select(seqnames, start, end, strand, context, rc.meth.lvl)
 
 df_CG <- subset(df, context == "CG") %>%
 select(-context) %>%
-utils::write.table(df_CG, file = paste0(outname,"_methimpute_HMM.recalCG.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(., file = paste0(outname,"_methimpute_HMM.recalCG.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 df_CHG <- subset(df, context == "CHG") %>%
 select(-context) %>%
-utils::write.table(df_CHG, file = paste0(outname,"_methimpute_HMM.recalCHG.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(., file = paste0(outname,"_methimpute_HMM.recalCHG.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 df_CHH <- subset(df, context == "CHH") %>%
 select(-context) %>%
-utils::write.table(df_CHH, file = paste0(outname,"_methimpute_HMM.recalCHH.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(., file = paste0(outname,"_methimpute_HMM.recalCHH.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
 
