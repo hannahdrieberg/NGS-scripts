@@ -70,19 +70,20 @@ dev.off()
 ## Export full fitted HMM model
 exportMethylome(model, paste0(outname,"_methimpute_HMMfit.tsv"))
 
-## Output recalibrated methylation levels for downstream analysis
+## Output recalibrated methylation levels for downstream analysis akin to bismark cov files
 df <- methods::as(model$data, 'data.frame') %>%
-select(seqnames, start, end, strand, context, rc.meth.lvl) 
+mutate(rc.counts.unmethylated = rc.counts.total - rc.counts.total) %>%
+select(seqnames, start, end, context, rc.meth.lvl, rc.counts.methylated, rc.counts.unmethylated) 
 
 df_CG <- subset(df, context == "CG") %>%
 select(-context) %>%
-utils::write.table(., file = paste0(outname,"_methimpute_HMM.recalCG.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(., file = paste0(outname,"_recalCG.bed.bismark.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 df_CHG <- subset(df, context == "CHG") %>%
 select(-context) %>%
-utils::write.table(., file = paste0(outname,"_methimpute_HMM.recalCHG.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(., file = paste0(outname,"_recalCHG.bed.bismark.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 df_CHH <- subset(df, context == "CHH") %>%
 select(-context) %>%
-utils::write.table(., file = paste0(outname,"_methimpute_HMM.recalCHH.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(., file = paste0(outname,"_recalCHH.bed.bismark.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
 
