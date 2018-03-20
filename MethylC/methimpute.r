@@ -72,7 +72,7 @@ exportMethylome(model, paste0(outname,"_methimpute_HMMfit.tsv"))
 
 ## Output recalibrated methylation levels for downstream analysis akin to bismark cov files
 df <- methods::as(model$data, 'data.frame') %>%
-mutate(rc.counts.unmethylated = rc.counts.total - rc.counts.total) %>%
+mutate(rc.counts.unmethylated = rc.counts.total - rc.counts.methylated) %>%
 select(seqnames, start, end, context, rc.meth.lvl, rc.counts.methylated, rc.counts.unmethylated) 
 
 df_CG <- subset(df, context == "CG") %>%
