@@ -46,7 +46,11 @@ distcor = distanceCorrelation(methylome)
 fit = estimateTransDist(distcor)
 
 ## HMM for complete set using transition probabilities
-model = callMethylation(data = methylome, transDist = fit$transDist, num.threads = 3)
+# model = callMethylation(data = methylome, transDist = fit$transDist, num.threads = 3)
+# print(model)
+
+## Context-specific HMMs
+model = callMethylationSeparate(data = methylome, num.threads = 3)
 # print(model)
 
 ## At genes and TE coordinates
@@ -57,7 +61,7 @@ seqlevels(arabidopsis_TEs) <- sub('chr', 'Chr', seqlevels(arabidopsis_TEs))
 
 ## METHimpute plotting
 pdf(paste0(outname,"_methimpute_HMMfit_enrichment.pdf"))
-print(fit)
+print(fit$plot)
 plotHistogram(model, total.counts=5)
 plotScatter(model)
 plotTransitionProbs(model)
@@ -72,8 +76,9 @@ exportMethylome(model, paste0(outname,"_methimpute_HMMfit.tsv"))
 
 ## Output recalibrated methylation levels for downstream analysis akin to bismark cov files
 df <- methods::as(model$data, 'data.frame') %>%
-mutate(rc.counts.unmethylated = rc.counts.total - rc.counts.methylated) %>%
-select(seqnames, start, end, context, rc.meth.lvl, rc.counts.methylated, rc.counts.unmethylated) 
+#mutate(rc.counts.unmethylated = rc.counts.total - rc.counts.methylated) %>%
+#select(seqnames, start, end, context, rc.meth.lvl, rc.counts.methylated, rc.counts.unmethylated) 
+select(seqnames, start, end, context, rc.meth.lvl)
 
 df_CG <- subset(df, context == "CG") %>%
 select(-context) %>%
