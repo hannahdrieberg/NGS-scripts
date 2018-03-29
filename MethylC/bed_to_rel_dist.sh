@@ -1,6 +1,5 @@
 #!/bin/bash
-
-#plotting DNA methylation over gene models
+# Plotting DNA methylation over gene models
 
 #######################
 # REQUIREMENTS
@@ -10,7 +9,7 @@
 #######################
 
 if [ "$#" -ne 4 ]; then
-echo "USAGE: bed_to_rel_dist.sh <-wig or -bed> <input path to bed file you want to map to> <filename prefix> <output map name>"
+echo "USAGE: bed_to_rel_dist.sh <-wig or -bed> <input path to bed file> <filename prefix> <output map name>"
 echo "EXAMPLE: bed_to_rel_dist.sh -bed /home/steve/brachy_annotation/genes.bed epignome.500k gene"
 exit 1
 fi
