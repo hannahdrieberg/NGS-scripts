@@ -12,6 +12,9 @@ Perform feature counts on aligned reads on annotation file of interest for diffe
 #### RNAseq_v0.1.sh
 Master script for performing quality trimming and subread alignment of RNA-seq reads. Sorted BAM as output for down-stream analysis.
 
+#### edgeR.r
+Template script to run edgeR for differential gene expression calling.
+
 #### rel_expression_plots.r
 Get raw read coverage across features of interest from RNA WIG files (see RNAseq_bam_to_100bpwigs).
 

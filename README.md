@@ -1,7 +1,10 @@
 # NGS-scripts
 Repository for scripts used for analysing next generation sequencing data organised by technique.
 
-#### TAIR10 annotation script
+#### At_rRNA_AGIs.txt
+List of rRNA loci for removal prior to DEG calling.
+
+#### TAIR10_annotation.sh
 Download TAIR10 gff and produce annotation files
 
 #### TruSeq-adapters.fa

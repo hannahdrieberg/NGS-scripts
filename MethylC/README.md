@@ -57,9 +57,10 @@ Pair of scripts (use .sh to run) to take annotation file, bed file, and feature 
 #### wgbs_cov_to_TDF.txt
 Produce TDF files from bismark cov file of interest. Check IGV compatible genome build ready.
 
-### wgbs_pipeline_v0.4.sh
+### wgbs_pipeline.sh
+#### v0.4
 Bismark alignment script using Bowtie1 aligner. Has SE and PE options.
-
-### wgbs_pipeline_v0.5.sh
+#### v0.5
 Bismark alignment script using Bowtie2 aligner. Has SE and PE options.
-
+#### v0.6
+Perl script for 100bp windows deprecated thus removed.
