@@ -5,7 +5,7 @@ set -u
 # This script it designed to take a single end fastq file and process it through the 
 # bismark aligner call methylated cytosines, and develop per-c bed files and 100bp 
 # window wig files for CG, CHG, and CHH methylation levels
-# Compatible with Bismark v0.16.0
+# Compatible with Bismark v0.16.3
 # USES BOWTIE2 FOR ALIGNMENT
 # Genome indexing
 # Bowtie2: bismark_genome_preparation --bowtie2 /path/to/genome
@@ -57,9 +57,9 @@ cd ${fileID}_wgbspipeline_${dow}
 #fastqc
 mkdir 1_fastqc
 fastqc $fq_file 2>&1 | tee -a ${fileID}_logs_${dow}.log
-mv ${fq_file%%.fastq*}_fastqc* 1_fastqc #
+mv ${fq_file%%.fastq*}_fastqc* 1_fastqc
 
-#trim_galore
+## trim_galore!
 mkdir 2_trimgalore
 cd 2_trimgalore
 trim_galore ../$fq_file 2>&1 | tee -a ../${fileID}_logs_${dow}.log
@@ -168,25 +168,25 @@ echo ""
 echo "Full logfile of steps: ${fileID}_logs_${dow}.log"
 echo "##################"
 
-#develop directory tree
+## develop directory tree
 mkdir ${fileID}_wgbspipeline_${dow}
 mv $fq_file1 ${fileID}_wgbspipeline_${dow}
 mv $fq_file2 ${fileID}_wgbspipeline_${dow}
 cd ${fileID}_wgbspipeline_${dow}
 
-#fastqc
+## fastqc
 mkdir 1_fastqc
 fastqc $fq_file1 $fq_file2 2>&1 | tee -a ${fileID}_logs_${dow}.log
-mv ${fq_file1%%.fastq*}_fastqc* 1_fastqc #
-mv ${fq_file2%%.fastq*}_fastqc* 1_fastqc #
+mv ${fq_file1%%.fastq*}_fastqc* 1_fastqc
+mv ${fq_file2%%.fastq*}_fastqc* 1_fastqc
 
-#trim_galore
+## trim_galore!
 mkdir 2_trimgalore
 cd 2_trimgalore
 trim_galore --paired ../$fq_file1 ../$fq_file2 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 cd ../
 
-#fastqc_again
+## fastqc_again
 mkdir 3_trimmed_fastqc
 fastqc 2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* 2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 2_trimgalore/${fq_file1%%.fastq*}_val_1_fastqc* 3_trimmed_fastqc
@@ -196,13 +196,12 @@ mkdir 0_rawfastq
 mv $fq_file1 0_rawfastq
 mv $fq_file2 0_rawfastq
 
-#bismark to BAM
-
+## bismark alignment
 mkdir 4_bismark_alignment
 cd 4_bismark_alignment
 
 ## PE alignment
-bismark --un $genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark --un --multicore 2 $genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 ## SE directional on unmapped R1
 bismark --multicore 2 $genome_path ${fq_file1%%.fastq*}_val_1.*unmapped_reads_1.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
@@ -220,13 +219,13 @@ rm -v *_report.txt
 rm -v *_unmapped_reads_*
 rm -v *SEremapped.bam
 
-#methylation extraction PE (-p)
+## methylation extraction PE (-p)
 bismark_methylation_extractor --comprehensive --report --multicore 2 --buffer_size 8G -p --gzip ${fq_file1%%.fastq*}_val_1_bismark_bt2_pe.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-#methylation extraction SE re-mapped
+## methylation extraction SE re-mapped
 bismark_methylation_extractor --comprehensive --report --multicore 2 --buffer_size 8G -s --gzip ${fq_file1%%.fastq*}_SEremapped.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-#merge the met_extract results
+## merge the met_extract results
 zcat CpG*.txt.gz > CpG_context_${fileID}_merged.txt
 zcat CHG*.txt.gz > CHG_context_${fileID}_merged.txt
 zcat CHH*.txt.gz > CHH_context_${fileID}_merged.txt
@@ -246,7 +245,7 @@ echo "#####################"
 echo "providing pipeline metrics to wgbs pipeline logfile..."
 echo "#####################"
 
-#get all relevant numbers for final log summary
+## get all relevant numbers for final log summary
 bismark_version=$(bismark --version | grep "Bismark Version:" | cut -d":" -f2 | tr -d ' ')
 samtools_version=$(samtools 3>&1 1>&2 2>&3 | grep "Version:" | cut -d' ' -f2 | tr -d ' ')
 

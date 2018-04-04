@@ -69,7 +69,7 @@ cd 2_scythe_sickle
 
 echo "scythe adapters ..."
 
-scythe -a /home/diep/scripts/TruSeq-adapters.fa -p 0.1 ../$fq > ${fq%%.fastq*}_noadapt.fastq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+scythe -a $HOME/scripts/TruSeq-adapters.fa -p 0.1 ../$fq > ${fq%%.fastq*}_noadapt.fastq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 echo "sickle low-quality ..."
 sickle se -f ${fq%%.fastq*}_noadapt.fastq -o ${fq%%.fastq*}_trimmed.fastq -t sanger -q 20 -l 20 2>&1 | tee -a ../${fileID}_logs_${dow}.log
@@ -127,7 +127,7 @@ if [ "$1" == "PE" ]; then
 if [ "$#" -ne 5 ]; then
 echo "Missing required arguments for paired-end!"
 echo "USAGE: RNA-seq_v0.1.sh <PE> <R1> <R2> <subread indexed genome> <fileID output>"
-echo "EXAMPLE: RNAseq_v0.1.sh SE sample.fastq /home/diep/TAIR10/chromosomes/TAIR10_subread_index sample-r1"
+echo "EXAMPLE: RNAseq_v0.1.sh SE sample.fastq $HOME/TAIR10/chromosomes/TAIR10_subread_index sample-r1"
 exit 1
 fi
 
@@ -178,9 +178,9 @@ cd 2_scythe_sickle
 
 echo "scythe adapters ..."
 
-scythe -a /home/diep/scripts/TruSeq-adapters.fa -p 0.1 ../$fq1 > ${fq1%%.fastq*}_noadapt.fastq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+scythe -a $HOME/scripts/TruSeq-adapters.fa -p 0.1 ../$fq1 > ${fq1%%.fastq*}_noadapt.fastq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-scythe -a /home/diep/scripts/TruSeq-adapters.fa -p 0.1 ../$fq2 > ${fq2%%.fastq*}_noadapt.fastq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+scythe -a $HOME/scripts/TruSeq-adapters.fa -p 0.1 ../$fq2 > ${fq2%%.fastq*}_noadapt.fastq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 echo "sickle low-quality ..."
 
@@ -217,7 +217,7 @@ echo "Beginning alignment ..."
 # subread-align -T 5 -H -t 1 -u -i ${index} -r ${fq1%%.fastq*}_trimmed.fastq -R ${fq2%%.fastq*}_trimmed.fastq -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 # use subjunc to align
-subjunc -T 5 -u -H -i $index -r ${fq1%%.fastq*}_trimmed.fastq -R ${fq2%%.fastq*}_trimmed.fastq -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+subjunc -T 5 -u -H -i $index -r ${fq1%%.fastq*}_trimmed.fastq -R ${fq2%%.fastq*}_trimmed.fastq -o ${fileID} 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 echo "cleaning..."
 
