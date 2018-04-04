@@ -207,8 +207,8 @@ mv $fq2 0_fastq
 
 # subread align
 mkdir 4_subread-align
-mv 2_scythe_sickle/${fq1%%.fastq*}_trimmed.fastq -t 4_subread-align/
-mv 2_scythe_sickle/${fq2%%.fastq*}_trimmed.fastq -t 4_subread-align/
+mv 2_scythe_sickle/${fq1%%.fastq*}_trimmed.fastq* -t 4_subread-align/
+mv 2_scythe_sickle/${fq2%%.fastq*}_trimmed.fastq* -t 4_subread-align/
 cd 4_subread-align/
 
 echo "Beginning alignment ..."
