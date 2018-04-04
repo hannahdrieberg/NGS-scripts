@@ -9,7 +9,6 @@ library(edgeR)
 
 ## Count files from featureCounts
 countFiles <- dir(pattern = ".counts")
-library(tidyverse)
 ## Define sample groups
 sampleGroups <- c(1,1,1,2,2,2)
 
