@@ -56,7 +56,7 @@ cd ${fileID}_wgbspipeline_${dow}
 
 #fastqc
 mkdir 1_fastqc
-fastqc $fq_file 2>&1 | tee -a ${fileID}_logs_${dow}.log
+fastqc -t 4 $fq_file 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv ${fq_file%%.fastq*}_fastqc* 1_fastqc #
 
 #trim_galore
@@ -67,7 +67,7 @@ cd ../
 
 #fastqc_again
 mkdir 3_trimmed_fastqc
-fastqc 2_trimgalore/${fq_file%%.fastq*}_trimmed.fq* 2>&1 | tee -a ${fileID}_logs_${dow}.log
+fastqc -t 4 2_trimgalore/${fq_file%%.fastq*}_trimmed.fq* 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 2_trimgalore/${fq_file%%.fastq*}_trimmed_fastqc* 3_trimmed_fastqc
 
 mkdir 0_rawfastq
@@ -184,7 +184,7 @@ cd ${fileID}_wgbspipeline_${dow}
 
 #fastqc
 mkdir 1_fastqc
-fastqc $fq_file1 $fq_file2 2>&1 | tee -a ${fileID}_logs_${dow}.log
+fastqc -t 4 $fq_file1 $fq_file2 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv ${fq_file1%%.fastq*}_fastqc* 1_fastqc #
 mv ${fq_file2%%.fastq*}_fastqc* 1_fastqc #
 
@@ -196,7 +196,7 @@ cd ../
 
 #fastqc_again
 mkdir 3_trimmed_fastqc
-fastqc 2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* 2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ${fileID}_logs_${dow}.log
+fastqc -t 4 2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* 2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 2_trimgalore/${fq_file1%%.fastq*}_val_1_fastqc* 3_trimmed_fastqc
 mv 2_trimgalore/${fq_file2%%.fastq*}_val_2_fastqc* 3_trimmed_fastqc
 
