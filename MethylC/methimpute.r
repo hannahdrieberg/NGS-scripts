@@ -34,7 +34,7 @@ arabidopsis_chromosomes$chromosome <- sub('chr', 'Chr', arabidopsis_chromosomes$
 bismark.data <- importBismark(file, chrom.lengths=arabidopsis_chromosomes)
 
 ## Get positions of all cytosines to inflate methylation data (include non-covered sites)
-fasta.file <- '/home/diep/TAIR10/arabidopsis_seq.fa'
+fasta.file <- '$HOME/TAIR10/chromosomes/arabidopsis_seq.fa'
 cytosine.positions = extractCytosinesFromFASTA(fasta.file, contexts = c('CG','CHG','CHH'))
 methylome = inflateMethylome(bismark.data,cytosine.positions)
 print(methylome)
