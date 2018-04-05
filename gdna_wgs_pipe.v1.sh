@@ -9,7 +9,7 @@ set -eu
 
 if [ "$#" -lt 4 ]; then
 echo "Missing required arguments!"
-echo "USAGE: gdna_wgs_pipe.v1.sh <SE,PE> <fastq R1> <R2> <subread indexed genome> <fileID output>"
+echo "USAGE: gdna_wgs_pipe.v1.sh <SE PE> <R1> <R2> <subread indexed genome> <fileID output>"
 echo "EXAMPLE: gdna_wgs_pipe.v1.sh SE sample.fastq $HOME/TAIR10/chromosomes/TAIR10_subread_index sample-r1"
 exit 1
 fi
@@ -45,9 +45,9 @@ echo "Time of analysis: $dow"
 echo "##################"
 
 # make sample work directory
-mkdir ${fileID}_RNA_${dow}
-mv $fq ${fileID}_RNA_${dow}
-cd ${fileID}_RNA_${dow}
+mkdir ${fileID}_gDNA_wgs_${dow}
+mv $fq ${fileID}_gDNA_wgs_${dow}
+cd ${fileID}_gDNA_wgs_${dow}
 
 if [[ $fq != *.gz ]];then
 gzip $fq
@@ -55,22 +55,24 @@ fq="${fq}.gz"
 fi
 
 # initial fastqc
+echo "FASTQC r1 ..."
+
 mkdir 1_fastqc
-fastqc $fq 2>&1 | tee -a ${fileID}_logs_${dow}.log
+fastqc -t 2 $fq 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv ${fq%%.fastq*}_fastqc* 1_fastqc
 
 echo "Performing quality-based read trimming... "
 
 mkdir 2_trimgalore
-cd 2_trimgalore
-trim_galore ../$fq 2>&1 | tee -a ${fileID}_logs_${dow}.log
+cd 2_trimgalore/
+trim_galore --dont_gzip ../$fq 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 cd ../
 
 # repeat fastqc
-echo "FASTQC ..."
+echo "FASTQC r2 ..."
 
 mkdir 3_trimmed_fastqc
-fastqc 2_trimgalore/${fq%%.fastq*}_trimmed.fastq 2>&1 | tee -a ${fileID}_logs_${dow}.log
+fastqc -t 2 2_trimgalore/${fq%%.fastq*}_trimmed.fq 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 2_trimgalore/${fq%%.fastq*}_trimmed_fastqc* -t 3_trimmed_fastqc
 
 mkdir 0_fastq
@@ -78,16 +80,16 @@ mv $fq 0_fastq
 
 # subread align
 mkdir 4_subread-align
-mv 2_trim_galore/${fq%%.fastq*}_trimmed.fastq -t 4_subread-align/
+mv 2_trimgalore/${fq%%.fastq*}_trimmed.fq -t 4_subread-align/
 cd 4_subread-align/
 
 echo "Beginning alignment ..."
 
 # -t 0 = RNA-seq -t 1 = genomic DNA seq
 
-subread-align -T 4 -t 1 -i $index -r ${fq%%.fastq*}_trimmed.fastq -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+subread-align -T 4 -t 1 -i $index -r ${fq%%.fastq*}_trimmed.fq -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-if [[ $fq%%.fastq}* != *".gz" ]]; then gzip ${fq%%.fastq*}_trimmed.fastq; fi
+if [[ $fq%%.fastq}* != *".gz" ]]; then gzip ${fq%%.fastq*}_trimmed.fq; fi
 
 echo "cleaning..."
 
@@ -96,7 +98,7 @@ outbam="${fileID}.sorted.bam"
 samtools sort -m 2G ${tmpbam} -o $outbam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 samtools index $outbam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 rm -v ${tmpbam}
-mv *trimmed.fastq.gz ../2_trimgalore/
+mv *trimmed.fq.gz ../2_trimgalore/
 
 echo "Alignment complete"
 
@@ -133,10 +135,10 @@ echo "Time of analysis: $dow"
 echo "##################"
 
 # make sample work directory
-mkdir ${fileID}_RNA_${dow}
-mv $fq1 ${fileID}_RNA_${dow}
-mv $fq2 ${fileID}_RNA_${dow}
-cd ${fileID}_RNA_${dow}
+mkdir ${fileID}_gDNA_wgs_${dow}
+mv $fq1 ${fileID}_gDNA_wgs_${dow}
+mv $fq2 ${fileID}_gDNA_wgs_${dow}
+cd ${fileID}_gDNA_wgs_${dow}
 
 if [[ $fq1 != *.gz ]];then
 gzip $fq1
@@ -150,7 +152,7 @@ fi
 
 # initial fastqc
 mkdir 1_fastqc
-fastqc $fq1 $fq2 2>&1 | tee -a ${fileID}_logs_${dow}.log
+fastqc -t 2 $fq1 $fq2 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv ${fq1%%.fastq*}_fastqc* 1_fastqc
 mv ${fq2%%.fastq*}_fastqc* 1_fastqc
 
@@ -158,7 +160,7 @@ echo "Performing quality-based read trimming... "
 
 mkdir 2_trimgalore
 cd 2_trimgalore
-trim_galore --paired ../$fq1 ../$fq2 2>&1 | tee -a ${fileID}_logs_${dow}.log
+trim_galore --dont_gzip --paired ../$fq1 ../$fq2 2>&1 | tee -a ${fileID}_logs_${dow}.log
 cd ../
 
 # repeat fastqc
@@ -166,8 +168,7 @@ echo "FASTQC ..."
 
 # fastqc again
 mkdir 3_trimmed_fastqc
-fastqc 2_trimgalore/${fq1%%.fastq*}_trimmed.fastq 2_trimgalore/${fq2%%.fastq*}_trimmed.fastq 2>&1 | tee -a ${fileID}_logs_${dow}.log
-
+fastqc -t 2 2_trimgalore/${fq1%%.fastq*}_trimmed.fq 2_trimgalore/${fq2%%.fastq*}_trimmed.fq 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv 2_trimgalore/${fq1%%.fastq*}_trimmed_fastqc* -t 3_trimmed_fastqc
 mv 2_trimgalore/${fq2%%.fastq*}_trimmed_fastqc* -t 3_trimmed_fastqc
 
@@ -177,22 +178,22 @@ mv $fq2 0_fastq
 
 # subread align
 mkdir 4_subread-align
-mv 2_trimgalore/${fq1%%.fastq*}_trimmed.fastq -t 4_subread-align/
-mv 2_trimgalore/${fq2%%.fastq*}_trimmed.fastq -t 4_subread-align/
+mv 2_trimgalore/${fq1%%.fastq*}_trimmed.fq -t 4_subread-align/
+mv 2_trimgalore/${fq2%%.fastq*}_trimmed.fq -t 4_subread-align/
 cd 4_subread-align/
 
 echo "Beginning alignment ..."
 
 # -t 0 = RNA-seq -t 1 = genomic DNA seq
 
-subread-align -T 4 -t 1 -i ${index} -r ${fq1%%.fastq*}_trimmed.fastq -R ${fq2%%.fastq*}_trimmed.fastq -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+subread-align -T 4 -t 1 -i ${index} -r ${fq1%%.fastq*}_trimmed.fq -R ${fq2%%.fastq*}_trimmed.fq -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 echo "cleaning..."
 
-if [[ $fq1%%.fastq}* != *".gz" ]]; then gzip ${fq1%%.fastq*}_trimmed.fastq; fi
-if [[ $fq2%%.fastq}* != *".gz" ]]; then gzip ${fq2%%.fastq*}_trimmed.fastq; fi
+if [[ $fq1%%.fastq}* != *".gz" ]]; then gzip ${fq1%%.fastq*}_trimmed.fq; fi
+if [[ $fq2%%.fastq}* != *".gz" ]]; then gzip ${fq2%%.fastq*}_trimmed.fq; fi
 
-mv *trimmed.fastq.gz ../2_trimgalore/
+mv *trimmed.fq.gz ../2_trimgalore/
 
 echo "Alignment complete"
 
