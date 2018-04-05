@@ -112,13 +112,13 @@ echo "#####################"
 bismark_version=$(bismark --version | grep "Bismark Version:" | cut -d":" -f2 | tr -d ' ')
 samtools_version=$(samtools 3>&1 1>&2 2>&3 | grep "Version:" | cut -d' ' -f2 | tr -d ' ')
 
-map_ef=$(grep 'Mapping efficiency:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed_bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
-unique_aln=$(grep 'Number of alignments with a unique best hit from the different alignments:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed_bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t')
-no_aln=$(grep 'Sequences with no alignments under any condition:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed_bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t')
-multi_aln=$(grep 'Sequences did not map uniquely:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed_bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t')
-cpg_per=$(grep 'C methylated in CpG context:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed_bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
-chg_per=$(grep 'C methylated in CHG context:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed_bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
-chh_per=$(grep 'C methylated in CHH context:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed_bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
+map_ef=$(grep 'Mapping efficiency:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed*bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
+unique_aln=$(grep 'Number of alignments with a unique best hit from the different alignments:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed*bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t')
+no_aln=$(grep 'Sequences with no alignments under any condition:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed*bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t')
+multi_aln=$(grep 'Sequences did not map uniquely:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed*bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t')
+cpg_per=$(grep 'C methylated in CpG context:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed*bismark_bt2_SE_report.txt | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
+chg_per=$(grep 'C methylated in CHG context:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed*bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
+chh_per=$(grep 'C methylated in CHH context:' 4_bismark_alignment/${fq_file%%.fastq*}_trimmed*bismark_bt2_SE_report.txt  | cut -d: -f2 | tr -d '\t' | cut -d'%' -f1)
 
 if [[ $fq_file == *gz* ]];then
 	raw_reads=$(zcat 0_rawfastq/*.gz | wc -l)
