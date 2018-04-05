@@ -45,9 +45,9 @@ echo "Time of analysis: $dow"
 echo "##################"
 
 # make sample work directory
-mkdir ${fileID}_RNA_${dow}
-mv $fq ${fileID}_RNA_${dow}
-cd ${fileID}_RNA_${dow}
+mkdir ${fileID}_gDNA_wgs_${dow}
+mv $fq ${fileID}_gDNA_wgs_${dow}
+cd ${fileID}_gDNA_wgs_${dow}
 
 if [[ $fq != *.gz ]];then
 gzip $fq
@@ -133,10 +133,10 @@ echo "Time of analysis: $dow"
 echo "##################"
 
 # make sample work directory
-mkdir ${fileID}_RNA_${dow}
-mv $fq1 ${fileID}_RNA_${dow}
-mv $fq2 ${fileID}_RNA_${dow}
-cd ${fileID}_RNA_${dow}
+mkdir ${fileID}_gDNA_wgs_${dow}
+mv $fq1 ${fileID}_gDNA_wgs_${dow}
+mv $fq2 ${fileID}_gDNA_wgs_${dow}
+cd ${fileID}_gDNA_wgs_${dow}
 
 if [[ $fq1 != *.gz ]];then
 gzip $fq1
