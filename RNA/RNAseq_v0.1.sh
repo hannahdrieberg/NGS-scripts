@@ -58,7 +58,7 @@ fi
 
 # initial fastqc
 mkdir 1_fastqc
-fastqc $fq 2>&1 | tee -a ${fileID}_logs_${dow}.log
+fastqc -t 2 $fq 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv ${fq%%.fastq*}_fastqc* 1_fastqc
 
 echo "Performing adapter and low-quality read trimming... "
@@ -83,7 +83,7 @@ echo "FASTQC..."
 
 # fastqc again
 mkdir 3_trimmed_fastqc
-fastqc 2_scythe_sickle/${fq%%.fastq*}_trimmed.fastq 2>&1 | tee -a ${fileID}_logs_${dow}.log
+fastqc -t 2 2_scythe_sickle/${fq%%.fastq*}_trimmed.fastq 2>&1 | tee -a ${fileID}_logs_${dow}.log
 
 mv 2_scythe_sickle/${fq%%.fastq*}_trimmed_fastqc* -t 3_trimmed_fastqc
 
@@ -97,11 +97,11 @@ cd 4_subread-align/
 
 echo "Beginning alignment ..."
 
-# use subread to align
-# subread-align -T 5 -t 1 -u -H -i $index -r ${fq%%.fastq*}_trimmed.fastq -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+# use subread to align -t 0 = RNA-seq -t 1 = genomic DNA seq
+# subread-align -T 4 -t 1 -i $index -r ${fq%%.fastq*}_trimmed.fastq* -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-# use subjunc to align
-subjunc -T 5 -u -H -i $index  -r ${fq%%.fastq*}_trimmed.fastq -o  "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+# use subjunc to align 
+subjunc -T 4 -i $index -r ${fq%%.fastq*}_trimmed.fastq* -o  "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 if [[ $fq%%.fastq}* != *".gz" ]]; then gzip ${fq%%.fastq*}_trimmed.fastq; fi
 
@@ -166,7 +166,7 @@ fi
 
 # initial fastqc
 mkdir 1_fastqc
-fastqc $fq1 $fq2 2>&1 | tee -a ${fileID}_logs_${dow}.log
+fastqc -t 2 $fq1 $fq2 2>&1 | tee -a ${fileID}_logs_${dow}.log
 mv ${fq1%%.fastq*}_fastqc* 1_fastqc
 mv ${fq2%%.fastq*}_fastqc* 1_fastqc
 
@@ -196,7 +196,7 @@ echo "FASTQC..."
 
 # fastqc again
 mkdir 3_trimmed_fastqc
-fastqc 2_scythe_sickle/${fq1%%.fastq*}_trimmed.fastq 2_scythe_sickle/${fq2%%.fastq*}_trimmed.fastq 2>&1 | tee -a ${fileID}_logs_${dow}.log
+fastqc -t 2 2_scythe_sickle/${fq1%%.fastq*}_trimmed.fastq* 2_scythe_sickle/${fq2%%.fastq*}_trimmed.fastq* 2>&1 | tee -a ${fileID}_logs_${dow}.log
 
 mv 2_scythe_sickle/${fq1%%.fastq*}_trimmed_fastqc* -t 3_trimmed_fastqc
 mv 2_scythe_sickle/${fq2%%.fastq*}_trimmed_fastqc* -t 3_trimmed_fastqc
@@ -213,11 +213,11 @@ cd 4_subread-align/
 
 echo "Beginning alignment ..."
 
-# use subread to align
-# subread-align -T 5 -H -t 1 -u -i ${index} -r ${fq1%%.fastq*}_trimmed.fastq -R ${fq2%%.fastq*}_trimmed.fastq -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+# use subread to align -t 0 = RNA-seq -t 1 = genomic DNA seq
+# subread-align -T 4 -t 1 -i ${index} -r ${fq1%%.fastq*}_trimmed.fastq* -R ${fq2%%.fastq*}_trimmed.fastq* -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-# use subjunc to align
-subjunc -T 5 -u -H -i $index -r ${fq1%%.fastq*}_trimmed.fastq -R ${fq2%%.fastq*}_trimmed.fastq -o ${fileID} 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+# use subjunc to align 
+subjunc -T 4 -i $index -r ${fq1%%.fastq*}_trimmed.fastq -R ${fq2%%.fastq*}_trimmed.fastq -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 echo "cleaning..."
 
