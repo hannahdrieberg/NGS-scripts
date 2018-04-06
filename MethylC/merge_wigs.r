@@ -28,7 +28,7 @@ select(-X1, -X2, -X3) %>%
 cor() %>%
 as.matrix()
 
-pdf(file=paste0('wig_cor_',context,'.pdf'), width = 0, height = 0, paper="a4")
+pdf(file=paste0('wig_cor_',context,'.pdf'), width = 0, height = 0, paper="a4r")
 heatmap.2(data, 
 	trace='none',
 	density.info='none',
