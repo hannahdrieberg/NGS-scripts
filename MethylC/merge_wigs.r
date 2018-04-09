@@ -39,5 +39,8 @@ heatmap.2(data,
 	rowsep = 1:nrow(data),
 	sepcolor = "white",
 	sepwidth = c(0.001,0.001),
-	dendrogram='both')
+	dendrogram='both',
+	margins = c(8,8),
+	cexCol = 1,
+	cexRow = 1)
 dev.off()
