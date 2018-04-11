@@ -25,8 +25,8 @@ samtools faidx $fas
 # https://www.biostars.org/p/70795/
 awk -v OFS='\t' {'print $1,$2'} ${fas}.fai > temp.genome 
 # use genome file to make 100bp windows across genome
-bedtools makewindows -g temp.genome -w 100 > temp.genome.100bp.bed
-sort -k1,1 -k2,2n temp.genome.100bp.bed > temp.genome.100bp.sorted.bed
+bedtools makewindows -g temp.genome -w 99 -s 100 > temp.genome.100bp.bed
+sortBed -i temp.genome.100bp.bed > temp.genome.100bp.sorted.bed
 
 # use bedtools coverage to get coverage across 100bp windows from BAM
 # MAKE SURE TO USE -sorted FLAG

@@ -14,6 +14,7 @@ fi
 bed=$1
 fas=$2
 bin=$3
+window=$(expr $bin - 1)
 
 echo 'Make genome bed ...'
 
@@ -25,7 +26,7 @@ samtools faidx $fas
 awk -v OFS='\t' {'print $1,$2'} ${fas}.fai > temp.genome
 
 # use genome file to make 100bp windows across genome
-bedtools makewindows -g temp.genome -w ${bin} > temp.genome.${bin}bp.bed
+bedtools makewindows -g temp.genome -w ${window} -s ${bin} > temp.genome.${bin}bp.bed
 sortBed -i temp.genome.${bin}bp.bed | awk -F$'\t' ' $1 != "ChrC" && $1 != "ChrM" ' > temp.genome.${bin}bp.sorted.bed
 
 # use bedtool intersect and groupBy to get mean methylation levels per bin based on per-site methylation
