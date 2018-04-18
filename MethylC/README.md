@@ -39,6 +39,9 @@ Merge 100bp tiled methylation files (wig) to produce correlation matrices with h
 #### met-sign.sh
 Extract cytosine reports for methylation at non-canonical methylation sequence contexts (see Gouil & Baulcombe, PLoS Gen 2015).
 
+#### methimpute.r
+Use METHimpute to perform HMM-based imputation of methylation state at single C resolution across genome. Also produces 100bp.bed output files (methylation levels binned into 100bp windows).
+
 #### methylation_tiling.sh
 Use WIG files to obtain methylation values across features of interest (similar to bed_to_rel.sh but without binning values).
 
