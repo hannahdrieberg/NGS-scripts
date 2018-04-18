@@ -3,7 +3,7 @@ library(fields)
 args=commandArgs(trailingOnly=T)
 print(args)
 
-## Perform METHimpute
+## Perform METHimpute to get imputed/recalibrated genome-wide methylation levels at single Cs and 100bp tiles
 # https://github.com/ataudt/methimpute/blob/master/README.md
 # https://github.com/ataudt/methimpute/blob/master/vignettes/methimpute.pdf
 
@@ -34,23 +34,19 @@ arabidopsis_chromosomes$chromosome <- sub('chr', 'Chr', arabidopsis_chromosomes$
 bismark.data <- importBismark(file, chrom.lengths=arabidopsis_chromosomes)
 
 ## Get positions of all cytosines to inflate methylation data (include non-covered sites)
-fasta.file <- '$HOME/TAIR10/chromosomes/arabidopsis_seq.fa'
+fasta.file <- '~/TAIR10/chromosomes/arabidopsis_seq.fa'
 cytosine.positions = extractCytosinesFromFASTA(fasta.file, contexts = c('CG','CHG','CHH'))
 methylome = inflateMethylome(bismark.data,cytosine.positions)
 print(methylome)
 
 ## Obtain correlation parameters (methylation levels from adjacent cytosines)
-distcor = distanceCorrelation(methylome)
+distcor = distanceCorrelation(methylome, separate.contexts = TRUE)
 
 ## Estimate decay parameter for distancce dependeny of the transition probabilities in HMM
 fit = estimateTransDist(distcor)
 
 ## HMM for complete set using transition probabilities
-# model = callMethylation(data = methylome, transDist = fit$transDist, num.threads = 3)
-# print(model)
-
-## Context-specific HMMs
-model = callMethylationSeparate(data = methylome, num.threads = 3)
+model = callMethylationSeparate(data = methylome, transDist = fit$transDist, num.threads = 4)
 # print(model)
 
 ## At genes and TE coordinates
@@ -72,23 +68,42 @@ plotEnrichment(model, annotation=arabidopsis_TEs)
 dev.off()
 
 ## Export full fitted HMM model
-exportMethylome(model, paste0(outname,"_methimpute_HMMfit.tsv"))
+# exportMethylome(model, paste0(outname,"_methimpute_HMMfit.tsv"))
 
 ## Output recalibrated methylation levels for downstream analysis akin to bismark cov files
 df <- methods::as(model$data, 'data.frame') %>%
-#mutate(rc.counts.unmethylated = rc.counts.total - rc.counts.methylated) %>%
-#select(seqnames, start, end, context, rc.meth.lvl, rc.counts.methylated, rc.counts.unmethylated) 
 select(seqnames, start, end, context, rc.meth.lvl)
 
 df_CG <- subset(df, context == "CG") %>%
 select(-context) %>%
-utils::write.table(., file = paste0(outname,"_recalCG.bed.bismark.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(., file = paste0(outname,"_recal.CG.bed.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 df_CHG <- subset(df, context == "CHG") %>%
 select(-context) %>%
-utils::write.table(., file = paste0(outname,"_recalCHG.bed.bismark.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(., file = paste0(outname,"_recal.CHG.bed.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 df_CHH <- subset(df, context == "CHH") %>%
 select(-context) %>%
-utils::write.table(., file = paste0(outname,"_recalCHH.bed.bismark.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(., file = paste0(outname,"_recal.CHH.bed.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
+
+## Binned methylation output of recalibrated weighted methylation levels
+df_100bp <- binMethylome(model$data, binsize=100, contexts=c("CG","CHG","CHH"), columns.average="rc.meth.lvl")
+
+df_100bp_CG <- methods::as(df_100bp$CG, 'data.frame') %>%
+select(seqnames, start, end, rc.meth.lvl) %>%
+mutate(start = start - 1) %>%
+mutate(end = end - 1) %>%
+utils::write.table(., file = paste0(outname,"_recal.CG.100bp.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
+
+df_100bp_CHG <- methods::as(df_100bp$CHG, 'data.frame') %>%
+select(seqnames, start, end, rc.meth.lvl) %>%
+mutate(start = start - 1) %>%
+mutate(end = end - 1) %>%
+utils::write.table(., file = paste0(outname,"_recal.CHG.100bp.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
+
+df_100bp_CHH <- methods::as(df_100bp$CHH, 'data.frame') %>%
+select(seqnames, start, end, rc.meth.lvl) %>%
+mutate(start = start - 1) %>%
+mutate(end = end - 1) %>%
+utils::write.table(., file = paste0(outname,"_recal.CHH.100bp.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
 
