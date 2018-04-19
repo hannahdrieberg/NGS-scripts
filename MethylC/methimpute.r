@@ -16,7 +16,7 @@ print(args)
 
 ### Input files
 # Run in bash to get 1-based genome-wide cytosine report
-# bismark_methylation_extractor --multicore 4 --cytosine_report --CX --genome_folder /home/diep/TAIR10 *sorted.bam
+# bismark_methylation_extractor --multicore 4 --cytosine_report --CX --genome_folder $HOME/TAIR10 *sorted.bam
 
 ## load library
 library(methimpute)
@@ -76,14 +76,17 @@ select(seqnames, start, end, context, rc.meth.lvl)
 
 df_CG <- subset(df, context == "CG") %>%
 select(-context) %>%
+mutate(rc.meth.lvl = rc.meth.lvl * 100) %>%
 utils::write.table(., file = paste0(outname,"_recal.CG.bed.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 df_CHG <- subset(df, context == "CHG") %>%
 select(-context) %>%
+mutate(rc.meth.lvl = rc.meth.lvl * 100) %>%
 utils::write.table(., file = paste0(outname,"_recal.CHG.bed.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 df_CHH <- subset(df, context == "CHH") %>%
 select(-context) %>%
+mutate(rc.meth.lvl = rc.meth.lvl * 100) %>%
 utils::write.table(., file = paste0(outname,"_recal.CHH.bed.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 ## Binned methylation output of recalibrated weighted methylation levels
@@ -91,18 +94,21 @@ df_100bp <- binMethylome(model$data, binsize=100, contexts=c("CG","CHG","CHH"), 
 
 df_100bp_CG <- methods::as(df_100bp$CG, 'data.frame') %>%
 select(seqnames, start, end, rc.meth.lvl) %>%
+mutate(rc.meth.lvl = rc.meth.lvl * 100) %>%
 mutate(start = start - 1) %>%
 mutate(end = end - 1) %>%
 utils::write.table(., file = paste0(outname,"_recal.CG.100bp.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 df_100bp_CHG <- methods::as(df_100bp$CHG, 'data.frame') %>%
 select(seqnames, start, end, rc.meth.lvl) %>%
+mutate(rc.meth.lvl = rc.meth.lvl * 100) %>%
 mutate(start = start - 1) %>%
 mutate(end = end - 1) %>%
 utils::write.table(., file = paste0(outname,"_recal.CHG.100bp.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 df_100bp_CHH <- methods::as(df_100bp$CHH, 'data.frame') %>%
 select(seqnames, start, end, rc.meth.lvl) %>%
+mutate(rc.meth.lvl = rc.meth.lvl * 100) %>%
 mutate(start = start - 1) %>%
 mutate(end = end - 1) %>%
 utils::write.table(., file = paste0(outname,"_recal.CHH.100bp.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
