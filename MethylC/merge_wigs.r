@@ -19,6 +19,7 @@ data <- data_frame(files) %>%
 mutate(file_contents = map(files, read_delim, delim='\t', col_names=F, skip=1)) %>%
 unnest() %>%
 filter(X1 != 'Mt' & X1 != 'ChrM' & X1 != 'Pt' & X1 != 'ChrC') %>%
+select(files, X1, X2, X3, X4) %>%
 mutate(sample=sapply(strsplit(files, '_'), function(l) l[1])) %>%
 mutate(genotype=sapply(strsplit(sample, '-'), function(l) l[1])) %>%
 mutate(rep=sapply(strsplit(sample, '-'), function(l) l[2])) %>%
@@ -57,6 +58,7 @@ data <- data_frame(files) %>%
 mutate(file_contents = map(files, read_delim, delim='\t', col_names=F, skip=1)) %>%
 unnest() %>%
 filter(X1 != 'Mt' & X1 != 'ChrM' & X1 != 'Pt' & X1 != 'ChrC') %>%
+select(files, X1, X2, X3, X4) %>%
 mutate(sample=sapply(strsplit(files, '_'), function(l) l[1])) %>%
 mutate(genotype=sapply(strsplit(sample, '-'), function(l) l[1])) %>%
 mutate(rep=sapply(strsplit(sample, '-'), function(l) l[2])) %>%
