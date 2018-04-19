@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 options(echo=T)
 library(fields)
 args=commandArgs(trailingOnly=T)
@@ -77,17 +78,17 @@ select(seqnames, start, end, context, rc.meth.lvl)
 df_CG <- subset(df, context == "CG") %>%
 select(-context) %>%
 mutate(rc.meth.lvl = rc.meth.lvl * 100) %>%
-utils::write.table(., file = paste0(outname,"_recal.CG.bed.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(., file = paste0(outname,"_recal_CpG.bed.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 df_CHG <- subset(df, context == "CHG") %>%
 select(-context) %>%
 mutate(rc.meth.lvl = rc.meth.lvl * 100) %>%
-utils::write.table(., file = paste0(outname,"_recal.CHG.bed.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(., file = paste0(outname,"_recal_CHG.bed.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 df_CHH <- subset(df, context == "CHH") %>%
 select(-context) %>%
 mutate(rc.meth.lvl = rc.meth.lvl * 100) %>%
-utils::write.table(., file = paste0(outname,"_recal.CHH.bed.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(., file = paste0(outname,"_recal_CHH.bed.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 ## Binned methylation output of recalibrated weighted methylation levels
 df_100bp <- binMethylome(model$data, binsize=100, contexts=c("CG","CHG","CHH"), columns.average="rc.meth.lvl")
