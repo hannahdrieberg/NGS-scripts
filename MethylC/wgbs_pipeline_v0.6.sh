@@ -5,7 +5,7 @@ set -u
 # This script it designed to take a single end fastq file and process it through the 
 # bismark aligner call methylated cytosines, and develop per-c bed files and 100bp 
 # window wig files for CG, CHG, and CHH methylation levels
-# Compatible with Bismark v0.16.3
+# Compatible with Bismark v0.19
 # USES BOWTIE2 FOR ALIGNMENT
 # Genome indexing
 # Bowtie2: bismark_genome_preparation --bowtie2 /path/to/genome
