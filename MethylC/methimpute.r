@@ -97,19 +97,19 @@ select(seqnames, start, end, rc.meth.lvl) %>%
 mutate(rc.meth.lvl = rc.meth.lvl * 100) %>%
 mutate(start = start - 1) %>%
 mutate(end = end - 1) %>%
-utils::write.table(., file = paste0(outname,"_recal.CG.100bp.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(., file = paste0(outname,"_recal_CpG_100bp.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 df_100bp_CHG <- methods::as(df_100bp$CHG, 'data.frame') %>%
 select(seqnames, start, end, rc.meth.lvl) %>%
 mutate(rc.meth.lvl = rc.meth.lvl * 100) %>%
 mutate(start = start - 1) %>%
 mutate(end = end - 1) %>%
-utils::write.table(., file = paste0(outname,"_recal.CHG.100bp.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(., file = paste0(outname,"_recal_CHG_100bp.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 df_100bp_CHH <- methods::as(df_100bp$CHH, 'data.frame') %>%
 select(seqnames, start, end, rc.meth.lvl) %>%
 mutate(rc.meth.lvl = rc.meth.lvl * 100) %>%
 mutate(start = start - 1) %>%
 mutate(end = end - 1) %>%
-utils::write.table(., file = paste0(outname,"_recal.CHH.100bp.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(., file = paste0(outname,"_recal_CHH_100bp.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
 
