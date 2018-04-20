@@ -57,10 +57,12 @@ logcpm <- cpmByGroup(dge.tmm.disp, prior.count=2, log=TRUE, normalized.lib.sizes
 rpkm_gr <- rpkmByGroup(dge.tmm.disp, gene.length=gene.lengths, dispersion=dge.tmm.disp$trended.dispersion)
 
 ## single factor exact tests
-et <- exactTest(dge.tmm.disp, pair=1:2)
-topTags(et, adjust.method = "fdr", sort.by="logFC", p.value=0.05)
-de.tmm <- decideTests(et, adjust.method = "fdr", p.value = 0.05, lfc = 1)
-summary(de.tmm)
+et <- exactTest(dge.tmm.disp, pair=levels(dge.tmm.disp$samples$group), dispersion="trended")
+# Extract top DEGs based on exactTest
+tt <- topTags(et, adjust.method = "fdr", sort.by="logFC", p.value=0.05)
+# Identify significantlly differentially expressed genes
+sigdeg <- decideTestsDEG(et, adjust.method = "fdr", p.value = 0.05, lfc = 1)
+summary(sigdeg)
 
 ## Plot biological coefficient of variation and multidimensional scaling plot
 # plotBCV(dge.tmm.disp)
