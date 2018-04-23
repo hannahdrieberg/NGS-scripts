@@ -87,7 +87,7 @@ echo "Beginning alignment ..."
 
 # -t 0 = RNA-seq -t 1 = genomic DNA seq
 
-subread-align -T 4 -t 1 -i $index -r ${fq%%.fastq*}_trimmed.fq -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+subread-align -T 4 -M 1 -t 1 -i $index -r ${fq%%.fastq*}_trimmed.fq -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 if [[ $fq%%.fastq}* != *".gz" ]]; then gzip ${fq%%.fastq*}_trimmed.fq; fi
 
@@ -186,7 +186,7 @@ echo "Beginning alignment ..."
 
 # -t 0 = RNA-seq -t 1 = genomic DNA seq
 
-subread-align -T 4 -t 1 -i ${index} -r ${fq1%%.fastq*}_trimmed.fq -R ${fq2%%.fastq*}_trimmed.fq -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+subread-align -T 4 -M 1 -t 1 -i ${index} -r ${fq1%%.fastq*}_trimmed.fq -R ${fq2%%.fastq*}_trimmed.fq -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 echo "cleaning..."
 
