@@ -38,7 +38,7 @@ featureCounts\
 	-s $strand\
 	-a temp2.saf\
 	-o "${1%%.bam*}_${outname}.counts"\
-	$sample
+	$sample 2>&1 | tee -a ../*log
 fi
 	
 if [[ $layout == "PE" ]]; then 
@@ -51,7 +51,7 @@ featureCounts\
 	-s $strand\
 	-a temp2.saf\
 	-o "${1%%.bam*}_${outname}.counts"\
-	$sample
+	$sample 2>&1 | tee -a ../*log
 fi
 
 rm temp*.saf -v
