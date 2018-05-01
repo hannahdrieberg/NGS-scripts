@@ -1,64 +1,49 @@
 #!/bin/bash
 
-# Using TAIR GFF files to produce annotation files
-# Derived from SRE gene_to_gene.sh
-
-# Get TAIR annotation file
-wget https://www.arabidopsis.org/download_files/Genes/TAIR10_genome_release/TAIR10_gff3/TAIR10_GFF3_genes_transposons.gff
+# Use ENSEMBL TAIR GFF files to produce annotation files
+wget ftp://ftp.ensemblgenomes.org/pub/release-39/plants/gff3/arabidopsis_thaliana/Arabidopsis_thaliana.TAIR10.39.gff3.gz
 
 # Make bedfile file of TAIR10 genes
 
 R
 
-gene_te=read.delim('TAIR10_GFF3_genes_transposons.gff', header=F)
-colnames(gene_te) = c("seqname", "source", "feature", "start", "end", "score", "strand", "frame", "attributes")
-gene <- subset(gene_te, feature == 'gene')
+getAttributeField <- function (x, field, attrsep = ";") {
+     s = strsplit(x, split = attrsep, fixed = TRUE)
+     sapply(s, function(atts) {
+         a = strsplit(atts, split = "=", fixed = TRUE)
+         m = match(field, sapply(a, "[", 1))
+         if (!is.na(m)) {
+             rv = a[[m]][2]
+         }
+         else {
+             rv = as.character(NA)
+         }
+         return(rv)
+     })
+}
 
-gene$chr <- substr(as.character(gene$seqname), start=4, stop=4)
-gene$Name <- sapply(strsplit(as.character(gene$attributes), split=';'), function(l) l[3])
-test <- as.numeric(regexec(pattern='Name', text=as.character(gene$Name)))
-gene$Name <- substr(x=as.character(gene$Name), start = test+5, stop = nchar(as.character(gene$Name)))
-gene$ID <- sapply(strsplit(as.character(gene$attributes), split=';'), function(l) l[1])
-test <- as.numeric(regexec(pattern='ID', text=as.character(gene$ID)))
-gene$ID <- substr(x=as.character(gene$ID), start = test+3, stop = nchar(as.character(gene$ID)))
-gene$type <- sapply(strsplit(as.character(gene$attributes), split=';'), function(l) l[2])
-test <- as.numeric(regexec(pattern='Note', text=as.character(gene$type)))
-gene$type <- substr(x=as.character(gene$type), start = test+5, stop = nchar(as.character(gene$type)))
+gffRead <- function(gffFile, nrows = -1) {
+     cat("Reading ", gffFile, ": ", sep="")
+     gff = read.table(gffFile, sep="\t", as.is=TRUE, quote="",
+     header=FALSE, comment.char="#", nrows = nrows,
+     colClasses=c("character", "character", "character", "integer",
+"integer",
+     "character", "character", "character", "character"))
+     colnames(gff) = c("seqname", "source", "feature", "start", "end",
+             "score", "strand", "frame", "attributes")
+        cat("found", nrow(gff), "rows with classes:",
+        paste(sapply(gff, class), collapse=", "), "\n")
+     stopifnot(!any(is.na(gff$start)), !any(is.na(gff$end)))
+     return(gff)
+}
 
-# Make bedfile file of TAIR10 te
+ens=gffRead('Arabidopsis_thaliana.TAIR10.39.gff3')
 
-te <- subset(gene_te, feature == 'transposable_element')
+# Gene annotation
+gene=subset(ens,ens$feature=='gene')
+gene$Name=getAttributeField(gene$attributes, 'Name')
+gene$ID=getAttributeField(gene$attributes, 'ID')
+gene.out=gene[,c('seqname','start','end','Name','score','strand')]
 
-te$chr <- substr(as.character(te$seqname), start=4, stop=4)
-te$Name <- sapply(strsplit(as.character(te$attributes), split=';'), function(l) l[2])
-test <- as.numeric(regexec(pattern='Name', text=as.character(te$Name)))
-te$Name <- substr(x=as.character(te$Name), start = test+5, stop = nchar(as.character(te$Name)))
-te$ID <- sapply(strsplit(as.character(te$attributes), split=';'), function(l) l[1])
-test <- as.numeric(regexec(pattern='ID', text=as.character(te$ID)))
-te$ID <- substr(x=as.character(te$ID), start = test+3, stop = nchar(as.character(te$ID)))
-te$type <- sapply(strsplit(as.character(te$attributes), split=';'), function(l) l[3])
-test <- as.numeric(regexec(pattern='Alias', text=as.character(te$type)))
-te$type <- substr(x=as.character(te$type), start = test+6, stop = nchar(as.character(te$type)))
+write.table(gene.out,'TAIR10.39_mRNA.bed',sep='\t',row.names=F,col.names=F,quote=F)
 
-gene.out=gene[,c('chr','start','end','Name','score','strand')]
-write.table(gene.out,'TAIR10_genes.bed',sep='\t',row.names=F,col.names=F,quote=F)
-
-te.out=te[,c('chr','start','end','Name','score','strand')]
-write.table(te.out,'TAIR10_TE.bed',sep='\t',row.names=F,col.names=F,quote=F)
-
-gene_te.out = rbind(gene.out, te.out)
-write.table(gene_te.out,'TAIR10_genes_TE.bed',sep='\t',row.names=F,col.names=F,quote=F)
-
-# make bedfile of TAIR10 5'UTR
-
-futr <- subset(gene_te, feature == 'five_prime_UTR')
-
-futr$chr <- substr(as.character(futr$seqname), start=4, stop=4)
-test <- as.numeric(regexec(pattern='Parent', text=as.character(futr$attributes)))
-futr$Name <- substr(x=as.character(futr$attributes), start = test+7, stop = nchar(as.character(futr$attributes)))
-
-futr.out=futr[,c('chr','start','end','Name','score','strand')]
-write.table(futr.out,'TAIR10_5_utr.bed',sep='\t',row.names=F,col.names=F,quote=F)
-
-quit()
-n
