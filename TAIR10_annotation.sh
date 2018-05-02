@@ -7,6 +7,8 @@ wget ftp://ftp.ensemblgenomes.org/pub/release-39/plants/gff3/arabidopsis_thalian
 
 R
 
+library(tidyverse)
+
 getAttributeField <- function (x, field, attrsep = ";") {
      s = strsplit(x, split = attrsep, fixed = TRUE)
      sapply(s, function(atts) {
@@ -37,13 +39,21 @@ gffRead <- function(gffFile, nrows = -1) {
      return(gff)
 }
 
-ens=gffRead('Arabidopsis_thaliana.TAIR10.39.gff3')
+ens <- gffRead('Arabidopsis_thaliana.TAIR10.39.gff3')
 
 # Gene annotation
-gene=subset(ens,ens$feature=='gene')
-gene$Name=getAttributeField(gene$attributes, 'Name')
-gene$ID=getAttributeField(gene$attributes, 'ID')
-gene.out=gene[,c('seqname','start','end','Name','score','strand')]
+gene <- subset(ens,ens$feature=='gene') %>%
+	mutate(ID=getAttributeField(gene$attributes, 'ID')) %>%
+	mutate(Name=sapply(strsplit(ID, ":"), function(l) l[2])) %>%
+	select(c('seqname','start','end','Name','score','strand'))
 
-write.table(gene.out,'TAIR10.39_mRNA.bed',sep='\t',row.names=F,col.names=F,quote=F)
+write.table(gene,'TAIR10.39_genes.bed', sep='\t', row.names=F, col.names=F, quote=F)
+
+# mRNA annotation
+mRNA <- subset(ens,ens$feature=='mRNA') %>%
+	mutate(ID=getAttributeField(attributes, 'ID')) %>%
+	mutate(Name=sapply(strsplit(ID, ":"), function(l) l[2])) %>%
+	select(c('seqname','start','end','Name','score','strand'))
+
+write.table(gene.out,'TAIR10.39_mRNA.bed', sep='\t', row.names=F, col.names=F, quote=F)
 
