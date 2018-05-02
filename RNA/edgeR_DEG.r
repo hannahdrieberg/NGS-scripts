@@ -20,13 +20,14 @@ sampleGroups <- sub(2, "drought", x=sampleGroups)
 ## The DGElist object
 lbls <- sapply(strsplit(countFiles, "_"), function(l) l[1])
 dge <- readDGE(countFiles, columns = c(1,7), group = sampleGroups, label=lbls, skip=1)
-geneNames <- as.character(rownames(dge$counts))
+geneNames <- rownames(dge$counts)
 
 # Use sample groups to make design matrix
 design <- model.matrix(~0 + sampleGroups)
 colnames(design) <- unique(sampleGroups)
 
-## rRNA contamination
+############## rRNA filter
+## rRNA contamination (ENSEMBL annotation has rRNA genes as "ncRNA")
 rRNA <- read.delim("~/scripts/At_rRNA_AGIs.txt", head=F)
 rRNA <- as.character(rRNA$V1)
 ## find rRNAs & count
@@ -34,9 +35,9 @@ rRNA.tags <- match(rRNA, geneNames)
 rRNA_counts <- dge$counts[rRNA.tags, ]
 rRNA.summary <- colSums(rRNA_counts)
 rRNA.rates <- (rRNA.summary/dge$samples$lib.size)
-
 ## rRNA filter
 dge$counts <- dge$counts[-rRNA.tags, ]
+##############
 
 ## Abundance filter (CPM > 1 in at least 3 samples)
 keep <- rowSums(cpm(dge) > 1) > 3
@@ -65,16 +66,6 @@ n.reps <- length(sampleGroups)/length(groups)
 plotMDS(dge.tmm.disp, dim.plot = c(1,2), col = rep(rainbow(length(groups)), each = n.reps))
 plotMDS(dge.tmm.disp, dim.plot = c(2,3), col = rep(rainbow(length(groups)), each = n.reps))
 dev.off()
-
-## Use Araport11 annotation file to obtain gene lengths
-ara11 <- read.delim("~/Araport11/annotations/Araport11_mRNA.sorted.bed", head=F) %>%
-mutate(length = V3 - V2) %>%
-filter(V4 %in% geneNames)
-gene.lengths <- ara11$length[ara11$V4 %in% rownames(dge.tmm.disp$counts)]
-
-## calculate CPM by group
-logcpm <- cpmByGroup(dge.tmm.disp, prior.count=2, log=TRUE, normalized.lib.sizes=TRUE, dispersion=dge.tmm.disp$trended.dispersion)
-rpkm_gr <- rpkmByGroup(dge.tmm.disp, gene.length=gene.lengths, dispersion=dge.tmm.disp$trended.dispersion)
 
 ## single factor exact tests (pairwise comparisons)
 et <- exactTest(dge.tmm.disp, pair=as.character(unique(dge.tmm.disp$samples$group)), dispersion="trended")
@@ -122,10 +113,10 @@ gffRead <- function(gffFile, nrows = -1) {
 }
 
 # read in Araport11 gff3
-ara=gffRead("~/Araport11/Araport11_GFF3_genes_transposons.201606.gff")
+anno <- gffRead("~/Araport11/Araport11_GFF3_genes_transposons.201606.gff")
 
 # Gene annotation
-gene=subset(ara,ara$feature=='gene') %>%
+gene <- subset(anno,anno$feature=='gene') %>%
 	mutate(locus=getAttributeField(attributes, 'ID')) %>%
 	mutate(description=getAttributeField(attributes, 'Note')) %>%
 	mutate(type=getAttributeField(attributes, 'locus_type')) %>%
@@ -140,6 +131,18 @@ gene=subset(ara,ara$feature=='gene') %>%
 	arrange(desc(logFC))
 
 write.table(gene,paste0('RNAseq_edgeR-exacttest_',groups[1],'vs',groups[2],'.txt'), sep='\t', na='', col.names=T, row.names=F, quote=F)
+
+########### Get logCPM or RPKM for all genes (of interest) manually
+## Use Araport11/TAIR10 annotation file to obtain gene lengths
+ara11 <- read.delim("~/Araport11/annotations/Araport11_mRNA.sorted.bed", head=F) %>%
+mutate(length = V3 - V2) %>%
+filter(V4 %in% geneNames)
+gene.lengths <- ara11$length[ara11$V4 %in% rownames(dge.tmm.disp$counts)]
+
+## calculate CPM by group
+logcpm <- cpmByGroup(dge.tmm.disp, prior.count=2, log=TRUE, normalized.lib.sizes=TRUE, dispersion=dge.tmm.disp$trended.dispersion)
+rpkm_gr <- rpkmByGroup(dge.tmm.disp, gene.length=gene.lengths, dispersion=dge.tmm.disp$trended.dispersion)
+
 
 ################
 ## GLM
