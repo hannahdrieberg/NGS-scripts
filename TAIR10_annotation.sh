@@ -39,21 +39,28 @@ gffRead <- function(gffFile, nrows = -1) {
      return(gff)
 }
 
-ens <- gffRead('Arabidopsis_thaliana.TAIR10.39.gff3')
+ens <- gffRead('Arabidopsis_thaliana.TAIR10.39.gff3') %>%
+	mutate(seqname=sub("Mt","M", seqname)) %>%
+	mutate(seqname=sub("Pt","C", seqname)) %>%
+	mutate(seqname=paste0('Chr',seqname))
+
+# Chromosome annotation
+chr <- subset(ens,ens$feature=='chromosome') %>%
+        select(c('seqname','start','end'))
 
 # Gene annotation
-gene <- subset(ens,ens$feature=='gene') %>%
-	mutate(ID=getAttributeField(gene$attributes, 'ID')) %>%
+gene <- subset(ens, ens$feature == 'gene') %>%
+	mutate(ID=getAttributeField(attributes, 'ID')) %>%
 	mutate(Name=sapply(strsplit(ID, ":"), function(l) l[2])) %>%
 	select(c('seqname','start','end','Name','score','strand'))
 
 write.table(gene,'TAIR10.39_genes.bed', sep='\t', row.names=F, col.names=F, quote=F)
 
 # mRNA annotation
-mRNA <- subset(ens,ens$feature=='mRNA') %>%
+mRNA <- subset(ens, ens$feature == 'mRNA') %>%
 	mutate(ID=getAttributeField(attributes, 'ID')) %>%
 	mutate(Name=sapply(strsplit(ID, ":"), function(l) l[2])) %>%
 	select(c('seqname','start','end','Name','score','strand'))
 
-write.table(gene.out,'TAIR10.39_mRNA.bed', sep='\t', row.names=F, col.names=F, quote=F)
+write.table(mRNA,'TAIR10.39_mRNA.bed', sep='\t', row.names=F, col.names=F, quote=F)
 
