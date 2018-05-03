@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 ## Template file to perform DEG calling using for RNAseq data with edgeR
 
 ## Installation of edgeR
@@ -134,15 +135,17 @@ write.table(gene,paste0('RNAseq_edgeR-exacttest_',groups[1],'vs',groups[2],'.txt
 
 ########### Get logCPM or RPKM for all genes (of interest) manually
 ## Use Araport11/TAIR10 annotation file to obtain gene lengths
-ara11 <- read.delim("~/Araport11/annotations/Araport11_mRNA.sorted.bed", head=F) %>%
-mutate(length = V3 - V2) %>%
-filter(V4 %in% geneNames)
-gene.lengths <- ara11$length[ara11$V4 %in% rownames(dge.tmm.disp$counts)]
+gene.lengths <- anno %>%
+	subset(feature == "gene") %>%
+	mutate(locus=getAttributeField(attributes, 'ID')) %>%
+	filter(locus %in% rownames(dge.tmm.disp$counts)) %>%
+	mutate(length = end - start) %>%
+	select(locus, length) %>%
+	na.omit() 
 
 ## calculate CPM by group
 logcpm <- cpmByGroup(dge.tmm.disp, prior.count=2, log=TRUE, normalized.lib.sizes=TRUE, dispersion=dge.tmm.disp$trended.dispersion)
-rpkm_gr <- rpkmByGroup(dge.tmm.disp, gene.length=gene.lengths, dispersion=dge.tmm.disp$trended.dispersion)
-
+rpkm_gr <- rpkmByGroup(dge.tmm.disp, gene.length=gene.lengths$length, dispersion=dge.tmm.disp$trended.dispersion)
 
 ################
 ## GLM
