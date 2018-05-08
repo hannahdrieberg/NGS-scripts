@@ -56,7 +56,7 @@ gene$Name=getAttributeField(gene$attributes, 'Name')
 gene$ID=getAttributeField(gene$attributes, 'ID')
 gene.out=gene[,c('seqname','start','end','Name','score','strand')]
 
-write.table(gene.out,'Araport11_mRNA.bed',sep='\t',row.names=F,col.names=F,quote=F)
+write.table(gene.out,'Araport11_genes.bed',sep='\t',row.names=F,col.names=F,quote=F)
 
 # TE annotation
 te=subset(ara,ara$feature=='transposable_element')
