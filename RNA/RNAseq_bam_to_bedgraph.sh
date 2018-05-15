@@ -54,6 +54,10 @@ fi
 
 if [[ "$lay" == "PE" ]] && [[ "$str"  == "unstranded" ]] ; then
 
+# need sorted bam
+echo "sort by position"
+samtools sort ${smp} -o ${smp%%bam}sorted.bam
+
 echo "BAM to bedgraph ..."
 # unstranded bedgraph
 bedtools genomecov -bga -split -ibam $smp -g $chrc_sizes > ${smp%%sorted.bam*}bg
@@ -70,13 +74,19 @@ if [[ "$lay" == "PE" ]] && [[ "$str"  == "stranded" ]] ; then
 echo "Extract properly-paired read mates (+ flags 99/147; - flags 83/163) from paired-end BAM files"
 # http://seqanswers.com/forums/showthread.php?t=29399
 
+# need sorted bam
+echo "sort by position"
+samtools sort ${smp} -o ${smp%%bam}sorted.bam
+
+echo "forward strand"
 # R1 forward
-samtools view -f 99 -b ${smp} > ${smp%%bam}R1F.bam
+samtools view -f 99 -b ${smp%%bam}sorted.bam > ${smp%%bam}R1F.bam
 # R2 reverse
-samtools view -f 147 -b ${smp} > ${smp%%bam}R2R.bam
+samtools view -f 147 -b ${smp%%bam}sorted.bam > ${smp%%bam}R2R.bam
 # FORWARD R1 read pairs
 samtools merge -f ${smp%%bam}forward.bam ${smp%%bam}R1F.bam ${smp%%bam}R2R.bam
 
+echo "reverse strand"
 # R1 reverse
 samtools view -f 83 -b ${smp} > ${smp%%bam}R1R.bam
 # R2 forward
