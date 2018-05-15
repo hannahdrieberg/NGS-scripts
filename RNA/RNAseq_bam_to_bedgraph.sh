@@ -91,8 +91,8 @@ bedtools genomecov -bga -split -ibam ${smp%%bam}reverse.bam -g $chrc_sizes > ${s
 bedtools genomecov -bga -split -scale -1 -ibam ${smp%%bam}forward.bam -g $chrc_sizes > ${smp%%bam}minus.bg
 
 echo "bigWigs..."
-/home/diep/bin/kentUtils/bin/bedGraphToBigWig ${smp%%bam}plus.bg ${chrc_sizes}  ${smp%%bam}plus.bigWig
-/home/diep/bin/kentUtils/bin/bedGraphToBigWig ${smp%%bam}minus.bg ${chrc_sizes} ${smp%%bam}minus.bigWig
+$HOME/bin/kentUtils/bin/bedGraphToBigWig ${smp%%bam}plus.bg ${chrc_sizes}  ${smp%%bam}plus.bigWig
+$HOME/bin/kentUtils/bin/bedGraphToBigWig ${smp%%bam}minus.bg ${chrc_sizes} ${smp%%bam}minus.bigWig
 
 rm ${smp%%.bam}*R1*bam -v
 rm ${smp%%.bam}*R2*bam -v
