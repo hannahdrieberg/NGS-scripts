@@ -67,6 +67,8 @@ bedtools genomecov -bga -split -ibam $smp -g $chrc_sizes > ${smp%%bam}bg
 echo "bigWig ..."
 $HOME/bin/kentUtils/bin/bedGraphToBigWig ${smp%%bam}bg ${chrc_sizes} ${smp%%bam}bigWig
 
+rm $smp -v
+
 fi
 
 if [[ "$lay" == "PE" ]] && [[ "$str"  == "stranded" ]] ; then
@@ -110,6 +112,7 @@ rm ${smp%%.bam}*R1*bam -v
 rm ${smp%%.bam}*R2*bam -v
 rm ${smp%%.bam}*forward*bam -v
 rm ${smp%%.bam}*reverse*bam -v
+rm $smp -v
 
 fi
 
