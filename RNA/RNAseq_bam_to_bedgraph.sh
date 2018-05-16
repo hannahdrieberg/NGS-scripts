@@ -34,18 +34,17 @@ if [[ "$lay" == "SE" ]] && [[ "$str"  == "unstranded" ]] ; then
 
 echo "BAM to bedgraph ..."
 # unstranded bedgraph
-bedtools genomecov -bga -split -ibam $smp -g $chrc_sizes > ${smp%%sorted.bam*}bg
+bedtools genomecov -bga -split -ibam $smp -g $chrc_sizes > ${smp%%bam}bg
 
 # bg to bigWig
 echo "bigWig ..."
-/home/diep/bin/kentUtils/bin/bedGraphToBigWig ${smp%%sorted.bam*}bg ${chrc_sizes} ${smp%%bam}bigWig
+$HOME/bin/kentUtils/bin/bedGraphToBigWig ${smp%%bam}bg ${chrc_sizes} ${smp%%bam}bigWig
 
 fi
 
-
 if [[ "$lay" == "SE" ]] && [[ "$str"  == "stranded" ]] ; then
 
-echo "Does not exist ....bye"
+echo "Does not exist ... bye"
 # https://www.biostars.org/p/179035/
 # samtools view -f 128 F 4 -b $smp > 
 
@@ -58,16 +57,17 @@ if [[ "$lay" == "PE" ]] && [[ "$str"  == "unstranded" ]] ; then
 echo "sort by position"
 samtools sort ${smp} -o ${smp%%bam}sorted.bam
 
+smp="${smp%%bam}sorted.bam"
+
 echo "BAM to bedgraph ..."
 # unstranded bedgraph
-bedtools genomecov -bga -split -ibam $smp -g $chrc_sizes > ${smp%%sorted.bam*}bg
+bedtools genomecov -bga -split -ibam $smp -g $chrc_sizes > ${smp%%bam}bg
 
 # bg to bigWig
 echo "bigWig ..."
-/home/diep/bin/kentUtils/bin/bedGraphToBigWig ${smp%%sorted.bam*}bg ${chrc_sizes} ${smp%%bam}bigWig
+$HOME/bin/kentUtils/bin/bedGraphToBigWig ${smp%%bam}bg ${chrc_sizes} ${smp%%bam}bigWig
 
 fi
-
 
 if [[ "$lay" == "PE" ]] && [[ "$str"  == "stranded" ]] ; then
 
@@ -78,19 +78,21 @@ echo "Extract properly-paired read mates (+ flags 99/147; - flags 83/163) from p
 echo "sort by position"
 samtools sort ${smp} -o ${smp%%bam}sorted.bam
 
+smp="${smp%%bam}sorted.bam"
+
 echo "forward strand"
 # R1 forward
-samtools view -f 99 -b ${smp%%bam}sorted.bam > ${smp%%bam}R1F.bam
+samtools view -f 99 -b $smp > ${smp%%bam}R1F.bam
 # R2 reverse
-samtools view -f 147 -b ${smp%%bam}sorted.bam > ${smp%%bam}R2R.bam
+samtools view -f 147 -b $smp > ${smp%%bam}R2R.bam
 # FORWARD R1 read pairs
 samtools merge -f ${smp%%bam}forward.bam ${smp%%bam}R1F.bam ${smp%%bam}R2R.bam
 
 echo "reverse strand"
 # R1 reverse
-samtools view -f 83 -b ${smp} > ${smp%%bam}R1R.bam
+samtools view -f 83 -b $smp > ${smp%%bam}R1R.bam
 # R2 forward
-samtools view -f 163 -b ${smp} > ${smp%%bam}R2F.bam
+samtools view -f 163 -b $smp > ${smp%%bam}R2F.bam
 # REVERSE R1 read pairs
 samtools merge -f ${smp%%bam}reverse.bam ${smp%%bam}R1R.bam ${smp%%bam}R2F.bam
 
