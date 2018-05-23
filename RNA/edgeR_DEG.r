@@ -7,16 +7,13 @@
 
 library(tidyverse)
 library(edgeR)
+library(scatterplot3d)
 
 ## Count files from featureCounts
 countFiles <- dir(pattern = ".counts")
 
-## Define sample groups
-sampleGroups <- c(1,1,1,2,2,2)
-
-# Make descriptive group labels
-sampleGroups <- sub(1, "unstressed", x=sampleGroups)
-sampleGroups <- sub(2, "drought", x=sampleGroups)
+## Define sample groups with descriptive labels from filenames
+sampleGroups <- sapply(strsplit(countFiles, "-"), function(l) l[1])
 
 ## The DGElist object
 lbls <- sapply(strsplit(countFiles, "_"), function(l) l[1])
@@ -40,6 +37,11 @@ rRNA.rates <- (rRNA.summary/dge$samples$lib.size)
 dge$counts <- dge$counts[-rRNA.tags, ]
 ##############
 
+## Remove organelle transcripts (if applicable)
+exc.tags <- geneNames[substr(geneNames, start=3, stop=3) == "C" | substr(geneNames, start=3, stop=3) == "M" | substr(geneNames, start=3, stop=3) == "R"] 
+exc.tags <- match(exc.tags, geneNames)
+dge$counts <- dge$counts[-exc.tags, ]
+
 ## Abundance filter (CPM > 1 in at least 3 samples)
 keep <- rowSums(cpm(dge) > 1) > 3
 dge <- dge[keep, ]
@@ -50,23 +52,27 @@ dge$samples$lib.size <- colSums(dge$counts)
 ## TMM Normalization
 dge.tmm <- calcNormFactors(dge, method = "TMM")
 
+## Estimate common, trended and tagwise dispersion
+dge.tmm.disp <- estimateDisp(dge.tmm, design, verobse=TRUE, robust=TRUE)
+
+# diagnostic plots
+pdf("diagnostic_plots.pdf", paper="a4r")
+groups <- unique(as.character(sampleGroups))
+n.reps <- length(sampleGroups)/length(groups)
+plot(rRNA.rates, main = "rRNA contamination in libraries", ylab = "rRNA abundance (% of total mapped reads)", xlab = "Sample", col = rep(rainbow(length(groups)), each = n.reps), lwd = 1.5, type = 'b')
+mtext(sampleGroups, at = 1:length(sampleGroups), las=2, cex=0.5)
+plotBCV(dge.tmm.disp)
+mds <- plotMDS(dge.tmm.disp, ndim=3, dim.plot = c(1,2), col = rep(rainbow(length(groups)), each = n.reps))
+s3d <- scatterplot3d(x = mds$cmdscale.out[,1:3], main = "3-dimensional MDS", xlab = "dim 1", ylab = "dim 2", zlab = "dim 3", color = rep(rainbow(length(groups)), each = n.reps), type='h', pch=19, lwd=1.5)
+text(s3d$xyz.convert(mds$cmdscale.out[,1:3]), labels=sampleGroups, cex=.75, pos=4)
+dev.off()
+
+#####################################
+#####################################
+
 ##########
 ## exact tests
 ##########
-
-## Estimate common, trended and tagwise dispersion
-dge.tmm.disp <- estimateDisp(dge.tmm, design)
-
-# diagnostic plots
-pdf("exacttests_diagnostic_plots.pdf", paper="a4r")
-plot(rRNA.rates, main = "rRNA contamination in libraries", ylab = "rRNA abundance (% of total mapped reads)",
-xlab = "Sample")
-plotBCV(dge.tmm.disp)
-groups <- unique(as.character(sampleGroups))
-n.reps <- length(sampleGroups)/length(groups)
-plotMDS(dge.tmm.disp, dim.plot = c(1,2), col = rep(rainbow(length(groups)), each = n.reps))
-plotMDS(dge.tmm.disp, dim.plot = c(2,3), col = rep(rainbow(length(groups)), each = n.reps))
-dev.off()
 
 ## single factor exact tests (pairwise comparisons)
 et <- exactTest(dge.tmm.disp, pair=as.character(unique(dge.tmm.disp$samples$group)), dispersion="trended")
@@ -80,6 +86,17 @@ summary(sigdeg)
 # tt <- topTags(et, adjust.method = "fdr", sort.by="logFC", p.value=0.05)
 tt <- topTags(et, adjust.method = "fdr", sort.by="logFC", p.value=0.05, n=dim(et)[1])
 tt <- tt$table[abs(tt$table$logFC) >= 1,]
+
+################
+## GLM
+###############
+
+fit <- glmQLFit(dge.tmm.disp, design, robust=TRUE)
+plotQLDdisp(fit)
+qlf <- glmQLFTest(fit)
+
+
+##################################### ##################################
 
 ## Output table
 
@@ -146,27 +163,4 @@ gene.lengths <- anno %>%
 ## calculate CPM by group
 logcpm <- cpmByGroup(dge.tmm.disp, prior.count=2, log=TRUE, normalized.lib.sizes=TRUE, dispersion=dge.tmm.disp$trended.dispersion)
 rpkm_gr <- rpkmByGroup(dge.tmm.disp, gene.length=gene.lengths$length, dispersion=dge.tmm.disp$trended.dispersion)
-
-################
-## GLM
-###############
-
-### Estimate GLM dispersion paramters
-glm.dge.tmm <- estimateGLMCommonDisp(dge.tmm)
-glm.dge.tmm <- estimateGLMTrendedDisp(glm.dge.tmm)
-glm.dge.tmm <- estimateGLMTagwiseDisp(glm.dge.tmm)
-
-# diagnostic plots
-pdf("exacttests_diagnostic_plots.pdf", paper="a4r")
-plot(rRNA.rates, main = "rRNA contamination in libraries", ylab = "rRNA abundance (% of total mapped reads)",
-xlab = "Sample")
-plotBCV(glm.dge.tmm)
-groups <- unique(as.character(sampleGroups))
-n.reps <- length(sampleGroups)/length(groups)
-plotMDS(dge.tmm.disp, dim.plot = c(1,2), col = rep(rainbow(length(groups)), each = n.reps))
-plotMDS(dge.tmm.disp, dim.plot = c(2,3), col = rep(rainbow(length(groups)), each = n.reps))
-dev.off()
-
-fit <- glmFit(glm.dge.tmm)
-
 
