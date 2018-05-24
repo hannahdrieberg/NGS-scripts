@@ -35,12 +35,14 @@ rRNA.summary <- colSums(rRNA_counts)
 rRNA.rates <- (rRNA.summary/dge$samples$lib.size)
 ## rRNA filter
 dge$counts <- dge$counts[-rRNA.tags, ]
+geneNames <- rownames(dge$counts) # reset geneNames
 ##############
 
 ## Remove organelle transcripts (if applicable)
 exc.tags <- geneNames[substr(geneNames, start=3, stop=3) == "C" | substr(geneNames, start=3, stop=3) == "M" | substr(geneNames, start=3, stop=3) == "R"] 
 exc.tags <- match(exc.tags, geneNames)
 dge$counts <- dge$counts[-exc.tags, ]
+geneNames <- rownames(dge$counts) # reset geneNames
 
 ## Abundance filter (CPM > 1 in at least 3 samples)
 keep <- rowSums(cpm(dge) > 1) > 3
@@ -84,17 +86,26 @@ summary(sigdeg)
 ## final DEG (from pairwise et)
 # Extract top DEGs based on exactTest
 # tt <- topTags(et, adjust.method = "fdr", sort.by="logFC", p.value=0.05)
-tt <- topTags(et, adjust.method = "fdr", sort.by="logFC", p.value=0.05, n=dim(et)[1])
+tt <- topTags(et, adjust.method = "fdr", sort.by="none", p.value=0.05, n=dim(et)[1])
 tt <- tt$table[abs(tt$table$logFC) >= 1,]
 
 ################
 ## GLM
 ###############
 
-fit <- glmQLFit(dge.tmm.disp, design, robust=TRUE)
-plotQLDdisp(fit)
-qlf <- glmQLFTest(fit)
+fit <- glmQLFit(dge.tmm.disp, design, robust=TRUE, dispersion=dge.tmm.disp$trended.dispersion)
 
+###
+pdf("glm_QLfit.pdf", paper="a4r")
+plotQLDisp(fit)
+dev.off()
+###
+
+qlf <- glmQLFTest(fit, contrast=NULL) # tests lfc=0
+# OR
+qlf <- glmTreat(fit, contrast = NULL, lfc = 1, null = "interval") # tests |lfc| >= 1
+tt <-  topTags(qlf, adjust.method = "fdr", sort.by="none", p.value=0.05, n=dim(qlf)[1])
+tt <- tt$table
 
 ##################################### ##################################
 
