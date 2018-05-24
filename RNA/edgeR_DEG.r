@@ -38,8 +38,10 @@ rRNA.rates <- (colSums(rRNA_counts)/dge$samples$lib.size)*100
 dge$counts <- dge$counts[-rRNA.tags, ]
 ##############
 
-## Remove organelle transcripts (if applicable)
-exc.tags <- rownames(dge$counts)[substr(geneNames, start=3, stop=3) == "C" | substr(geneNames, start=3, stop=3) == "M" | substr(geneNames, start=3, stop=3) == "R"] 
+## Remove organelle transcripts (if applicable) and MIR genes
+exc.tags <- rownames(dge$counts)[substr(rownames(dge$counts), start=3, stop=3) == "C" | 
+				 substr(rownames(dge$counts), start=3, stop=3) == "M" | 
+				 substr(rownames(dge$counts), start=3, stop=3) == "R"] 
 exc.tags <- match(exc.tags, rownames(dge$counts))
 dge$counts <- dge$counts[-exc.tags, ]
 
