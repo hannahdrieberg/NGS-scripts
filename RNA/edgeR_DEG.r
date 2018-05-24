@@ -18,31 +18,30 @@ sampleGroups <- sapply(strsplit(countFiles, "-"), function(l) l[1])
 ## The DGElist object
 lbls <- sapply(strsplit(countFiles, "_"), function(l) l[1])
 dge <- readDGE(countFiles, columns = c(1,7), group = sampleGroups, label=lbls, skip=1)
-geneNames <- rownames(dge$counts)
 
 # Use sample groups to make design matrix
 design <- model.matrix(~0 + sampleGroups)
 colnames(design) <- unique(sampleGroups)
 
 ############## rRNA filter
+
 ## rRNA contamination (ENSEMBL annotation has rRNA genes as "ncRNA")
 rRNA <- read.delim("~/scripts/At_rRNA_AGIs.txt", head=F)
 rRNA <- as.character(rRNA$V1)
+
 ## find rRNAs & count
-rRNA.tags <- match(rRNA, geneNames)
+rRNA.tags <- match(rRNA, rownames(dge$counts))
 rRNA_counts <- dge$counts[rRNA.tags, ]
-rRNA.summary <- colSums(rRNA_counts)
-rRNA.rates <- (rRNA.summary/dge$samples$lib.size)
+rRNA.rates <- (colSums(rRNA_counts)/dge$samples$lib.size)*100
+
 ## rRNA filter
 dge$counts <- dge$counts[-rRNA.tags, ]
-geneNames <- rownames(dge$counts) # reset geneNames
 ##############
 
 ## Remove organelle transcripts (if applicable)
-exc.tags <- geneNames[substr(geneNames, start=3, stop=3) == "C" | substr(geneNames, start=3, stop=3) == "M" | substr(geneNames, start=3, stop=3) == "R"] 
-exc.tags <- match(exc.tags, geneNames)
+exc.tags <- rownames(dge$counts)[substr(geneNames, start=3, stop=3) == "C" | substr(geneNames, start=3, stop=3) == "M" | substr(geneNames, start=3, stop=3) == "R"] 
+exc.tags <- match(exc.tags, rownames(dge$counts))
 dge$counts <- dge$counts[-exc.tags, ]
-geneNames <- rownames(dge$counts) # reset geneNames
 
 ## Abundance filter (CPM > 1 in at least 3 samples)
 keep <- rowSums(cpm(dge) > 1) > 3
