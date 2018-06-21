@@ -4,6 +4,9 @@ library(fields)
 args=commandArgs(trailingOnly=T)
 print(args)
 
+## Citation
+# Taudt, A., Roquis, D., Vidalis, A., Wardenaar, R., Johannes, F., and Colome-Tatché́-Tatché, M. (2018). METHimpute: imputation-guided construction of complete methylomes from WGBS data. BMC Genomics 19: 444.
+
 ## Perform METHimpute to get imputed/recalibrated genome-wide methylation levels at single Cs and 100bp tiles
 # https://github.com/ataudt/methimpute/blob/master/README.md
 # https://github.com/ataudt/methimpute/blob/master/vignettes/methimpute.pdf
