@@ -81,7 +81,7 @@ select(seqnames, start, end, context, rc.meth.lvl)
 df_CG <- subset(df, context == "CG") %>%
 select(-context) %>%
 mutate(rc.meth.lvl = rc.meth.lvl * 100) %>%
-utils::write.table(., file = paste0(outname,"_recal_CpG.bed.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(., file = paste0(outname,"_recal_CG.bed.cov"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 df_CHG <- subset(df, context == "CHG") %>%
 select(-context) %>%
@@ -101,7 +101,7 @@ select(seqnames, start, end, rc.meth.lvl) %>%
 mutate(rc.meth.lvl = rc.meth.lvl * 100) %>%
 mutate(start = start - 1) %>%
 mutate(end = end - 1) %>%
-utils::write.table(., file = paste0(outname,"_recal_CpG_100bp.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
+utils::write.table(., file = paste0(outname,"_recal_CG_100bp.bed"), quote = F, sep = '\t', row.names = F, col.names = F)
 
 df_100bp_CHG <- methods::as(df_100bp$CHG, 'data.frame') %>%
 select(seqnames, start, end, rc.meth.lvl) %>%

@@ -32,15 +32,15 @@ sortBed -i temp.genome.${bin}bp.bed | awk -F$'\t' ' $1 != "ChrC" && $1 != "ChrM"
 # use bedtool intersect and groupBy to get mean methylation levels per bin based on per-site methylation
 echo 'Bedtools CG ...'
 bedtools intersect -sorted -a temp.genome.${bin}bp.bed -b ${bed}_CG.bed.bismark.cov > ${bed}_CG_${bin}bp.bed -wo
-groupBy -i ${bed}_CG_${bin}bp.bed -g 1,2,3 -c 7 -o mean > ${bed}_CG_${bin}bp.avg.bed
+groupBy -i ${bed}_CG_${bin}bp.bed -g 1,2,3 -c 7,7 -o mean,count > ${bed}_CG_${bin}bp.avg.bed
 
 echo 'Bedtools CHG ...'
 bedtools intersect -sorted -a temp.genome.${bin}bp.bed -b ${bed}_CHG.bed.bismark.cov > ${bed}_CHG_${bin}bp.bed -wo
-groupBy -i ${bed}_CHG_${bin}bp.bed -g 1,2,3 -c 7 -o mean > ${bed}_CHG_${bin}bp.avg.bed
+groupBy -i ${bed}_CHG_${bin}bp.bed -g 1,2,3 -c 7,7 -o mean,count > ${bed}_CHG_${bin}bp.avg.bed
 
 echo 'Bedtools CHH ...'
 bedtools intersect -sorted -a temp.genome.${bin}bp.bed -b ${bed}_CHH.bed.bismark.cov > ${bed}_CHH_${bin}bp.bed -wo
-groupBy -i ${bed}_CHH_${bin}bp.bed -g 1,2,3 -c 7 -o mean > ${bed}_CHH_${bin}bp.avg.bed
+groupBy -i ${bed}_CHH_${bin}bp.bed -g 1,2,3 -c 7,7 -o mean,count > ${bed}_CHH_${bin}bp.avg.bed
 
 echo 'cleaning ...'
 # CLEAN
