@@ -60,6 +60,9 @@ Pair of scripts (use .sh to run) to take annotation file, bed file, and feature 
 #### wgbs_cov_to_TDF.txt
 Produce TDF files from bismark cov file of interest. Check IGV compatible genome build ready.
 
+#### wgbs_custom_bins.sh
+Bin weighted methylation levels into sizes of users choosing (typically 100bp).
+
 ### wgbs_pipeline.sh
 #### v0.4
 Bismark alignment script using Bowtie1 aligner. Has SE and PE options.
