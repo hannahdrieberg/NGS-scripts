@@ -41,7 +41,7 @@ echo "Performing closestBed of CHG methylation..."
 closestBed -D "ref" -a ${filename}_CHG_100bp.bed -b $bedpath > ${filename}_CHG_${outname}.bed
 echo "Performing closestBed of CHH methylation..."
 closestBed -D "ref" -a ${filename}_CHH_100bp.bed -b $bedpath > ${filename}_CHH_${outname}.bed
-echo "Performing closestBed of CpG methylation..."
+echo "Performing closestBed of CG methylation..."
 closestBed -D "ref" -a ${filename}_CG_100bp.bed -b $bedpath > ${filename}_CG_${outname}.bed
 
 #subset to the regions within 100bp of a gene (make the files more manageable for R)

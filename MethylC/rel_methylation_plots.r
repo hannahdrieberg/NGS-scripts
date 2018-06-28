@@ -4,7 +4,7 @@ args=commandArgs(trailingOnly=T)
 print(args)
 
 #read in files#
-cpg=read.delim(paste(args[1],'_CpG_',args[2],'.1k.bed',sep=''),head=F)
+cpg=read.delim(paste(args[1],'_CG_',args[2],'.1k.bed',sep=''),head=F)
 chg=read.delim(paste(args[1],'_CHG_',args[2],'.1k.bed',sep=''),head=F)
 chh=read.delim(paste(args[1],'_CHH_',args[2],'.1k.bed',sep=''),head=F)
 
