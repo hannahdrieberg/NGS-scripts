@@ -11,7 +11,7 @@ type=args[2]
 library(tidyverse)
 library(gplots)
 
-files <- dir(pattern=paste0(context,"_100bp.wig"))
+files <- dir(pattern=paste0(context,"_100bp.bed"))
 
 if(type==1){
 
