@@ -33,7 +33,7 @@ Supplemental file for 100bp DMR calling to produce final DMR table.
 #### merge_wigs.r
 Merge 100bp tiled methylation files (wig) to produce correlation matrices with hierarchical clustering of samples of interest.
 
-#### met-sign.sh
+#### met_signatures.sh
 Extract cytosine reports for methylation at non-canonical methylation sequence contexts (see Gouil & Baulcombe, PLoS Gen 2015).
 
 #### methimpute.r

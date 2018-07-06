@@ -18,19 +18,19 @@ chh=${file}*CHH*cov
 
 echo "5mC % in $1"
 
-echo "mCG Chr1-5: $cg"
+echo "mCG Chr1-5: "$cg" "
 grep -e "Chr1" -e "Chr2" -e "Chr3" -e "Chr4" -e "Chr5" $cg |  awk '{ met+= $5} { unmet += $6} { total = met + unmet } END {print ((met / total)*100)}'
 
-echo "mCHG Chr1-5: $chg"
+echo "mCHG Chr1-5: "$chg" "
 grep -e "Chr1" -e "Chr2" -e "Chr3" -e "Chr4" -e "Chr5" $chg |  awk '{ met+= $5} { unmet += $6} { total = met + unmet } END {print ((met / total)*100)}'
 
-echo "mCHH Chr1-5: $chh"
+echo "mCHH Chr1-5: "$chh" "
 grep -e "Chr1" -e "Chr2" -e "Chr3" -e "Chr4" -e "Chr5" $chh |  awk '{ met+= $5} { unmet += $6} { total = met + unmet } END {print ((met / total)*100)}'
 
-echo "mCHH ChrC: $chh"
+echo "mCHH ChrC: "$chh" "
 grep -e "ChrC"  $chh | awk '{ met+= $5} { unmet += $6} { total = met + unmet } END {print ((met / total)*100)}'
 
-echo "mCHH ChrM: $chh"
+echo "mCHH ChrM: "$chh" "
 grep -e "ChrM"  $chh | awk '{ met+= $5} { unmet += $6} { total = met + unmet } END {print ((met / total)*100)}'
 
 echo "DONE"
