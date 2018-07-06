@@ -27,9 +27,6 @@ Script for re-formatting bed.cov file methylation output for input to DSS.
 #### bed_to_rel_dist.sh
 Produce genome summarised methylation plots across features of interest e.g. gene models.
 
-#### conversion_rate_check.sh
-Calculate bisulfite conversion efficiency by calclulating percent methylated in the chloroplast genome, which itself should be completely unmethylated.
-
 #### dmr_merge.r
 Supplemental file for 100bp DMR calling to produce final DMR table.
 
@@ -42,8 +39,8 @@ Extract cytosine reports for methylation at non-canonical methylation sequence c
 #### methimpute.r
 Use METHimpute to perform HMM-based imputation of methylation state at single C resolution across genome. Also produces 100bp.bed output files (methylation levels binned into 100bp windows).
 
-#### methylation_tiling.sh
-Use WIG files to obtain methylation values across features of interest (similar to bed_to_rel.sh but without binning values).
+#### methylation_rates.sh
+Calculate mCG, mCHG and mCHH % across At Chr1-5 and mCHH across Cp and Mt genomes (conversion efficiency)
 
 #### pca_wigs.r
 Perform PCA on 100bp binned weighted methylation levels.

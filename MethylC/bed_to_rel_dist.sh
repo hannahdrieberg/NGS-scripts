@@ -10,7 +10,7 @@
 
 if [ "$#" -ne 4 ]; then
 echo "USAGE: bed_to_rel_dist.sh <-wig or -bed> <input path to bed file> <filename prefix> <output map name>"
-echo "EXAMPLE: bed_to_rel_dist.sh -bed /home/steve/brachy_annotation/genes.bed epignome.500k gene"
+echo "EXAMPLE: bed_to_rel_dist.sh -bed $HOME/Araport11/Araport11_genes.sorted.bed sample-r1 genes"
 exit 1
 fi
 

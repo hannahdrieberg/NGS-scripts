@@ -13,7 +13,7 @@ set -u
 
 if [ "$#" -lt 4 ]; then
 echo "Missing required arguments!"
-echo "USAGE: wgbs_pipelinev0.5.sh <SE/PE> <R1> <R2> <path to bismark genome> <fileID for output>"
+echo "USAGE: wgbs_pipelinev0.6.sh <SE/PE> <R1> <R2> <path to bismark genome> <fileID for output>"
 exit 1
 fi
 
@@ -27,7 +27,7 @@ if [ "$1" == "SE" ];then
 #require arguments
 if [ "$#" -ne 4 ]; then
 echo "Missing required arguments for single-end!"
-echo "USAGE: wgbs_pipelinev0.5.sh SE <R1> <path to bismark genome> <fileID for output>"
+echo "USAGE: wgbs_pipelinev0.6.sh SE <R1> <path to bismark genome> <fileID for output>"
 exit 1
 fi
 
@@ -146,7 +146,7 @@ if [ "$1" == "PE" ];then
 
 if [ "$#" -ne 5 ]; then
 echo "Missing required arguments for paired-end!"
-echo "USAGE: wgbs_pipelinev0.5.sh PE <R1> <R2> <path to bismark genome folder> <fileID for output files>"
+echo "USAGE: wgbs_pipelinev0.6.sh PE <R1> <R2> <path to bismark genome folder> <fileID for output files>"
 exit 1
 fi
 #gather input variables
@@ -236,6 +236,8 @@ rm C*txt.gz -v
 bismark2bedGraph --CX CpG*txt -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 bismark2bedGraph --CX CHG*txt -o ${fileID}_CHG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 bismark2bedGraph --CX CHH*txt -o ${fileID}_CHH.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+
+rm C*txt -v
 
 cd ../
 mkdir 5_output_files
