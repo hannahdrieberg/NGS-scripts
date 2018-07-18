@@ -71,7 +71,7 @@ write.table(te.out,'Araport11_TE.bed',sep='\t',row.names=F,col.names=F,quote=F)
 mRNA <- subset(ara, feature == "mRNA")
 mRNA$name=getAttributeField(mRNA$attributes, 'Name')
 mRNA$parent=getAttributeField(mRNA$attributes, 'Parent')
-mRNA.out=mRNA[,c('seqname','start','end','name','parent','score','strand')]
+mRNA.out=mRNA[,c('seqname','start','end','name','score','strand')]
 
 write.table(mRNA.out,'Araport11_mRNA.bed',sep='\t',row.names=F,col.names=F,quote=F)
 
