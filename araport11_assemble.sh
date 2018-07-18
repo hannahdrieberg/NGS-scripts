@@ -50,7 +50,7 @@ gffRead <- function(gffFile, nrows = -1) {
 
 ara=gffRead('Araport11_GFF3_genes_transposons.201606.gff')
 
-# Gene annotation
+### Gene annotation
 gene=subset(ara,ara$feature=='gene')
 gene$Name=getAttributeField(gene$attributes, 'Name')
 gene$ID=getAttributeField(gene$attributes, 'ID')
@@ -58,7 +58,7 @@ gene.out=gene[,c('seqname','start','end','Name','score','strand')]
 
 write.table(gene.out,'Araport11_genes.bed',sep='\t',row.names=F,col.names=F,quote=F)
 
-# TE annotation
+### TE annotation
 te=subset(ara,ara$feature=='transposable_element')
 te$Name=getAttributeField(te$attributes, 'Name')
 te$ID=getAttributeField(te$attributes, 'ID')
@@ -66,6 +66,14 @@ te$alias=getAttributeField(te$attributes, 'Alias')
 te.out=te[,c('seqname','start','end','Name','score','strand','alias')]
 
 write.table(te.out,'Araport11_TE.bed',sep='\t',row.names=F,col.names=F,quote=F)
+
+### Transcript annotation
+mRNA <- subset(ara, feature == "mRNA")
+mRNA$name=getAttributeField(mRNA$attributes, 'Name')
+mRNA$parent=getAttributeField(mRNA$attributes, 'Parent')
+mRNA.out=mRNA[,c('seqname','start','end','name','parent','score','strand')]
+
+write.table(mRNA.out,'Araport11_mRNA.bed',sep='\t',row.names=F,col.names=F,quote=F)
 
 quit()
 n

@@ -1,5 +1,6 @@
 #!/bin/bash
-# Use featureCounts to perform feature counting on BAM files
+# Use featureCounts to assign counts to annotated features from aligned BAM files
+
 set -eu
 
 if [ "$#" -lt 5 ]; then
