@@ -15,7 +15,7 @@ sitecounts=as.numeric(args[4])
 
 print(args)
 #grab all the wig files, select those for your context
-a=dir(pattern="*.wig")
+a=dir(pattern="*100bp.bed")
 a=subset(a,grepl(context,a)==T)
 biglist=as.list(a)
 
@@ -27,8 +27,8 @@ out=NULL
 #loop through all pairwise combinations#########################
 for(i in 1:(length(aa)/2)){
 
-file1=read.delim(aa[1,i],head=F,skip=1)
-file2=read.delim(aa[2,i],head=F,skip=1)
+file1=read.delim(aa[1,i],head=F)
+file2=read.delim(aa[2,i],head=F)
 
 #take windows where there is coverage for both samples
 merged=merge(file1,file2,by=c('V1','V2','V3'))
