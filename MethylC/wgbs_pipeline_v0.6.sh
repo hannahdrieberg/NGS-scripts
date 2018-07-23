@@ -79,25 +79,24 @@ cd 4_bismark_alignment
 
 bismark --multicore 2 $genome_path ../2_trimgalore/${fq_file%%.fastq*}_trimmed.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-samtools sort ${fq_file%%.fastq*}_trimmed*_bismark*.bam -o ${fq_file%%.fastq*}_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-samtools index ${fq_file%%.fastq*}_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-
-rm -v *bismark_bt2.bam
-
 ## MarkDuplicates to filter PCR and optical duplicates from BAM reads
 java -Xmx8G -jar $HOME/bin/picard.jar MarkDuplicates \
-	INPUT=${fq_file%%.fastq*}_bismark.sorted.bam \
-	OUTPUT=${fq_file%%.fastq*}_bismark.sorted.filtered.bam \
+	INPUT=${fq_file%%.fastq*}_trimmed*_bismark*.bam \
+	OUTPUT=${fq_file%%.fastq*}_bismark.filtered.bam \
 	METRICS_FILE=${fq_file%%.fastq*}_marked_dup_metrics.txt \
-	REMOVE_DUPLICATES=true
+	REMOVE_DUPLICATES=true 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-rm ${fq_file%%.fastq*}_bismark.sorted.bam -v
+samtools sort ${fq_file%%.fastq*}_bismark.filtered.bam -o ${fq_file%%.fastq*}_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools index ${fq_file%%.fastq*}_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+
+rm -v ${fq_file%%.fastq*}_bismark.filtered.bam
+rm -v *bismark_bt2.bam
 
 ## methylation extraction
-bismark_methylation_extractor --comprehensive --report --multicore 3 --buffer_size 8G -s ${fq_file%%.fastq*}_bismark.sorted.filtered.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark_methylation_extractor --comprehensive --report --multicore 3 --buffer_size 8G -s ${fq_file%%.fastq*}_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 ## bedgraph creation
-bismark2bedGraph --CX CpG*txt -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark2bedGraph --CX CpG*txt -o ${fileID}_CG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 bismark2bedGraph --CX CHG*txt -o ${fileID}_CHG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 bismark2bedGraph --CX CHH*txt -o ${fileID}_CHH.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
@@ -219,15 +218,15 @@ java -Xmx8G -jar $HOME/bin/picard.jar MarkDuplicates \
 	INPUT=${fq_file1%%.fastq*}_val_1_bismark_bt2_pe.bam \
 	OUTPUT=${fq_file1%%.fastq*}_bismark_pe.filtered.bam \
 	METRICS_FILE=${fq_file%%.fastq*}_marked_dup_metrics.txt \
-	REMOVE_DUPLICATES=true
+	REMOVE_DUPLICATES=true 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-rm ${fq_file1%%.fastq*}_val_1_bismark_bt2_pe.bam -v
+rm ${fq_file1%%.fastq*}_val_1_bismark_bt2_pe.bam* -v
 
 ## methylation extraction PE (-p)
 bismark_methylation_extractor --comprehensive --report --multicore 2 --buffer_size 8G -p --gzip ${fq_file1%%.fastq*}_bismark_pe.filtered.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #bedgraph creation on merged results
-bismark2bedGraph --CX CpG*txt -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark2bedGraph --CX CpG*txt -o ${fileID}_CG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 bismark2bedGraph --CX CHG*txt -o ${fileID}_CHG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 bismark2bedGraph --CX CHH*txt -o ${fileID}_CHH.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
