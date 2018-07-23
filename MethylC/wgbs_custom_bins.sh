@@ -1,22 +1,22 @@
 #!/bin/bash
 set -eu
 
-# Generate mean methylation levels into custom bins from per-site BED files
-# Provide path of genome .fa file
+# Generate mean methylation levels into custom bins with desired read depth/coverage from per-site BED files
 
 if [ "$#" -lt 3 ]; then
 echo "Missing arguments!"
-echo "USAGE: wgbs_custom_bins.sh <sample> <genome fasta> <bin size>"
-echo "EXAMPLE: wgbs_custom_bins.sh col0-r1 /home/diep/TAIR10/TAIR10_Chr.all.fasta 1000000"
+echo "USAGE: wgbs_custom_bins.sh <sample> <genome fasta> <coverage> <bin size>"
+echo "EXAMPLE: wgbs_custom_bins.sh col0-r1 /home/diep/TAIR10/TAIR10_Chr.all.fasta 15 100"
 exit 1
 fi
 
 bed=$1
 fas=$2
-bin=$3
+cov=$3
+bin=$4
 window=$(expr $bin - 1)
 
-echo 'Make genome bed ...'
+echo 'Weighted methylation in $bed across $bin bp windows with depth >= $cov ...'
 
 # use samtools to generate fasta index
 samtools faidx $fas
@@ -30,13 +30,13 @@ bedtools makewindows -g temp.genome -w ${window} -s ${bin} | sortBed | awk -F$'\
 
 # use bedtool intersect and groupBy to get mean methylation levels per bin based on per-site methylation
 echo 'Bedtools CG ...'
-bedtools intersect -sorted -wo -a temp.genome.${bin}bp.sorted.bed -b ${bed}_CG.bed.bismark.cov | groupBy -g 1,2,3 -c 7,8,9 -o mean,sum,sum | awk -v OFS='\t' '{print $1,$2,$3,$4 = ($5 / ($5+$6)*100 )}' > ${bed}_CG_${bin}bp.bed
+bedtools intersect -sorted -wo -a temp.genome.${bin}bp.sorted.bed -b ${bed}_CG.bed.bismark.cov | groupBy -g 1,2,3 -c 7,8,9 -o mean,sum,sum | awk -v OFS='\t' '{print $1,$2,$3,$4 = ($5 / ($5+$6)*100 ),$5 = ($5 + $6)}' | awk '{ if ($5 >= '$cov') { print } }' > ${bed}_CG_${bin}bp.bed
 
 echo 'Bedtools CHG ...'
-bedtools intersect -sorted -wo -a temp.genome.${bin}bp.sorted.bed -b ${bed}_CHG.bed.bismark.cov | groupBy -g 1,2,3 -c 7,8,9 -o mean,sum,sum | awk -v OFS='\t' '{print $1,$2,$3,$4 = ($5 / ($5+$6)*100 )}' > ${bed}_CHG_${bin}bp.bed
+bedtools intersect -sorted -wo -a temp.genome.${bin}bp.sorted.bed -b ${bed}_CHG.bed.bismark.cov | groupBy -g 1,2,3 -c 7,8,9 -o mean,sum,sum | awk -v OFS='\t' '{print $1,$2,$3,$4 = ($5 / ($5+$6)*100 ), $5 = ($5 + $6)}' | awk '{ if ($5 >= '$cov') { print } }' > ${bed}_CHG_${bin}bp.bed
 
 echo 'Bedtools CHH ...'
-bedtools intersect -sorted -wo -a temp.genome.${bin}bp.sorted.bed -b ${bed}_CHH.bed.bismark.cov | groupBy -g 1,2,3 -c 7,8,9 -o mean,sum,sum | awk -v OFS='\t' '{print $1,$2,$3,$4 = ($5 / ($5+$6)*100 )}' > ${bed}_CHH_${bin}bp.bed
+bedtools intersect -sorted -wo -a temp.genome.${bin}bp.sorted.bed -b ${bed}_CHH.bed.bismark.cov | groupBy -g 1,2,3 -c 7,8,9 -o mean,sum,sum | awk -v OFS='\t' '{print $1,$2,$3,$4 = ($5 / ($5+$6)*100 ), $5 = ($5 + $6)}' | awk '{ if ($5 >= '$cov') { print } }' > ${bed}_CHH_${bin}bp.bed
 
 echo 'cleaning ...'
 # CLEAN
