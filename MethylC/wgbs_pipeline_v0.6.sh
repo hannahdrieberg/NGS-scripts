@@ -79,18 +79,29 @@ cd 4_bismark_alignment
 
 bismark --multicore 2 $genome_path ../2_trimgalore/${fq_file%%.fastq*}_trimmed.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-samtools sort ${fq_file%%.fastq*}_trimmed*_bismark*.bam -o ${fq_file%%.fastq*}_trimmed_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-samtools index ${fq_file%%.fastq*}_trimmed_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools sort ${fq_file%%.fastq*}_trimmed*_bismark*.bam -o ${fq_file%%.fastq*}_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+samtools index ${fq_file%%.fastq*}_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 rm -v *bismark_bt2.bam
 
+## MarkDuplicates to filter PCR and optical duplicates from BAM reads
+java -Xmx8G -jar $HOME/bin/picard.jar MarkDuplicates \
+	INPUT=${fq_file%%.fastq*}_bismark.sorted.bam \
+	OUTPUT=${fq_file%%.fastq*}_bismark.sorted.filtered.bam \
+	METRICS_FILE=${fq_file%%.fastq*}_marked_dup_metrics.txt \
+	REMOVE_DUPLICATES=true
+
+rm ${fq_file%%.fastq*}_bismark.sorted.bam -v
+
 ## methylation extraction
-bismark_methylation_extractor --comprehensive --report --multicore 2 --buffer_size 8G -s ${fq_file%%.fastq*}_trimmed_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark_methylation_extractor --comprehensive --report --multicore 3 --buffer_size 8G -s ${fq_file%%.fastq*}_bismark.sorted.filtered.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 ## bedgraph creation
-bismark2bedGraph --CX CpG* -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-bismark2bedGraph --CX CHG* -o ${fileID}_CHG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-bismark2bedGraph --CX CHH* -o ${fileID}_CHH.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark2bedGraph --CX CpG*txt -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark2bedGraph --CX CHG*txt -o ${fileID}_CHG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark2bedGraph --CX CHH*txt -o ${fileID}_CHH.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+
+rm C*txt -v
 
 cd ../
 mkdir 5_output_files
@@ -201,36 +212,19 @@ mkdir 4_bismark_alignment
 cd 4_bismark_alignment
 
 ## PE alignment
-bismark --un --multicore 2 $genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark --multicore 2 $genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-## SE directional on unmapped R1
-bismark --multicore 2 $genome_path ${fq_file1%%.fastq*}_val_1.*unmapped_reads_1.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+## MarkDuplicates to filter PCR and optical duplicates from BAM reads
+java -Xmx8G -jar $HOME/bin/picard.jar MarkDuplicates \
+	INPUT=${fq_file1%%.fastq*}_val_1_bismark_bt2_pe.bam \
+	OUTPUT=${fq_file1%%.fastq*}_bismark_pe.filtered.bam \
+	METRICS_FILE=${fq_file%%.fastq*}_marked_dup_metrics.txt \
+	REMOVE_DUPLICATES=true
 
-## SE non-directional on unmapped R2
-bismark --non_directional $genome_path  ${fq_file2%%.fastq*}_val_2.*unmapped_reads_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-
-## merge & sort SE remapped BAMs
-samtools merge ${fq_file1%%.fastq*}_SEremapped.bam ${fq_file1%%.fastq*}*unmapped_reads_1*bt2.bam ${fq_file2%%.fastq*}*unmapped_reads_2*bt2.bam | tee -a ../${fileID}_logs_${dow}.log
-samtools sort ${fq_file1%%.fastq*}_SEremapped.bam -o ${fq_file1%%.fastq*}_SEremapped.sorted.bam | tee -a ../${fileID}_logs_${dow}.log
-samtools index ${fq_file1%%.fastq*}_SEremapped.sorted.bam | tee -a ../${fileID}_logs_${dow}.log
-
-cat *report.txt > ${fq_file1%%.fastq*}_PE_SE_multireports_bt2.txt
-rm -v *_report.txt
-rm -v *_unmapped_reads_*
-rm -v *SEremapped.bam
+rm ${fq_file1%%.fastq*}_val_1_bismark_bt2_pe.bam -v
 
 ## methylation extraction PE (-p)
-bismark_methylation_extractor --comprehensive --report --multicore 2 --buffer_size 8G -p --gzip ${fq_file1%%.fastq*}_val_1_bismark_bt2_pe.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-
-## methylation extraction SE re-mapped
-bismark_methylation_extractor --comprehensive --report --multicore 2 --buffer_size 8G -s --gzip ${fq_file1%%.fastq*}_SEremapped.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-
-## merge the met_extract results
-zcat CpG*.txt.gz > CpG_context_${fileID}_merged.txt
-zcat CHG*.txt.gz > CHG_context_${fileID}_merged.txt
-zcat CHH*.txt.gz > CHH_context_${fileID}_merged.txt
-
-rm C*txt.gz -v
+bismark_methylation_extractor --comprehensive --report --multicore 2 --buffer_size 8G -p --gzip ${fq_file1%%.fastq*}_bismark_pe.filtered.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #bedgraph creation on merged results
 bismark2bedGraph --CX CpG*txt -o ${fileID}_CpG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
