@@ -15,9 +15,6 @@ First step of *100bp_dmrs.v0.1.sh* that makes pairwise comparisons of windows sh
 #### BS-SNPer.sh		
 Script to perform SNP calling from aligned bisulfite converted reads. Use on sorted BAM file.
 
-#### C_context_window_SREedits.pl	
-SRE perl script to create 100bp windows from bismark methylation extractor report files. 
-
 #### DSS_calling.r
 Script for performing DSS DMR calling on re-formatted (using DSS_file_prep.r) bed.cov file output.
 
