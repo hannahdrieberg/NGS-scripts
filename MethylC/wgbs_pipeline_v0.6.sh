@@ -81,7 +81,7 @@ bismark --multicore 2 $genome_path ../2_trimgalore/${fq_file%%.fastq*}_trimmed.f
 
 ## MarkDuplicates to filter PCR and optical duplicates from BAM reads
 java -Xmx2G -jar $HOME/bin/picard.jar MarkDuplicates \
-	INPUT=${fq_file%%.fastq*}_trimmed*_bismark*.bam \
+	INPUT=${fq_file%%.fastq*}_trimmed_bismark_bt2.bam \
 	OUTPUT=${fq_file%%.fastq*}_bismark.filtered.bam \
 	METRICS_FILE=${fq_file%%.fastq*}_marked_dup_metrics.txt \
 	REMOVE_DUPLICATES=true 2>&1 | tee -a ../${fileID}_logs_${dow}.log
@@ -89,6 +89,7 @@ java -Xmx2G -jar $HOME/bin/picard.jar MarkDuplicates \
 samtools sort ${fq_file%%.fastq*}_bismark.filtered.bam -o ${fq_file%%.fastq*}_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 samtools index ${fq_file%%.fastq*}_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
+# remove intermediate files
 rm -v ${fq_file%%.fastq*}_trimmed_bismark_bt2.bam
 rm -v ${fq_file%%.fastq*}_bismark.filtered.bam
 
