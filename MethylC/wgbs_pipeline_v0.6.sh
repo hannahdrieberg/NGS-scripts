@@ -89,8 +89,8 @@ java -Xmx2G -jar $HOME/bin/picard.jar MarkDuplicates \
 samtools sort ${fq_file%%.fastq*}_bismark.filtered.bam -o ${fq_file%%.fastq*}_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 samtools index ${fq_file%%.fastq*}_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
+rm -v ${fq_file%%.fastq*}_trimmed_bismark_bt2.bam
 rm -v ${fq_file%%.fastq*}_bismark.filtered.bam
-rm -v *bismark_bt2.bam
 
 ## methylation extraction
 bismark_methylation_extractor --comprehensive --report --multicore 3 --buffer_size 8G -s ${fq_file%%.fastq*}_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
