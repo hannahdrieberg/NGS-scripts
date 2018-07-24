@@ -79,22 +79,25 @@ cd 4_bismark_alignment
 
 bismark --multicore 2 $genome_path ../2_trimgalore/${fq_file%%.fastq*}_trimmed.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
+# sort BAM
+samtools sort ${fq_file%%.fastq*}_trimmed_bismark_bt2.bam -o ${fq_file%%.fastq*}_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+
 ## MarkDuplicates to filter PCR and optical duplicates from BAM reads
 java -Xmx2G -jar $HOME/bin/picard.jar MarkDuplicates \
-	INPUT=${fq_file%%.fastq*}_trimmed_bismark_bt2.bam \
-	OUTPUT=${fq_file%%.fastq*}_bismark.filtered.bam \
+	INPUT=${fq_file%%.fastq*}_bismark.sorted.bam \
+	OUTPUT=${fq_file%%.fastq*}_bismark.final.bam \
 	METRICS_FILE=${fq_file%%.fastq*}_marked_dup_metrics.txt \
 	REMOVE_DUPLICATES=true 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-samtools sort ${fq_file%%.fastq*}_bismark.filtered.bam -o ${fq_file%%.fastq*}_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
-samtools index ${fq_file%%.fastq*}_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+# index final BAM
+samtools index ${fq_file%%.fastq*}_bismark.final.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 # remove intermediate files
 rm -v ${fq_file%%.fastq*}_trimmed_bismark_bt2.bam
-rm -v ${fq_file%%.fastq*}_bismark.filtered.bam
+rm -v ${fq_file%%.fastq*}_bismark.sorted.bam
 
-## methylation extraction
-bismark_methylation_extractor --comprehensive --report --multicore 3 --buffer_size 8G -s ${fq_file%%.fastq*}_bismark.sorted.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+## methylation extraction from final BAM
+bismark_methylation_extractor --comprehensive --report --multicore 3 --buffer_size 8G -s ${fq_file%%.fastq*}_bismark.final.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 ## bedgraph creation
 bismark2bedGraph --CX CpG*txt -o ${fileID}_CG.bed 2>&1 | tee -a ../${fileID}_logs_${dow}.log
