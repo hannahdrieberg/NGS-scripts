@@ -16,7 +16,7 @@ cov=$3
 bin=$4
 window=$(expr $bin - 1)
 
-echo 'Weighted methylation in $bed across $bin bp windows with depth >= $cov ...'
+echo "Weighted methylation in $bed across $bin bp windows with depth >= $cov ..."
 
 # use samtools to generate fasta index
 samtools faidx $fas
