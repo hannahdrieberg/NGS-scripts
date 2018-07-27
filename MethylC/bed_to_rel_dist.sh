@@ -8,28 +8,19 @@
 # R with libraries: fields
 #######################
 
-if [ "$#" -ne 4 ]; then
-echo "USAGE: bed_to_rel_dist.sh <-wig or -bed> <input path to bed file> <filename prefix> <output map name>"
-echo "EXAMPLE: bed_to_rel_dist.sh -bed $HOME/Araport11/Araport11_genes.sorted.bed sample-r1 genes"
+if [ "$#" -ne 3 ]; then
+echo "USAGE: bed_to_rel_dist.sh <input path to bed file> <filename prefix> <output map name>"
+echo "EXAMPLE: bed_to_rel_dist.sh $HOME/Araport11/Araport11_genes.sorted.bed sample-r1 genes"
 exit 1
 fi
 
-type=$1
-bedpath=$2
-filename=$3
-outname=$4
+bedpath=$1
+filename=$2
+outname=$3
 
-if [ "$1" == "-wig" ];then
-
-sed -e "1d" ${filename}_CpG_100bp.wig > ${filename}_CG_100bp.bed
-sed -e "1d" ${filename}_CHG_100bp.wig > ${filename}_CHG_100bp.bed
-sed -e "1d" ${filename}_CHH_100bp.wig > ${filename}_CHH_100bp.bed
-
-fi
-
-sort -k1,1 -k2,2n ${filename}_CG_100bp.bed -o ${filename}_CG_100bp.bed
-sort -k1,1 -k2,2n ${filename}_CHG_100bp.bed -o ${filename}_CHG_100bp.bed
-sort -k1,1 -k2,2n ${filename}_CHH_100bp.bed -o ${filename}_CHH_100bp.bed
+sort -k1,1 -k2,2n ${filename}_CG_100bp*.bed -o ${filename}_CG_100bp.bed
+sort -k1,1 -k2,2n ${filename}_CHG_100bp*.bed -o ${filename}_CHG_100bp.bed
+sort -k1,1 -k2,2n ${filename}_CHH_100bp*.bed -o ${filename}_CHH_100bp.bed
 
 #get total number of columns for both input files
 l1="$(cat ${filename}_CG_100bp.bed | awk 'BEGIN{FS="\t"};{print NF}' | head -n 1)"
@@ -50,6 +41,9 @@ awk -F$'\t' '$NF<1000 && $NF>-1000' ${filename}_CHG_${outname}.bed > ${filename}
 awk -F$'\t' '$NF<1000 && $NF>-1000' ${filename}_CHH_${outname}.bed > ${filename}_CHH_${outname}.1k.bed
 awk -F$'\t' '$NF<1000 && $NF>-1000' ${filename}_CG_${outname}.bed > ${filename}_CG_${outname}.1k.bed
 #######################
+
+rm ${filename}_CG_100bp.bed ${filename}_CHG_100bp.bed ${filename}_CHH_100bp.bed
+rm ${filename}_CHG_${outname}.bed ${filename}_CHH_${outname}.bed ${filename}_CG_${outname}.bed
 
 echo "Performing R plots..."
 #initiate the R script to create the plots
