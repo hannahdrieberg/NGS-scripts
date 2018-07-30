@@ -217,14 +217,20 @@ cd 4_bismark_alignment
 ## PE alignment
 bismark --multicore 2 $genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
+## sort BAM by position for input to MarkDuplicates
+samtools sort -n ${fq_file1%%.fastq*}_val_1_bismark_bt2_pe.bam -o temp.srt.bam
+
 ## MarkDuplicates to filter PCR and optical duplicates from BAM reads
 java -Xmx2G -jar $HOME/bin/picard.jar MarkDuplicates \
-	INPUT=${fq_file1%%.fastq*}_val_1_bismark_bt2_pe.bam \
-	OUTPUT=${fq_file1%%.fastq*}_bismark_pe.bam \
+	INPUT=temp.srt.bam \
+	OUTPUT=dedup.temp.sorted.bam \
 	METRICS_FILE=${fq_file%%.fastq*}_marked_dup_metrics.txt \
 	REMOVE_DUPLICATES=true 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
-rm ${fq_file1%%.fastq*}_val_1_bismark_bt2_pe.bam* -v
+## re-sort BAM by name prior to methylation extraction
+samtools sort -n dedup.temp.sorted.bam -o ${fq_file1%%.fastq*}_bismark_pe.bam
+
+rm -v temp.srt.bam dedup.temp.sorted.bam ${fq_file1%%.fastq*}_val_1_bismark_bt2_pe.bam 
 
 ## methylation extraction PE (-p)
 bismark_methylation_extractor --comprehensive --report --multicore 2 --buffer_size 8G -p \
