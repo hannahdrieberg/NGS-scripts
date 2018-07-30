@@ -1,0 +1,280 @@
+---
+title: "Total RNAseq - UWA HL timecourse"
+author: "Diep, Lei Li"
+date: "4 June 2018"
+output: pdf_document
+---
+
+### Aim: Measure transcript abundance of nuclear- and plastid-encoded genes using total RNAseq across a high-light timecourse paired with protein abudance. 
+
+```{r setup}
+library(tidyverse)
+library(reshape2)
+library(edgeR)
+library(scatterplot3d)
+
+work_dir <- "C:/Users/u4667515/Documents/Labwork/PostDoc_PEB/Experiments/2018/UWA High Light Protein Turnover"
+def_par <- par()
+```
+
+Raw reads were aligned to the TAIR10 genome. Trascripts were assigned to loci using the 'gene' category of the Araport11 re-annotaiton of the TAIR10 assembly (with a total of 33,341 loci).
+
+```{r, message=FALSE}
+data_path <- paste0(work_dir, "/feature counts/")
+gdrive <- paste0(work_dir, "/gdrive_folder/")
+countFiles <- dir(path = data_path, pattern = ".counts")
+countFiles
+
+## Define sample groups with descriptive labels from filenames
+sampleGroups <- sapply(strsplit(countFiles, "-"), function(l) l[1])
+
+## The DGElist object
+lbls <- sapply(strsplit(countFiles, ".sorted"), function(l) l[1])
+dge <- readDGE(countFiles, path = data_path, columns = c(1,7), group = sampleGroups, label=lbls, skip=1)
+
+# Use sample groups to make design matrix
+design <- model.matrix(~0 + sampleGroups)
+colnames(design) <- unique(sampleGroups)
+
+############## rRNA filter
+
+## rRNA contamination (ENSEMBL annotation has rRNA genes as "ncRNA")
+rRNA <- read.delim("~/Labwork/Protocols/Public_datasets_genelists/At_rRNA_AGIs.txt", head=F)
+rRNA <- as.character(rRNA$V1)
+
+## find rRNAs & count
+rRNA.tags <- match(rRNA, rownames(dge$counts))
+rRNA_counts <- dge$counts[rRNA.tags, ]
+rRNA.rates <- (colSums(rRNA_counts)/dge$samples$lib.size)*100
+
+# plot rRNA contamiation
+groups <- unique(as.character(sampleGroups))
+n.reps <- length(sampleGroups)/length(groups)
+plot(rRNA.rates, xaxt='n',
+     main = "rRNA contamination in libraries", 
+     ylab = "rRNA abundance (% of total mapped reads)", 
+     xlab = "Sample", 
+     ylim = c(0,100),
+     col = rep(rainbow(length(groups)), each = n.reps), lwd = 1.5, type = 'b', pch=19)
+axis(1, at=1:length(lbls), labels=lbls, las=2)
+
+## rRNA filter
+dge$counts <- dge$counts[-rRNA.tags, ]
+##############
+```
+
+> There is a reasonable amount of reads that have mapped to rRNAs ... this may reflect an issue with the rRNA removal beads. However, given rRNAs comprise the vast majority of the RNA pool, this is to be expected to some extent. This will only effect the amount of information at protein-coding genes and all normalization and quantification steps will omit rRNA reads.
+
+```{r}
+## Abundance filter (CPM > 1 in at least 3 samples)
+keep <- rowSums(cpm(dge) > 1) > 3
+dge <- dge[keep, ]
+
+## Re-calculate lib size based on retained transcripts
+dge$samples$lib.size <- colSums(dge$counts)
+
+dim(dge)
+```
+
+> Abundance filter applied to retain loci with at least 1 CPM in at least 3 samples (~ 10 - 20 reads for each replicate/treatment group). In combination with the rRNA filter, this leaves 18,575 loci. Now onto normalization and quantifing abundance for these transcripts...
+
+```{r}
+## TMM Normalization
+dge.tmm <- calcNormFactors(dge, method = "TMM")
+
+## Estimate common, trended and tagwise dispersion
+dge.tmm.disp <- estimateDisp(dge.tmm, design, verobse=TRUE, robust=TRUE)
+
+## Biological coefficient of variation
+plotBCV(dge.tmm.disp)
+```
+
+> The above graph plots the biological coefficient of variation (BCV) which is the coefficient of variation with which the true abundance of each gene varies between replicates. It represents the variance that would remain between reps if sequencing depth could be increased indefinitely. Reliable estimation of BCV is important for detecting differential expression. Trended (empirical Bayes "squeezing" strategy) or tagwise dispersions are typically used depending on the exact analysis.
+
+```{r}
+## MDS plots
+mds <- plotMDS(dge.tmm.disp, ndim=3, dim.plot = c(1,2), col = rep(rainbow(length(groups)), each = n.reps))
+
+s3d <- scatterplot3d(x = mds$cmdscale.out[,1:3], main = "3-dimensional MDS", xlab = "dim 1", ylab = "dim 2", zlab = "dim 3", color = rep(rainbow(length(groups)), each = n.reps), type='h', pch=19, lwd=1.5)
+text(s3d$xyz.convert(mds$cmdscale.out[,1:3]), labels=sampleGroups, cex=.75, pos=4)
+```
+
+> The above figures are 2D and 3D multi-dimensional scaling plots (comparable to a PCA). These give a descriptive measure of similarity between samples. Essentially, samples seem to cluster by time-point, suggesting that by 2 hours HL the plants have acclimated to the light conditions (need to re-read phsyiological measures and see if that matches). This might be expected as we found almost half of HL induced transcripts start to decay before the end of HL (Crisp et al 2017 TPC). This also matches a qualitative browsing on IGV (integrated genove viewer) where HL-induced transcripts show an induction at T2H but otherwise look pretty similar between H/L samples. The T0 dark samples clearly have distinct transcriptomes. Replicates per treatment group cluster together, which gives confidence in the RNA-seq data (ie. Experiments were performed/harvested well and I didn't mix up samples on the bench!). Though there is also some clustering with time between dark -> light (was starting with plants in the dark the best control?).
+
+```{r}
+## Output table
+getAttributeField <- function (x, field, attrsep = ";") {
+     s = strsplit(x, split = attrsep, fixed = TRUE)
+     sapply(s, function(atts) {
+         a = strsplit(atts, split = "=", fixed = TRUE)
+         m = match(field, sapply(a, "[", 1))
+         if (!is.na(m)) {
+             rv = a[[m]][2]
+         }
+         else {
+             rv = as.character(NA)
+         }
+         return(rv)
+     })
+}
+
+gffRead <- function(gffFile, nrows = -1) {
+     cat("Reading ", gffFile, ": ", sep="")
+     gff = read.table(gffFile, sep="\t", as.is=TRUE, quote="",
+     header=FALSE, comment.char="#", nrows = nrows,
+     colClasses=c("character", "character", "character", "integer",
+"integer",
+     "character", "character", "character", "character"))
+     colnames(gff) = c("seqname", "source", "feature", "start", "end",
+             "score", "strand", "frame", "attributes")
+        cat("found", nrow(gff), "rows with classes:",
+        paste(sapply(gff, class), collapse=", "), "\n")
+     stopifnot(!any(is.na(gff$start)), !any(is.na(gff$end)))
+     return(gff)
+}
+
+# read in Araport11 gff3
+anno <- gffRead("~/Labwork/Protocols/Araport11-igv/Araport11_GFF3_genes_transposons.201606.gff")
+
+gene <- subset(anno,anno$feature=='gene') %>%
+  mutate(Name=getAttributeField(attributes, 'Name')) %>%
+  mutate(description=getAttributeField(attributes, 'Note')) %>%
+	mutate(type=getAttributeField(attributes, 'locus_type')) %>%
+	mutate(primary=getAttributeField(attributes, 'full_name')) %>%
+	mutate(alias=getAttributeField(attributes, 'Alias')) %>%
+	subset(Name %in% rownames(dge.tmm.disp)) %>%
+	select('Name','description','type','primary','alias')
+	
+########### Get logCPM or RPKM for all genes (of interest) manually
+
+### calculate log 2 CPM per transcript per treatment
+# logcpm <- cpm(dge.tmm.disp, prior.count=2, log=TRUE, normalized.lib.sizes=TRUE, dispersion=dge.tmm.disp$trended.dispersion)
+logcpm <- cpmByGroup(dge.tmm.disp, prior.count=2, log=TRUE, normalized.lib.sizes=TRUE, dispersion=dge.tmm.disp$trended.dispersion) 
+logcpm <- as.data.frame(logcpm)
+logcpm$primary <-  gene$primary[match(rownames(logcpm), gene$Name)]
+logcpm$description = gene$description[match(rownames(logcpm), gene$Name)]
+  
+## write out file for log CPM
+write.csv(logcpm, file = paste0(gdrive, "3 - UWA_HL_timecourse_log2CPM_alltags.csv"), row.names = T)
+# write.csv(logcpm, "UWA_HL_timecourse_log2CPM_alltags_ind.csv", row.names = T)
+
+## Use Araport11 to obtain gene lengths based on transcripts in logcpm object
+gene <- subset(anno,anno$feature=='gene') %>%
+  mutate(Name=getAttributeField(attributes, 'Name')) %>%
+  mutate(description=getAttributeField(attributes, 'Note')) %>%
+  mutate(primary=getAttributeField(attributes, 'full_name')) %>%
+  mutate(length = end - start)
+
+gene.lengths <- rownames(dge.tmm.disp) 
+gene.lengths <- as.data.frame(gene.lengths)
+gene.lengths$length <- gene$length[match(gene.lengths$gene.lengths, gene$Name)]
+
+### calculate RPKM per transcript per treatment
+rpkm <- rpkm(dge.tmm.disp, gene.length=gene.lengths$length, normalized.lib.sizes = TRUE, dispersion=dge.tmm.disp$trended.dispersion)
+rpkm_gr <- rpkmByGroup(dge.tmm.disp, gene.length=gene.lengths$length, normalized.lib.sizes = TRUE, dispersion=dge.tmm.disp$trended.dispersion)
+rpkm_gr <- as.data.frame(rpkm_gr)
+rpkm_gr$primary <- gene$primary[match(rownames(rpkm_gr), gene$Name)]
+rpkm_gr$description <- gene$description[match(rownames(rpkm_gr), gene$Name)]
+  
+## write out file for RPKM
+# write.csv(rpkm, "UWA_HL_timecourse_RPKM_alltags_ind.csv")
+write.csv(rpkm_gr, file = paste0(gdrive, "4 - UWA_HL_timecourse_RPKM_alltags.csv"), row.names = T)
+
+```
+
+### Perform GLMs
+
+Contrasts to test:
+
+- T0 D vs T2 H
+- T0 D vs T5 H
+- T0 D vs T8 H
+- T2 L vs T2 H
+- T5 L vs T5 H
+- T8 L vs T8 H
+
+```{r, warning=FALSE}
+## design matrix
+print(design)
+
+## setup contrasts to be performed
+my.contrasts <- makeContrasts(
+  T2HvsT0 = t2h - t0d,
+  T5HvsT0 = t5h - t0d,
+  T8HvsT0 = t8h - t0d,
+  T2LvsT0 = t2l - t0d, 
+  T5LvsT0 = t5l - t0d,
+  T8LvsT0 = t8l - t0d,
+  T2HvsL = t2h - t2l,
+  T5HvsL = t5h - t5l,
+  T8HvsL = t8h - t8l,
+  levels=design
+)
+print(my.contrasts)
+
+# plot mean-difference plot as a quality control before DE testing
+# only one sample shown below
+n.lbls <- length(lbls)
+
+par(mfrow = c(round((n.lbls/n.reps)/2,digits = 0),n.reps))
+par(mar=c(2,2,2,2))
+
+for(i in 1:length(lbls)){
+plotMD(dge.tmm.disp, prior.count = 2, column = i)
+abline(h=0, col="red", lty=1, lwd=1)
+}
+
+par(mfrow = def_par["mfrow"])
+par(mar = def_par["mar"])
+```
+
+> MD plots look ok, some samples have a slight negative skew but none appear substantially aberrant.
+
+```{r}
+# fit quasi-likelihood negative binomial glm to count data 
+qlfit <- glmQLFit(dge.tmm.disp, design, robust=TRUE, dispersion=dge.tmm.disp$trended.dispersion)
+
+# plot genewise quasi-likelihood dispersion
+plotQLDisp(qlfit)
+```
+
+> Depicts quarter-root QL dispersion (similar plot to BCV plot above).
+
+### Differential gene expression testing
+
+Using quasi-likelihood F-ratio tests (*note* the following tests the hypothesis that the difference in mean expression between treatments is > 0 ie. there is no arbitrary fold-change cutoff which was traditionally applied to microarrays). Another factor this effects is differential expression calling between lowly and highly abundant transcript (ie. a 2-fold change is not the same between something lowly and highly expressed = it is harder to have a 2-fold increase in something that is already highly expressed). However, if desired I can also perform hypothesis testing that the difference between means (of gene expression) is > log2 1.5 (ie. apply a logFC cutoff) to be more stringent (currently there are many differentially expressed genes).
+
+```{r, warning=FALSE}
+out <- NULL
+
+par(mfrow = c(3,2))
+par(mar=c(2,2,2,2))
+
+for(i in colnames(my.contrasts)){
+  res <- glmQLFTest(qlfit, contrast = my.contrasts[,i])
+  print(summary(decideTests(res)))
+  plotMD(res, main = i)
+  tt <-  topTags(res, adjust.method = "fdr", sort.by="none", p.value=1, n=dim(res)[1]) # p-value set to 1 so genes aren't filtered
+  tt <- tt$table
+  tt$contrast <- paste(i)
+  tt$ID <- rownames(tt)
+  tt <- select(tt, ID, logCPM, contrast, logFC, FDR)
+  out <- c(out,tt)
+}
+
+par(mfrow = def_par["mfrow"])
+par(mar = def_par["mar"])
+```
+
+> MD plot showing the log-fold change and average abundance of each gene. Significantly up and down DE genes are highlighted in red and blue, respectively. 
+
+```{r}
+## setup output file
+test <- as.data.frame(out) %>%
+  select(-ID.1, -ID.2, -ID.3, -ID.4, -ID.5, -ID.6, -ID.7, -ID.8, -logCPM.1, -logCPM.2, -logCPM.3, -logCPM.4, -logCPM.5, -logCPM.6, -logCPM.7, -logCPM.8)
+  
+head(test)
+
+write.csv(test, file = paste0(gdrive, "7 - UWA_HL_timcourse_GLMFtest_0.05_FDR.csv"), row.names = F)
+```
+
