@@ -114,6 +114,54 @@ for(i in 1:8){
   plotSpliceDGE(sp, geneid = paste(tt$Geneid[i]))
 }
 par(mfcol = c(1,1))
+
+## Output table
+getAttributeField <- function (x, field, attrsep = ";") {
+     s = strsplit(x, split = attrsep, fixed = TRUE)
+     sapply(s, function(atts) {
+         a = strsplit(atts, split = "=", fixed = TRUE)
+         m = match(field, sapply(a, "[", 1))
+         if (!is.na(m)) {
+             rv = a[[m]][2]
+         }
+         else {
+             rv = as.character(NA)
+         }
+         return(rv)
+     })
+}
+
+gffRead <- function(gffFile, nrows = -1) {
+     cat("Reading ", gffFile, ": ", sep="")
+     gff = read.table(gffFile, sep="\t", as.is=TRUE, quote="",
+     header=FALSE, comment.char="#", nrows = nrows,
+     colClasses=c("character", "character", "character", "integer",
+"integer",
+     "character", "character", "character", "character"))
+     colnames(gff) = c("seqname", "source", "feature", "start", "end",
+             "score", "strand", "frame", "attributes")
+        cat("found", nrow(gff), "rows with classes:",
+        paste(sapply(gff, class), collapse=", "), "\n")
+     stopifnot(!any(is.na(gff$start)), !any(is.na(gff$end)))
+     return(gff)
+}
+
+# read in Araport11 gff3
+anno <- gffRead("~/Labwork/Protocols/Araport11-igv/Araport11_GFF3_genes_transposons.201606.gff")
+
+output <- subset(anno,anno$feature=='gene') %>%
+  mutate(Name=getAttributeField(attributes, 'Name')) %>%
+  mutate(description=getAttributeField(attributes, 'Note')) %>%
+	mutate(type=getAttributeField(attributes, 'locus_type')) %>%
+	mutate(primary=getAttributeField(attributes, 'full_name')) %>%
+	mutate(alias=getAttributeField(attributes, 'Alias')) %>%
+  select('Name','description','type','primary','alias') %>%
+  subset(Name %in% tt$Geneid) %>%
+  mutate(Nexons = tt$NExons[match(Name, tt$Geneid)]) %>%
+  mutate(FDR = tt$FDR[match(Name, tt$Geneid)])
+
+write.csv(output, file="alx8_AS_gene-test_0.05_FDR.csv", row.names = F)
+
 ```
 
 #### xrn2xrn3
@@ -133,5 +181,23 @@ for(i in 1:8){
 }
 par(mfcol = c(1,1))
 
+## output table
+
+output <- subset(anno,anno$feature=='gene') %>%
+  mutate(Name=getAttributeField(attributes, 'Name')) %>%
+  mutate(description=getAttributeField(attributes, 'Note')) %>%
+	mutate(type=getAttributeField(attributes, 'locus_type')) %>%
+	mutate(primary=getAttributeField(attributes, 'full_name')) %>%
+	mutate(alias=getAttributeField(attributes, 'Alias')) %>%
+  select('Name','description','type','primary','alias') %>%
+  subset(Name %in% tt$Geneid) %>%
+  mutate(Nexons = tt$NExons[match(Name, tt$Geneid)]) %>%
+  mutate(FDR = tt$FDR[match(Name, tt$Geneid)])
+
+write.csv(output, file="xrn2xrn3_AS_gene-test_0.05_FDR.csv", row.names = F)
 ```
+
 #### Conclusion
+Looks like a substantial number of AS events in *alx8*, but not so much in *xrn2xrn3*.
+
+
