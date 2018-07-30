@@ -36,7 +36,7 @@ fileID=$4;
 dow=$(date +"%F-%H-%m-%S")
 
 echo "##################"
-echo "Performing single-end gDNA-seq alignment with the following parameters:"
+echo "Performing single-end genome-seq alignment with the following parameters:"
 echo "Type: $type"
 echo "Input Files: $fq"
 echo "genome index: $index"
@@ -85,8 +85,7 @@ cd 4_subread-align/
 
 echo "Beginning alignment ..."
 
-# -t 0 = RNA-seq -t 1 = genomic DNA seq
-
+## subread alignment
 subread-align -T 4 -M 1 -t 1 -i $index -r ${fq%%.fastq*}_trimmed.fq -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 if [[ $fq%%.fastq}* != *".gz" ]]; then gzip ${fq%%.fastq*}_trimmed.fq; fi
@@ -126,7 +125,7 @@ fileID=$5;
 dow=$(date +"%F-%H-%m-%S")
 
 echo "##################"
-echo "Performing paired-end RNA-seq alignment with the following parameters:"
+echo "Performing paired-end genome-seq alignment with the following parameters:"
 echo "Type: $type"
 echo "Input Files: $fq1 $fq2"
 echo "genome index: $index"
@@ -184,8 +183,7 @@ cd 4_subread-align/
 
 echo "Beginning alignment ..."
 
-# -t 0 = RNA-seq -t 1 = genomic DNA seq
-
+## subread alignment
 subread-align -T 4 -M 1 -t 1 -i ${index} -r ${fq1%%.fastq*}_trimmed.fq -R ${fq2%%.fastq*}_trimmed.fq -o "${fileID}.bam" 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 echo "cleaning..."
