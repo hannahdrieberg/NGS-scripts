@@ -32,22 +32,23 @@ linreg_files <- dir(path = data_path)
 # read in data and QC
 raw <- data_frame(linreg_files) %>%
 	mutate(content = map(linreg_files, ~read_csv(file.path(data_path, .), skip=3))) %>%
+	mutate(plate = sapply(strsplit(linreg_files, ".csv"), function(l) l[1])) %>%
 	unnest() %>%
 	clean_names() %>%
         tbl_df() %>%
 	filter(sample_use != "0 0 0" & sample_use != "0 0 3")
 
 # qc raw points (make sure no -999 or 1s & see variation)
-ggplot(raw, aes(y=n0_indiv_eff, x=linreg_files, colour = amplicon)) +
-	  geom_jitter() +
-	  facet_wrap(~amplicon, scales="free_y")
+ggplot(raw, aes(y=n0_indiv_eff, x=plate, colour = amplicon)) +
+	geom_jitter() +
+	facet_wrap(~amplicon, scales="free_y") +
+	theme(axis.text.x=element_text(angle=45, hjust = 1))
 
 # summarise tech reps
-dat <- raw %>%
-	mutate(well = sapply(strsplit(as.character(name), " "), function(l) l[1])) %>%
+dat <- mutate(raw, well = sapply(strsplit(as.character(name), " "), function(l) l[1])) %>%
 	mutate(name = sapply(strsplit(as.character(name), " "), function(l) l[2])) %>%
-	select(linreg_files, well, name, N0_type, amplicon) %>% 
-	group_by(linreg_files, amplicon, name) %>%
+	select(plate, well, name, N0_type, amplicon) %>% 
+	group_by(plate, amplicon, name) %>%
 	summarise(avg = mean(n0_indiv_eff, na.rm=TRUE), 
 		  std = sd(n0_indiv_eff, na.rm=TRUE), 
 		  n = sum(!is.na(n0_indiv_eff))) %>%
@@ -57,45 +58,45 @@ dat <- raw %>%
 # get reference factor = avg per gene per plate at base comparison (eg WT @ T=0)
 ref_factor <- dat %>%
 	subset(genotype == ref_geno & timepoint == ref_time) %>%
-	group_by(linreg_files, amplicon, genotype, timepoint) %>%
+	group_by(plate, amplicon, genotype, timepoint) %>%
 	summarise(ref_factor = mean(avg), 
 		  std=sd(avg), 
 		  n=sum(!is.na(avg)))
 
 # get normalisation factor based on housekeeper fold-change across conditions
 norm_factor <- subset(dat, amplicon == house) %>%
-	mutate(ref_factor = ref_factor$ref_factor[match(interaction(linreg_files,amplicon), interaction(ref_factor$linreg_files,ref_factor$amplicon))]) %>%
+	mutate(ref_factor = ref_factor$ref_factor[match(interaction(plate,amplicon), interaction(ref_factor$plate,ref_factor$amplicon))]) %>%
 	mutate(norm = avg/ref_factor) %>%
-	group_by(linreg_files, amplicon, genotype, timepoint, ref_factor) %>%
+	group_by(plate, amplicon, genotype, timepoint, ref_factor) %>%
 	summarise(norm_factor = mean(norm, na.rm=TRUE), std = sd(norm, na.rm = TRUE), n=sum(!is.na(norm)))
 
 ## See tech variation (assuming housekeeper is true)
 ggplot(norm_factor, aes(x=timepoint, y=norm_factor, colour=genotype, group=genotype, fill=genotype)) +
 	geom_point() + geom_line() + 
-	facet_wrap(~linreg_files) + 
+	facet_wrap(~plate) + 
 	scale_y_continuous(name = paste(house)) + 
 	geom_ribbon(aes(ymin=norm_factor - std, ymax=norm_factor + std), alpha=0.2, show.legend = F, linetype='dotted')
 
 ## check genotyping transcripts (e.g. 3' downstream of T-DNA)
 geno <- filter(dat, amplicon == genotype_transcript) %>%
-	mutate(ref_factor = ref_factor$ref_factor[match(interaction(linreg_files,amplicon), interaction(ref_factor$linreg_files, ref_factor$amplicon))]) %>%
+	mutate(ref_factor = ref_factor$ref_factor[match(interaction(plate,amplicon), interaction(ref_factor$plate, ref_factor$amplicon))]) %>%
 	mutate(ref_fc = avg/ref_factor) %>%
-	mutate(norm_factor = norm_factor$norm_factor[match(interaction(linreg_files, genotype, timepoint), interaction(norm_factor$linreg_files,norm_factor$genotype,norm_factor$timepoint))]) %>%
+	mutate(norm_factor = norm_factor$norm_factor[match(interaction(plate, genotype, timepoint), interaction(norm_factor$plate,norm_factor$genotype,norm_factor$timepoint))]) %>%
 	mutate(norm_fc = ref_fc/norm_factor)
 
 ggplot(geno, aes(x=genotype, y=norm_fc, colour=genotype)) +
 	geom_jitter() +
-	facet_wrap(~linreg_files, scales="free_y")
+	facet_wrap(~plate, scales="free_y")
 
 
 ## calculate normalized fold changes for all target transcripts
 to_mdl <- filter(dat, amplicon != house & amplicon != genotype_transcript) %>%
-	  mutate(ref_factor = ref_factor$ref_factor[match(interaction(linreg_files,amplicon), interaction(ref_factor$linreg_files, ref_factor$amplicon))]) %>%
+	  mutate(ref_factor = ref_factor$ref_factor[match(interaction(plate,amplicon), interaction(ref_factor$plate, ref_factor$amplicon))]) %>%
 	    mutate(ref_fc = avg/ref_factor) %>%
-	      mutate(norm_factor = norm_factor$norm_factor[match(interaction(linreg_files, genotype, timepoint), interaction(norm_factor$linreg_files,norm_factor$genotype,norm_factor$timepoint))]) %>%
+	      mutate(norm_factor = norm_factor$norm_factor[match(interaction(plate, genotype, timepoint), interaction(norm_factor$plate,norm_factor$genotype,norm_factor$timepoint))]) %>%
 	        mutate(norm_fc = ref_fc/norm_factor)
 	  
-target_sum <- group_by(to_mdl, linreg_files, amplicon, genotype, timepoint) %>%
+target_sum <- group_by(to_mdl, plate, amplicon, genotype, timepoint) %>%
 	summarise(fc = mean(norm_fc), std = sd(norm_fc), n=sum(!is.na(norm_fc)))
 
 # plot raw means per plate per gene etc
@@ -104,7 +105,7 @@ for(i in unique(target_sum$amplicon)){
 	      ggplot(data = subset(target_sum, amplicon == i),
 		     aes(x=timepoint, y=fc, colour=genotype, group=genotype, fill=genotype)) +
 		geom_point() + geom_line() +
-		facet_wrap(~linreg_files, scales = "free_y") +
+		facet_wrap(~plate, scales = "free_y") +
 		scale_y_continuous(name = i) +
 		geom_ribbon(aes(ymin=fc-std, ymax=fc+std), alpha=0.2, show.legend = F, linetype='dotted')
 	)
