@@ -218,7 +218,7 @@ cd 4_bismark_alignment
 bismark --multicore 2 $genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 ## sort BAM by position for input to MarkDuplicates
-samtools sort -n ${fq_file1%%.fastq*}_val_1_bismark_bt2_pe.bam -o temp.srt.bam
+samtools sort ${fq_file1%%.fastq*}_val_1_bismark_bt2_pe.bam -o temp.srt.bam
 
 ## MarkDuplicates to filter PCR and optical duplicates from BAM reads
 java -Xmx2G -jar $HOME/bin/picard.jar MarkDuplicates \
