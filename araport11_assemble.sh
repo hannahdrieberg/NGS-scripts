@@ -89,7 +89,7 @@ utr <- subset(ara, feature == "five_prime_UTR" | feature == "three_prime_UTR") %
 	write.table(utr, "Araport11_UTR.bed", sep='\t', row.names=F, col.names=F, quote=F)
 
 ## use bedtools getfasta to obtain sequences in utr intervals 
-## bedtools getfasta -fi TAIR10_Chr.all.fasta -bed Araport11_UTR.bed > Araport11_UTR_seq.bed
+## bedtools getfasta -bedOut -s -fi TAIR10_Chr.all.fasta -bed Araport11_UTR.sorted.bed > Araport11_UTR_seq.bed
 
 ##########
 
