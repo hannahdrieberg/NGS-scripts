@@ -18,6 +18,8 @@ gzip -d *gff.gz
 
 R
 
+library(tidyverse)
+
 getAttributeField <- function (x, field, attrsep = ";") {
      s = strsplit(x, split = attrsep, fixed = TRUE)
      sapply(s, function(atts) {
@@ -77,6 +79,17 @@ write.table(mRNA.out,'Araport11_mRNA.bed',sep='\t',row.names=F,col.names=F,quote
 
 quit()
 n
+
+### 5' and 3' UTR annotation
+utr <- subset(ara, feature == "five_prime_UTR" | feature == "three_prime_UTR") %>%
+	mutate(id = getAttributeField(attributes, 'Parent')) %>%
+	select(seqname, start, end, strand, id, feature) %>%
+	mutate(id = sapply(strsplit(id, "\\."), function(l) l[1]))
+	
+	write.table(utr, "Araport11_UTR.bed", sep='\t', row.names=F, col.names=F, quote=F)
+
+## use bedtools getfasta to obtain sequences in utr intervals 
+## bedtools getfasta -fi TAIR10_Chr.all.fasta -bed Araport11_UTR.bed > Araport11_UTR_seq.bed
 
 ##########
 
