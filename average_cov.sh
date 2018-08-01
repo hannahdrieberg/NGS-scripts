@@ -2,5 +2,5 @@
 set -eu
 
 bam=$1
- 
-samtools depth  $bam  |  awk '{sum+=$3} END { print "Average = ",sum/NR}'
+
+samtools --threads 4 sort $bam | samtools depth - | awk '{sum+=$3} END { print "Mean depth = ",sum/NR}'
