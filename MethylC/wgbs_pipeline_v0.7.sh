@@ -214,7 +214,7 @@ mkdir 4_bismark_alignment
 cd 4_bismark_alignment
 
 ## PE alignment
-bismark --multicore 2 $genome_path\
+bismark --multicore 2 $genome_path \
 	-1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* \ 
 	-2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
