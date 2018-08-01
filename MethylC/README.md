@@ -12,6 +12,9 @@ Uses the output from *100bp_dmrs.v0.1.sh* to get mC from bed files (individual m
 #### 100bp_wig_to_dmrs.r
 First step of *100bp_dmrs.v0.1.sh* that makes pairwise comparisons of windows showing a defined difference in a given context.
 
+#### 5mC\_rates.sh
+Calculate mCG, mCHG and mCHH % across At Chr1-5 and mCHH across Cp and Mt genomes (conversion efficiency)
+
 #### BS-SNPer.sh		
 Script to perform SNP calling from aligned bisulfite converted reads. Use on sorted BAM file.
 
@@ -28,16 +31,13 @@ Produce genome summarised methylation plots across features of interest e.g. gen
 Supplemental file for 100bp DMR calling to produce final DMR table.
 
 #### merge_wigs.r
-Merge 100bp tiled methylation files (wig) to produce correlation matrices with hierarchical clustering of samples of interest.
+Merge 100bp binned weighted methylation BED files to produce correlation matrices with hierarchical clustering of samples of interest.
 
 #### met_signatures.sh
 Extract cytosine reports for methylation at non-canonical methylation sequence contexts (see Gouil & Baulcombe, PLoS Gen 2015).
 
 #### methimpute.r
 Use METHimpute to perform HMM-based imputation of methylation state at single C resolution across genome. Also produces 100bp.bed output files (methylation levels binned into 100bp windows).
-
-#### methylation_rates.sh
-Calculate mCG, mCHG and mCHH % across At Chr1-5 and mCHH across Cp and Mt genomes (conversion efficiency)
 
 #### pca_wigs.r
 Perform PCA on 100bp binned weighted methylation levels.
@@ -64,3 +64,5 @@ Bismark alignment script using Bowtie1 aligner. Has SE and PE options.
 Bismark alignment script using Bowtie2 aligner. Has SE and PE options.
 #### v0.6
 Perl script for 100bp windows deprecated thus removed.
+#### v0.7
+added deduplicate\_bismark and keeping only .cov files. Will consider adding coverage filter on single Cs.
