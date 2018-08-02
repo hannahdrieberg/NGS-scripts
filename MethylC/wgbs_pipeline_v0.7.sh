@@ -214,9 +214,7 @@ mkdir 4_bismark_alignment
 cd 4_bismark_alignment
 
 ## PE alignment
-bismark --multicore 2 $genome_path \
-	-1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* \ 
-	-2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
+bismark --multicore 2 $genome_path -1 ../2_trimgalore/${fq_file1%%.fastq*}_val_1.fq* -2 ../2_trimgalore/${fq_file2%%.fastq*}_val_2.fq* 2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 ## deduplicate BAMs (e.g. PCR duplicates)
 deduplicate_bismark --bam -p ${fq_file1%%.fastq*}_val_1_bismark_bt2_pe.bam 2>&1 | tee -a ../${fileID}_logs_${dow}.log
@@ -225,8 +223,8 @@ deduplicate_bismark --bam -p ${fq_file1%%.fastq*}_val_1_bismark_bt2_pe.bam 2>&1 
 rm -v ${fq_file1%%.fastq*}_val_1_bismark_bt2_pe.bam
 
 ## PE methylation extraction
-bismark_methylation_extractor --comprehensive --report --multicore 3 --buffer_size 8G\
-	-p ${fq_file1%%.fastq*}_val_1_bismark_bt2_pe.deduplicated.bam\
+bismark_methylation_extractor --comprehensive --report --multicore 3 --buffer_size 8G \
+	-p ${fq_file1%%.fastq*}_val_1_bismark_bt2_pe.deduplicated.bam \
        	2>&1 | tee -a ../${fileID}_logs_${dow}.log
 
 #bedgraph creation on merged results
