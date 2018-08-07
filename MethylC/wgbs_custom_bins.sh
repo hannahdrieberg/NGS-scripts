@@ -30,13 +30,13 @@ bedtools makewindows -g temp.genome -w ${window} -s ${bin} | sortBed | awk -F$'\
 
 # use bedtool intersect and groupBy to get mean methylation levels per bin based on per-site methylation
 echo 'Bedtools CG ...'
-sort -k1,1 -k2,2n ${bed}_CG.bed.bismark.cov | bedtools intersect -sorted -wo -a temp.genome.${bin}bp.sorted.bed -b "stdin" | groupBy -g 1,2,3 -c 7,8,9 -o mean,sum,sum | awk -v OFS='\t' '{print $1,$2,$3,$4 = ($5 / ($5+$6)*100 ),$5 = ($5 + $6)}' | awk '{ if ($5 >= '$cov') { print } }' > ${bed}_CG_${bin}bp_${cov}cov.bed
+sort -k1,1 -k2,2n ${bed}_CG.bed | bedtools intersect -sorted -wo -a temp.genome.${bin}bp.sorted.bed -b "stdin" | groupBy -g 1,2,3 -c 7,8,9 -o mean,sum,sum | awk -v OFS='\t' '{print $1,$2,$3,$4 = ($5 / ($5+$6)*100 ),$5 = ($5 + $6)}' | awk '{ if ($5 >= '$cov') { print } }' > ${bed}_CG_${bin}bp_${cov}cov.bed
 
 echo 'Bedtools CHG ...'
-sort -k1,1 -k2,2n ${bed}_CHG.bed.bismark.cov | bedtools intersect -sorted -wo -a temp.genome.${bin}bp.sorted.bed -b "stdin" | groupBy -g 1,2,3 -c 7,8,9 -o mean,sum,sum | awk -v OFS='\t' '{print $1,$2,$3,$4 = ($5 / ($5+$6)*100 ), $5 = ($5 + $6)}' | awk '{ if ($5 >= '$cov') { print } }' > ${bed}_CHG_${bin}bp_${cov}cov.bed
+sort -k1,1 -k2,2n ${bed}_CHG.bed | bedtools intersect -sorted -wo -a temp.genome.${bin}bp.sorted.bed -b "stdin" | groupBy -g 1,2,3 -c 7,8,9 -o mean,sum,sum | awk -v OFS='\t' '{print $1,$2,$3,$4 = ($5 / ($5+$6)*100 ), $5 = ($5 + $6)}' | awk '{ if ($5 >= '$cov') { print } }' > ${bed}_CHG_${bin}bp_${cov}cov.bed
 
 echo 'Bedtools CHH ...'
-sort -k1,1 -k2,2n ${bed}_CHH.bed.bismark.cov | bedtools intersect -sorted -wo -a temp.genome.${bin}bp.sorted.bed -b "stdin" | groupBy -g 1,2,3 -c 7,8,9 -o mean,sum,sum | awk -v OFS='\t' '{print $1,$2,$3,$4 = ($5 / ($5+$6)*100 ), $5 = ($5 + $6)}' | awk '{ if ($5 >= '$cov') { print } }' > ${bed}_CHH_${bin}bp_${cov}cov.bed
+sort -k1,1 -k2,2n ${bed}_CHH.bed | bedtools intersect -sorted -wo -a temp.genome.${bin}bp.sorted.bed -b "stdin" | groupBy -g 1,2,3 -c 7,8,9 -o mean,sum,sum | awk -v OFS='\t' '{print $1,$2,$3,$4 = ($5 / ($5+$6)*100 ), $5 = ($5 + $6)}' | awk '{ if ($5 >= '$cov') { print } }' > ${bed}_CHH_${bin}bp_${cov}cov.bed
 
 echo 'cleaning ...'
 # CLEAN

@@ -6,15 +6,17 @@ set -u
 
 if [ "$#" -lt 1 ]; then
 	echo "Missing required arguments!"
-	echo "USAGE: methylation_rates.sh <sample ID>"
-	echo "EXAMPLE: methylation_rates.sh col0-r1"
+	echo "USAGE: methylation_rates.sh <sample> <file>"
+	echo "EXAMPLE: methylation_rates.sh col0-r1 bed/cov"
 	exit 1
 fi
 
-file=$1
-cg=${file}*CG*cov
-chg=${file}*CHG*cov
-chh=${file}*CHH*cov
+sample=$1
+file=$2
+
+cg=${sample}*CG*.${file}
+chg=${sample}*CHG*.${file}
+chh=${sample}*CHH*.${file}
 
 echo "5mC % in $1"
 
