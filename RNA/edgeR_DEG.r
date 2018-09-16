@@ -10,7 +10,7 @@ library(edgeR)
 library(scatterplot3d)
 
 ## Count files from featureCounts
-countFiles <- dir(pattern = ".counts")
+countFiles <- dir(pattern = ".ungenes.counts")
 
 ## Define sample groups with descriptive labels from filenames
 sampleGroups <- sapply(strsplit(countFiles, "-"), function(l) l[1])
